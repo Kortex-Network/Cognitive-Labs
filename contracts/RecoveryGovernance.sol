@@ -420,13 +420,13 @@ contract RecoveryGovernance is AccessControl, ReentrancyGuard {
         }
         
         // Additional compliance checks based on recovery type
-        if (recoveryType == 0) { // DID_DOCUMENT
-            try this._validateDIDRecoveryData(data) returns (bool valid) {
+        if (recoveryType == 0) { // LABS_DOCUMENT
+            try this._validateLABSRecoveryData(data) returns (bool valid) {
                 if (!valid) {
-                    return (false, "Invalid DID recovery data");
+                    return (false, "Invalid LABS recovery data");
                 }
             } catch {
-                return (false, "Error validating DID data");
+                return (false, "Error validating LABS data");
             }
         }
         
@@ -434,17 +434,17 @@ contract RecoveryGovernance is AccessControl, ReentrancyGuard {
     }
     
     /**
-     * @dev Internal function to validate DID recovery data
+     * @dev Internal function to validate LABS recovery data
      */
-    function _validateDIDRecoveryData(bytes memory data) external pure returns (bool) {
-        // Decode and validate DID recovery data
+    function _validateLABSRecoveryData(bytes memory data) external pure returns (bool) {
+        // Decode and validate LABS recovery data
         try abi.decode(data, (string, address, string, string)) returns (
-            string memory did,
+            string memory LABS,
             address newOwner,
             string memory newPublicKey,
             string memory newServiceEndpoint
         ) {
-            return bytes(did).length > 0 && 
+            return bytes(LABS).length > 0 && 
                    newOwner != address(0) && 
                    bytes(newPublicKey).length > 0;
         } catch {

@@ -8,7 +8,7 @@ class RBACService {
         permissions: [
           'user.create', 'user.read', 'user.update', 'user.delete',
           'contract.deploy', 'contract.read', 'contract.update', 'contract.delete',
-          'did.create', 'did.read', 'did.update', 'did.delete',
+          'LABS.create', 'LABS.read', 'LABS.update', 'LABS.delete',
           'credential.issue', 'credential.verify', 'credential.revoke',
           'governance.execute', 'governance.pause', 'governance.unpause',
           'system.monitor', 'system.configure', 'system.backup',
@@ -19,7 +19,7 @@ class RBACService {
         permissions: [
           'user.create', 'user.read', 'user.update',
           'contract.deploy', 'contract.read', 'contract.update',
-          'did.create', 'did.read', 'did.update',
+          'LABS.create', 'LABS.read', 'LABS.update',
           'credential.issue', 'credential.verify',
           'governance.execute',
           'audit.read'
@@ -29,7 +29,7 @@ class RBACService {
         permissions: [
           'user.read',
           'contract.read',
-          'did.read', 'did.update',
+          'LABS.read', 'LABS.update',
           'credential.issue', 'credential.verify',
           'governance.execute',
           'audit.read'
@@ -39,7 +39,7 @@ class RBACService {
         permissions: [
           'user.read',
           'contract.read',
-          'did.read',
+          'LABS.read',
           'credential.verify',
           'governance.pause', 'governance.unpause',
           'audit.read'
@@ -49,20 +49,20 @@ class RBACService {
         permissions: [
           'user.read',
           'contract.read',
-          'did.read',
+          'LABS.read',
           'credential.verify',
           'audit.read', 'audit.export'
         ]
       },
       USER: {
         permissions: [
-          'did.create', 'did.read', 'did.update',
+          'LABS.create', 'LABS.read', 'LABS.update',
           'credential.issue', 'credential.verify'
         ]
       },
       VIEWER: {
         permissions: [
-          'did.read',
+          'LABS.read',
           'credential.verify'
         ]
       }
@@ -72,7 +72,7 @@ class RBACService {
     this.resources = {
       USER: ['create', 'read', 'update', 'delete'],
       CONTRACT: ['deploy', 'read', 'update', 'delete'],
-      DID: ['create', 'read', 'update', 'delete'],
+      LABS: ['create', 'read', 'update', 'delete'],
       CREDENTIAL: ['issue', 'verify', 'revoke'],
       GOVERNANCE: ['execute', 'pause', 'unpause'],
       SYSTEM: ['monitor', 'configure', 'backup'],

@@ -1,6 +1,6 @@
 global:
   smtp_smarthost: 'localhost:587'
-  smtp_from: 'alerts@stellar-did.com'
+  smtp_from: 'alerts@stellar-LABS.com'
 
 route:
   group_by: ['alertname']
@@ -24,8 +24,8 @@ receivers:
 
   - name: 'critical-alerts'
     email_configs:
-      - to: 'admin@stellar-did.com'
-        subject: '[CRITICAL] Stellar DID Backend Alert'
+      - to: 'admin@stellar-LABS.com'
+        subject: '[CRITICAL] Stellar LABS Backend Alert'
         body: |
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
@@ -37,8 +37,8 @@ receivers:
 
   - name: 'warning-alerts'
     email_configs:
-      - to: 'devops@stellar-did.com'
-        subject: '[WARNING] Stellar DID Backend Alert'
+      - to: 'devops@stellar-LABS.com'
+        subject: '[WARNING] Stellar LABS Backend Alert'
         body: |
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}

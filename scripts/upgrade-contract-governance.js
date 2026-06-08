@@ -24,9 +24,9 @@ async function main() {
     }
     
     // Get contract instances
-    const governanceToken = await ethers.getContractAt("DIDGovernanceToken", GOVERNANCE_TOKEN_ADDRESS);
-    const timelock = await ethers.getContractAt("DIDTimelock", TIMELOCK_ADDRESS);
-    const governor = await ethers.getContractAt("DIDGovernor", GOVERNOR_ADDRESS);
+    const governanceToken = await ethers.getContractAt("LABSGovernanceToken", GOVERNANCE_TOKEN_ADDRESS);
+    const timelock = await ethers.getContractAt("LABSTimelock", TIMELOCK_ADDRESS);
+    const governor = await ethers.getContractAt("LABSGovernor", GOVERNOR_ADDRESS);
     const governanceProxy = await ethers.getContractAt("GovernanceProxy", GOVERNANCE_PROXY_ADDRESS);
     
     console.log("Contracts loaded:");
@@ -37,14 +37,14 @@ async function main() {
     
     // Step 1: Deploy new implementation
     console.log("\n1. Deploying new implementation...");
-    const NewImplementation = await ethers.getContractFactory("EthereumDIDRegistry");
+    const NewImplementation = await ethers.getContractFactory("EthereumLABSRegistry");
     const newImplementation = await NewImplementation.deploy();
     await newImplementation.deployed();
     console.log("New implementation deployed to:", newImplementation.address);
     
     // Step 2: Create upgrade proposal
     console.log("\n2. Creating upgrade proposal...");
-    const proposalDescription = `Upgrade DID Registry to new implementation at ${newImplementation.address}`;
+    const proposalDescription = `Upgrade LABS Registry to new implementation at ${newImplementation.address}`;
     
     const proposalId = await governor.callStatic.proposeContractUpgrade(
         TARGET_PROXY_ADDRESS,
@@ -107,7 +107,7 @@ async function main() {
     console.log("Proposal state:", state); // 4 = Succeeded
     
     if (state != 4) {
-        throw new Error("Proposal did not succeed. State: " + state);
+        throw new Error("Proposal LABS not succeed. State: " + state);
     }
     
     // Step 7: Queue proposal

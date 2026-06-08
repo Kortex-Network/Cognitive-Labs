@@ -24,7 +24,7 @@ class StellarConnectionManager {
     // Initialize Horizon server with custom axios instance
     this.server = new StellarSDK.Horizon.Server(this.horizonUrl, {
       allowHttp: true,
-      appName: 'stellar-did-platform'
+      appName: 'stellar-LABS-platform'
     });
 
     // Circuit Breaker options

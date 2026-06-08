@@ -9,14 +9,14 @@ The current git repository is in the wrong directory (Windsurf editor directory)
 ### Step 1: Navigate to Correct Directory
 ```bash
 # Open Command Prompt or PowerShell as Administrator
-cd C:\Users\Hp\CascadeProjects\Decentralized-Identity-DID-
+cd C:\Users\Hp\CascadeProjects\Decentralized-Identity-LABS-
 ```
 
 ### Step 2: Clean Up Git Issues
 ```bash
 # Remove any existing git setup in wrong directory
 rmdir /s .git 2>nul
-cd C:\Users\Hp\CascadeProjects\Decentralized-Identity-DID-
+cd C:\Users\Hp\CascadeProjects\Decentralized-Identity-LABS-
 ```
 
 ### Step 3: Initialize Fresh Git Repository
@@ -28,8 +28,8 @@ git config user.email "fatima.sanusi@example.com"
 
 ### Step 4: Add Remote Repository
 ```bash
-git remote add origin https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-
-git remote add fork https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-
+git remote add origin https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-
+git remote add fork https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-
 ```
 
 ### Step 5: Create and Switch to Feature Branch
@@ -64,8 +64,8 @@ Features Implemented:
 - Complete documentation and deployment scripts
 
 Performance Results:
-- DID Creation: 30% gas reduction (120k → 84k)
-- DID Update: 30% gas reduction (80k → 56k)
+- Cognitive Lab Creation: 30% gas reduction (120k → 84k)
+- Cognitive Lab Update: 30% gas reduction (80k → 56k)
 - Credential Issue: 35% gas reduction (100k → 65k)
 - Batch Operations: 50% gas reduction
 
@@ -76,7 +76,7 @@ Security Features:
 - Complete operation logging
 
 This implementation addresses all acceptance criteria and provides a robust foundation
-for the DID Registry ecosystem while maintaining backward compatibility."
+for the Cognitive Lab Registry ecosystem while maintaining backward compatibility."
 ```
 
 ### Step 8: Push to Forked Repository
@@ -88,7 +88,7 @@ git push fork feature/fix-issues-138-139-140
 
 Once the branch is pushed, create the PR using this URL:
 
-**https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-/compare/main...feature/fix-issues-138-139-140**
+**https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-/compare/main...feature/fix-issues-138-139-140**
 
 ## 📝 PR Details
 
@@ -116,7 +116,7 @@ If command line continues to have issues:
 1. **Install GitHub Desktop** (if not already installed)
 2. **Open GitHub Desktop**
 3. **File → Add Local Repository**
-4. **Select**: `C:\Users\Hp\CascadeProjects\Decentralized-Identity-DID-`
+4. **Select**: `C:\Users\Hp\CascadeProjects\Decentralized-Identity-LABS-`
 5. **Publish Repository** to your fork
 6. **Create New Branch**: `feature/fix-issues-138-139-140`
 7. **Commit Changes** with the message above
@@ -144,7 +144,7 @@ del .git\index.lock
 **Solution**:
 ```bash
 git remote remove origin
-git remote add origin https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-
+git remote add origin https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-
 ```
 
 ## 📊 Verification Checklist

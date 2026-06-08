@@ -2,7 +2,7 @@ const { ethers, upgrades } = require("hardhat");
 require("dotenv").config();
 
 async function main() {
-  console.log("Deploying Upgradeable DID Registry Contracts...\n");
+  console.log("Deploying Upgradeable LABS Registry Contracts...\n");
 
   // Get deployer account
   const [deployer] = await ethers.getSigners();
@@ -10,10 +10,10 @@ async function main() {
   console.log("Account balance:", ethers.utils.formatEther(await deployer.getBalance()), "ETH\n");
 
   try {
-    // Deploy the UpgradeableStellarDIDRegistry implementation
-    console.log("1. Deploying UpgradeableStellarDIDRegistry implementation...");
-    const UpgradeableStellarDIDRegistry = await ethers.getContractFactory("UpgradeableStellarDIDRegistry");
-    const implementation = await UpgradeableStellarDIDRegistry.deploy();
+    // Deploy the UpgradeableStellarLABSRegistry implementation
+    console.log("1. Deploying UpgradeableStellarLABSRegistry implementation...");
+    const UpgradeableStellarLABSRegistry = await ethers.getContractFactory("UpgradeableStellarLABSRegistry");
+    const implementation = await UpgradeableStellarLABSRegistry.deploy();
     await implementation.deployed();
     console.log("   Implementation deployed to:", implementation.address);
 
@@ -26,9 +26,9 @@ async function main() {
 
     // Deploy the UUPS proxy
     console.log("\n3. Deploying UUPS Proxy...");
-    const DIDProxy = await ethers.getContractFactory("DIDProxy");
+    const LABSProxy = await ethers.getContractFactory("LABSProxy");
     const proxy = await upgrades.deployProxy(
-      DIDProxy,
+      LABSProxy,
       [deployer.address], // constructor arguments for initialize
       { 
         initializer: "initialize",
@@ -59,7 +59,7 @@ async function main() {
 
     // Test basic functionality
     console.log("\n6. Testing basic functionality...");
-    const registry = UpgradeableStellarDIDRegistry.attach(proxy.address);
+    const registry = UpgradeableStellarLABSRegistry.attach(proxy.address);
     
     const version = await registry.getVersion();
     console.log("   Contract version:", version);
@@ -82,7 +82,7 @@ async function main() {
 
     // Write deployment info to file
     const fs = require("fs");
-    const deploymentPath = `./deployments/${network.name}-upgradeable-did-registry.json`;
+    const deploymentPath = `./deployments/${network.name}-upgradeable-LABS-registry.json`;
     
     // Ensure deployments directory exists
     if (!fs.existsSync("./deployments")) {
@@ -92,7 +92,7 @@ async function main() {
     fs.writeFileSync(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
     console.log(`\n7. Deployment info saved to: ${deploymentPath}`);
 
-    console.log("\n🎉 Upgradeable DID Registry deployment completed successfully!");
+    console.log("\n🎉 Upgradeable LABS Registry deployment completed successfully!");
     console.log("\n📋 Summary:");
     console.log("   Proxy Address:", proxy.address);
     console.log("   Implementation Address:", implementation.address);
@@ -110,7 +110,7 @@ async function main() {
 
 // Deploy upgrade to new implementation
 async function upgrade() {
-  console.log("Upgrading DID Registry implementation...\n");
+  console.log("Upgrading LABS Registry implementation...\n");
   
   const [deployer] = await ethers.getSigners();
   console.log("Upgrading with account:", deployer.address);
@@ -118,7 +118,7 @@ async function upgrade() {
   try {
     // Get current proxy address
     const fs = require("fs");
-    const deploymentPath = `./deployments/${network.name}-upgradeable-did-registry.json`;
+    const deploymentPath = `./deployments/${network.name}-upgradeable-LABS-registry.json`;
     
     if (!fs.existsSync(deploymentPath)) {
       throw new Error("No existing deployment found. Deploy first using the main script.");
@@ -131,14 +131,14 @@ async function upgrade() {
 
     // Deploy new implementation
     console.log("\n1. Deploying new implementation...");
-    const UpgradeableStellarDIDRegistry = await ethers.getContractFactory("UpgradeableStellarDIDRegistry");
-    const newImplementation = await UpgradeableStellarDIDRegistry.deploy();
+    const UpgradeableStellarLABSRegistry = await ethers.getContractFactory("UpgradeableStellarLABSRegistry");
+    const newImplementation = await UpgradeableStellarLABSRegistry.deploy();
     await newImplementation.deployed();
     console.log("   New implementation deployed to:", newImplementation.address);
 
     // Upgrade the proxy
     console.log("\n2. Upgrading proxy...");
-    const proxy = await ethers.getContractAt("DIDProxy", proxyAddress);
+    const proxy = await ethers.getContractAt("LABSProxy", proxyAddress);
     const upgradeTx = await proxy.upgradeTo(newImplementation.address);
     await upgradeTx.wait();
     console.log("   Proxy upgraded successfully");

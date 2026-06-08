@@ -1,8 +1,8 @@
-# Stellar DID Platform - Complete API Documentation
+# Cognitive Lab Platform - Complete API Documentation
 
 ## Overview
 
-The Stellar DID Platform provides comprehensive REST and GraphQL APIs for decentralized identity management on the Stellar network. This documentation covers all endpoints, authentication, error handling, and best practices.
+The Cognitive Lab Platform provides comprehensive REST and GraphQL APIs for cognitive labs identity management on the Stellar network. This documentation covers all endpoints, authentication, error handling, and best practices.
 
 ## Table of Contents
 
@@ -34,7 +34,7 @@ Content-Type: application/json
 {
   "walletAddress": "GABC1234567890ABCDEF1234567890ABCDEF1234567890",
   "signature": "base64_encoded_signature",
-  "message": "Login to Stellar DID Platform"
+  "message": "Login to Cognitive Lab Platform"
 }
 ```
 
@@ -78,27 +78,27 @@ Content-Type: application/json
 
 ### Base URL
 ```
-https://api.stellar-did.com/api/v1
+https://api.stellar-Cognitive Lab.com/api/v1
 ```
 
-### DID Operations
+### Cognitive Lab Operations
 
-#### Create DID
+#### Create Cognitive Lab
 
 ```http
-POST /api/v1/did
+POST /api/v1/Cognitive Lab
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "did": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+  "Cognitive Lab": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
   "publicKey": "GABC1234567890ABCDEF1234567890ABCDEF1234567890",
-  "serviceEndpoint": "https://example.com/did-service",
+  "serviceEndpoint": "https://example.com/LABS-service",
   "verificationMethods": [
     {
       "id": "key-1",
       "type": "Ed25519VerificationKey2018",
-      "controller": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+      "controller": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
       "publicKeyBase58": "GABC1234567890ABCDEF1234567890ABCDEF1234567890"
     }
   ],
@@ -118,31 +118,31 @@ Content-Type: application/json
 {
   "success": true,
   "data": {
-    "id": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
-    "did": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+    "id": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+    "Cognitive Lab": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
     "owner": "GABC1234567890ABCDEF1234567890ABCDEF1234567890",
     "publicKey": "GABC1234567890ABCDEF1234567890ABCDEF1234567890",
     "created": "2023-01-01T00:00:00.000Z",
     "updated": "2023-01-01T00:00:00.000Z",
     "active": true,
-    "serviceEndpoint": "https://example.com/did-service",
+    "serviceEndpoint": "https://example.com/LABS-service",
     "verificationMethods": [...],
     "services": [...]
   }
 }
 ```
 
-#### Get DID
+#### Get Cognitive Lab
 
 ```http
-GET /api/v1/did/{did}
+GET /api/v1/Cognitive Lab/{Cognitive Lab}
 Authorization: Bearer <token>
 ```
 
-#### Update DID
+#### Update Cognitive Lab
 
 ```http
-PUT /api/v1/did/{did}
+PUT /api/v1/Cognitive Lab/{Cognitive Lab}
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -154,24 +154,24 @@ Content-Type: application/json
 }
 ```
 
-#### Deactivate DID
+#### Deactivate Cognitive Lab
 
 ```http
-DELETE /api/v1/did/{did}
+DELETE /api/v1/Cognitive Lab/{Cognitive Lab}
 Authorization: Bearer <token>
 ```
 
-#### List DIDs
+#### List Cognitive Labs
 
 ```http
-GET /api/v1/did?owner={address}&active={boolean}&limit={number}&offset={number}&sortBy={field}&sortOrder={asc|desc}
+GET /api/v1/Cognitive Lab?owner={address}&active={boolean}&limit={number}&offset={number}&sortBy={field}&sortOrder={asc|desc}
 Authorization: Bearer <token>
 ```
 
-#### Search DIDs
+#### Search Cognitive Labs
 
 ```http
-GET /api/v1/did/search?q={query}&limit={number}
+GET /api/v1/Cognitive Lab/search?q={query}&limit={number}
 Authorization: Bearer <token>
 ```
 
@@ -185,8 +185,8 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "issuer": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
-  "subject": "did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890",
+  "issuer": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+  "subject": "Cognitive Lab:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890",
   "credentialType": "VerifiableCredential",
   "claims": {
     "degree": {
@@ -221,7 +221,7 @@ Authorization: Bearer <token>
 #### List Credentials
 
 ```http
-GET /api/v1/credentials?issuer={did}&subject={did}&credentialType={type}&revoked={boolean}&expired={boolean}&limit={number}&offset={number}
+GET /api/v1/credentials?issuer={Cognitive Lab}&subject={Cognitive Lab}&credentialType={type}&revoked={boolean}&expired={boolean}&limit={number}&offset={number}
 Authorization: Bearer <token>
 ```
 
@@ -237,7 +237,7 @@ Content-Type: application/json
     "@context": [...],
     "id": "urn:uuid:12345678-1234-1234-1234-123456789012",
     "type": ["VerifiableCredential"],
-    "issuer": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+    "issuer": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
     "issuanceDate": "2023-01-01T00:00:00.000Z",
     "credentialSubject": {...},
     "proof": {...}
@@ -341,12 +341,12 @@ Content-Type: application/json
 
 ### Endpoint
 ```
-https://api.stellar-did.com/graphql
+https://api.stellar-Cognitive Lab.com/graphql
 ```
 
 ### Playground
 ```
-https://api.stellar-did.com/graphql
+https://api.stellar-Cognitive Lab.com/graphql
 ```
 
 ### Schema Overview
@@ -355,13 +355,13 @@ The GraphQL API provides the same functionality as the REST API with additional 
 
 ### Example Queries
 
-#### Get DID with Credentials
+#### Get Cognitive Lab with Credentials
 
 ```graphql
-query GetDIDWithCredentials($did: String!) {
-  did(did: $did) {
+query GetLABSWithCredentials($Cognitive Lab: String!) {
+  Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
     id
-    did
+    Cognitive Lab
     owner
     publicKey
     created
@@ -378,7 +378,7 @@ query GetDIDWithCredentials($did: String!) {
     }
   }
   
-  credentials(subject: $did, revoked: false) {
+  credentials(subject: $Cognitive Lab, revoked: false) {
     id
     issuer
     credentialType
@@ -392,27 +392,27 @@ query GetDIDWithCredentials($did: String!) {
 #### Search and Paginate
 
 ```graphql
-query SearchDIDs($query: String!, $limit: Int!, $offset: Int!) {
-  searchDIDs(query: $query, limit: $limit, offset: $offset) {
+query SearchLABSs($query: String!, $limit: Int!, $offset: Int!) {
+  searchLABSs(query: $query, limit: $limit, offset: $offset) {
     id
-    did
+    Cognitive Lab
     owner
     serviceEndpoint
   }
   
-  didCount(active: true)
+  LABSCount(active: true)
 }
 ```
 
 ### Real-time Subscriptions
 
-#### DID Creation Events
+#### Cognitive Lab Creation Events
 
 ```graphql
-subscription DIDCreated($owner: String) {
-  didCreated(owner: $owner) {
+subscription LABSCreated($owner: String) {
+  LABSCreated(owner: $owner) {
     id
-    did
+    Cognitive Lab
     owner
     created
     active
@@ -476,7 +476,7 @@ All API errors follow a consistent format:
 
 ```javascript
 try {
-  const response = await fetch('/api/v1/did/invalid-did', {
+  const response = await fetch('/api/v1/Cognitive Lab/invalid-Cognitive Lab', {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -566,9 +566,9 @@ Last-Modified: Wed, 01 Jan 2023 00:00:00 GMT
 
 ### Cache Strategies
 
-#### DID Documents
+#### Cognitive Lab Documents
 - **Cache Time**: 5 minutes
-- **Invalidation**: On DID updates
+- **Invalidation**: On Cognitive Lab updates
 
 #### Credentials
 - **Cache Time**: 5 minutes
@@ -587,18 +587,18 @@ Last-Modified: Wed, 01 Jan 2023 00:00:00 GMT
 ```javascript
 // Using Apollo Client for GraphQL
 const client = new ApolloClient({
-  uri: 'https://api.stellar-did.com/graphql',
+  uri: 'https://api.stellar-Cognitive Lab.com/graphql',
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
         fields: {
-          did: {
+          Cognitive Lab: {
             merge: true,
             cache: true
           }
         }
       },
-      DIDDocument: {
+      LABSDocument: {
         keyFields: ["id"],
         fields: {
           verificationMethods: {
@@ -653,21 +653,21 @@ Content-Type: application/json
 
 {
   "url": "https://your-app.com/webhook",
-  "events": ["did.created", "credential.issued", "credential.revoked"],
+  "events": ["Cognitive Lab.created", "credential.issued", "credential.revoked"],
   "secret": "webhook_secret_key"
 }
 ```
 
 ### Webhook Events
 
-#### DID Created
+#### Cognitive Lab Created
 
 ```json
 {
-  "event": "did.created",
+  "event": "Cognitive Lab.created",
   "timestamp": "2023-01-01T00:00:00.000Z",
   "data": {
-    "did": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+    "Cognitive Lab": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
     "owner": "GABC1234567890ABCDEF1234567890ABCDEF1234567890",
     "created": "2023-01-01T00:00:00.000Z"
   }
@@ -682,8 +682,8 @@ Content-Type: application/json
   "timestamp": "2023-01-01T00:00:00.000Z",
   "data": {
     "id": "urn:uuid:12345678-1234-1234-1234-123456789012",
-    "issuer": "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
-    "subject": "did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890",
+    "issuer": "Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890",
+    "subject": "Cognitive Lab:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890",
     "credentialType": "VerifiableCredential",
     "issued": "2023-01-01T00:00:00.000Z"
   }
@@ -732,27 +732,27 @@ app.post('/webhook', (req, res) => {
 ### JavaScript/TypeScript
 
 ```bash
-npm install @stellar-did/sdk
+npm install @stellar-Cognitive Lab/sdk
 ```
 
 ```typescript
-import { StellarDIDClient } from '@stellar-did/sdk';
+import { StellarLABSClient } from '@stellar-Cognitive Lab/sdk';
 
-const client = new StellarDIDClient({
-  apiUrl: 'https://api.stellar-did.com',
+const client = new StellarLABSClient({
+  apiUrl: 'https://api.stellar-Cognitive Lab.com',
   apiKey: 'your-api-key'
 });
 
-// Create DID
-const did = await client.dids.create({
+// Create Cognitive Lab
+const Cognitive Lab = await client.Cognitive Labs.create({
   publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
   serviceEndpoint: 'https://example.com'
 });
 
 // Issue credential
 const credential = await client.credentials.issue({
-  issuer: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-  subject: 'did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+  issuer: 'Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+  subject: 'Cognitive Lab:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
   credentialType: 'VerifiableCredential',
   claims: { name: 'John Doe' }
 });
@@ -761,27 +761,27 @@ const credential = await client.credentials.issue({
 ### Python
 
 ```bash
-pip install stellar-did-sdk
+pip install stellar-LABS-sdk
 ```
 
 ```python
-from stellar_did import StellarDIDClient
+from stellar_LABS import StellarLABSClient
 
-client = StellarDIDClient(
-    api_url='https://api.stellar-did.com',
+client = StellarLABSClient(
+    api_url='https://api.stellar-Cognitive Lab.com',
     api_key='your-api-key'
 )
 
-# Create DID
-did = client.dids.create(
+# Create Cognitive Lab
+Cognitive Lab = client.Cognitive Labs.create(
     public_key='GABC1234567890ABCDEF1234567890ABCDEF1234567890',
     service_endpoint='https://example.com'
 )
 
 # Issue credential
 credential = client.credentials.issue(
-    issuer='did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-    subject='did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+    issuer='Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+    subject='Cognitive Lab:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
     credential_type='VerifiableCredential',
     claims={'name': 'John Doe'}
 )
@@ -790,24 +790,24 @@ credential = client.credentials.issue(
 ### Go
 
 ```bash
-go get github.com/stellar-did/go-sdk
+go get github.com/stellar-Cognitive Lab/go-sdk
 ```
 
 ```go
 package main
 
 import (
-    "github.com/stellar-did/go-sdk"
+    "github.com/stellar-Cognitive Lab/go-sdk"
 )
 
 func main() {
-    client := stellarDid.NewClient(&stellarDid.Config{
-        APIURL:  "https://api.stellar-did.com",
+    client := stellarLABS.NewClient(&stellarLABS.Config{
+        APIURL:  "https://api.stellar-Cognitive Lab.com",
         APIKey:  "your-api-key",
     })
     
-    // Create DID
-    did, err := client.DIDs.Create(&stellarDid.DIDInput{
+    // Create Cognitive Lab
+    Cognitive Lab, err := client.Cognitive Labs.Create(&stellarLABS.LABSInput{
         PublicKey:      "GABC1234567890ABCDEF1234567890ABCDEF1234567890",
         ServiceEndpoint: "https://example.com",
     })
@@ -816,7 +816,7 @@ func main() {
         panic(err)
     }
     
-    fmt.Printf("Created DID: %s\n", did.ID)
+    fmt.Printf("Created Cognitive Lab: %s\n", Cognitive Lab.ID)
 }
 ```
 
@@ -824,7 +824,7 @@ func main() {
 
 ## Examples
 
-### Complete DID Management Flow
+### Complete Cognitive Lab Management Flow
 
 ```javascript
 // 1. Authenticate
@@ -834,27 +834,27 @@ const authResponse = await fetch('/api/v1/auth/login', {
   body: JSON.stringify({
     walletAddress: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
     signature: 'base64_signature',
-    message: 'Login to Stellar DID Platform'
+    message: 'Login to Cognitive Lab Platform'
   })
 });
 
 const { token } = await authResponse.json();
 
-// 2. Create DID
-const didResponse = await fetch('/api/v1/did', {
+// 2. Create Cognitive Lab
+const LABSResponse = await fetch('/api/v1/Cognitive Lab', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+    Cognitive Lab: 'Cognitive Lab:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
     publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-    serviceEndpoint: 'https://example.com/did-service'
+    serviceEndpoint: 'https://example.com/LABS-service'
   })
 });
 
-const did = await didResponse.json();
+const Cognitive Lab = await LABSResponse.json();
 
 // 3. Issue Credential
 const credentialResponse = await fetch('/api/v1/credentials', {
@@ -864,8 +864,8 @@ const credentialResponse = await fetch('/api/v1/credentials', {
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    issuer: did.data.did,
-    subject: 'did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+    issuer: Cognitive Lab.data.Cognitive Lab,
+    subject: 'Cognitive Lab:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
     credentialType: 'VerifiableCredential',
     claims: {
       name: 'John Doe',
@@ -901,7 +901,7 @@ import { WebSocketLink } from '@apollo/client/link/ws';
 
 // WebSocket link for subscriptions
 const wsLink = new WebSocketLink({
-  uri: 'wss://api.stellar-did.com/graphql',
+  uri: 'wss://api.stellar-Cognitive Lab.com/graphql',
   options: {
     reconnect: true,
     connectionParams: {
@@ -912,7 +912,7 @@ const wsLink = new WebSocketLink({
 
 // HTTP link for queries and mutations
 const httpLink = createHttpLink({
-  uri: 'https://api.stellar-did.com/graphql',
+  uri: 'https://api.stellar-Cognitive Lab.com/graphql',
   headers: {
     Authorization: `Bearer ${token}`
   }
@@ -936,12 +936,12 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-// Subscribe to DID creation events
-const DID_CREATED_SUBSCRIPTION = gql`
-  subscription DIDCreated($owner: String) {
-    didCreated(owner: $owner) {
+// Subscribe to Cognitive Lab creation events
+const LABS_CREATED_SUBSCRIPTION = gql`
+  subscription LABSCreated($owner: String) {
+    LABSCreated(owner: $owner) {
       id
-      did
+      Cognitive Lab
       owner
       created
       active
@@ -950,11 +950,11 @@ const DID_CREATED_SUBSCRIPTION = gql`
 `;
 
 const subscription = client.subscribe({
-  query: DID_CREATED_SUBSCRIPTION,
+  query: LABS_CREATED_SUBSCRIPTION,
   variables: { owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890' }
 }).subscribe({
   next: (data) => {
-    console.log('New DID created:', data.didCreated);
+    console.log('New Cognitive Lab created:', data.LABSCreated);
     // Update UI or trigger business logic
   },
   error: (error) => {
@@ -976,12 +976,12 @@ const subscription = client.subscribe({
 
 **Before (REST):**
 ```javascript
-const [didResponse, credentialsResponse] = await Promise.all([
-  fetch('/api/v1/did/did:stellar:...'),
-  fetch('/api/v1/credentials?subject=did:stellar:...')
+const [LABSResponse, credentialsResponse] = await Promise.all([
+  fetch('/api/v1/Cognitive Lab/Cognitive Lab:stellar:...'),
+  fetch('/api/v1/credentials?subject=Cognitive Lab:stellar:...')
 ]);
 
-const did = await didResponse.json();
+const Cognitive Lab = await LABSResponse.json();
 const credentials = await credentialsResponse.json();
 ```
 
@@ -989,14 +989,14 @@ const credentials = await credentialsResponse.json();
 ```javascript
 const { data } = await client.query({
   query: gql`
-    query GetDIDWithCredentials($did: String!) {
-      did(did: $did) {
+    query GetLABSWithCredentials($Cognitive Lab: String!) {
+      Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
         id
-        did
+        Cognitive Lab
         owner
         active
       }
-      credentials(subject: $did) {
+      credentials(subject: $Cognitive Lab) {
         id
         issuer
         credentialType
@@ -1004,7 +1004,7 @@ const { data } = await client.query({
       }
     }
   `,
-  variables: { did: 'did:stellar:...' }
+  variables: { Cognitive Lab: 'Cognitive Lab:stellar:...' }
 });
 ```
 
@@ -1013,7 +1013,7 @@ const { data } = await client.query({
 **Before (Polling):**
 ```javascript
 setInterval(async () => {
-  const response = await fetch('/api/v1/did/...');
+  const response = await fetch('/api/v1/Cognitive Lab/...');
   const data = await response.json();
   updateUI(data);
 }, 5000);
@@ -1023,17 +1023,17 @@ setInterval(async () => {
 ```javascript
 const subscription = client.subscribe({
   query: gql`
-    subscription DIDUpdated($did: String!) {
-      didUpdated(did: $did) {
+    subscription LABSUpdated($Cognitive Lab: String!) {
+      LABSUpdated(Cognitive Lab: $Cognitive Lab) {
         id
         updated
         active
       }
     }
   `,
-  variables: { did: 'did:stellar:...' }
+  variables: { Cognitive Lab: 'Cognitive Lab:stellar:...' }
 }).subscribe({
-  next: (data) => updateUI(data.didUpdated)
+  next: (data) => updateUI(data.LABSUpdated)
 });
 ```
 
@@ -1041,23 +1041,23 @@ const subscription = client.subscribe({
 
 **Before (Over-fetching):**
 ```javascript
-const response = await fetch('/api/v1/did/...');
-const did = await response.json();
-// Only using id and did, but getting full object
+const response = await fetch('/api/v1/Cognitive Lab/...');
+const Cognitive Lab = await response.json();
+// Only using id and Cognitive Lab, but getting full object
 ```
 
 **After (Field Selection):**
 ```javascript
 const { data } = await client.query({
   query: gql`
-    query GetMinimalDID($did: String!) {
-      did(did: $did) {
+    query GetMinimalLABS($Cognitive Lab: String!) {
+      Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
         id
-        did
+        Cognitive Lab
       }
     }
   `,
-  variables: { did: 'did:stellar:...' }
+  variables: { Cognitive Lab: 'Cognitive Lab:stellar:...' }
 });
 ```
 
@@ -1073,7 +1073,7 @@ const { data } = await client.query({
 
 #### v1.0 to v2.0
 - Authentication method changed from API key to JWT
-- DID endpoint structure updated
+- Cognitive Lab endpoint structure updated
 - Error response format standardized
 
 #### Migration Checklist
@@ -1091,21 +1091,21 @@ const { data } = await client.query({
 
 ### Getting Help
 
-- **Documentation**: https://docs.stellar-did.com
-- **API Reference**: https://api.stellar-did.com/docs
-- **GraphQL Playground**: https://api.stellar-did.com/graphql
-- **Community Forum**: https://community.stellar-did.com
-- **Support Email**: support@stellar-did.com
+- **Documentation**: https://docs.stellar-Cognitive Lab.com
+- **API Reference**: https://api.stellar-Cognitive Lab.com/docs
+- **GraphQL Playground**: https://api.stellar-Cognitive Lab.com/graphql
+- **Community Forum**: https://community.stellar-Cognitive Lab.com
+- **Support Email**: support@stellar-Cognitive Lab.com
 
 ### Reporting Issues
 
 Report bugs and feature requests at:
-https://github.com/stellar-did/platform/issues
+https://github.com/stellar-Cognitive Lab/platform/issues
 
 ### Status Page
 
 Check API status and uptime:
-https://status.stellar-did.com
+https://status.stellar-Cognitive Lab.com
 
 ---
 
@@ -1125,10 +1125,10 @@ https://status.stellar-did.com
 
 ### v1.5.0 (2023-08-01)
 - Added credential verification
-- Improved DID search
+- Improved Cognitive Lab search
 - Performance optimizations
 - Bug fixes
 
 ---
 
-*This documentation is continuously updated. For the latest version, visit https://docs.stellar-did.com*
+*This documentation is continuously updated. For the latest version, visit https://docs.stellar-Cognitive Lab.com*

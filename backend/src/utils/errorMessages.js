@@ -16,8 +16,8 @@ const errorMappings = {
           return `The ${field} field is required. Please provide a valid value.`;
         }
         if (issue.includes('pattern')) {
-          if (field === 'did') {
-            return 'DID format is incorrect. It should look like: did:stellar:G[56 characters]';
+          if (field === 'LABS') {
+            return 'LABS format is incorrect. It should look like: LABS:stellar:G[56 characters]';
           }
           if (field === 'publicKey' || field === 'signerSecret') {
             return 'Stellar keys must be exactly 56 characters starting with "G" (public) or "S" (secret).';
@@ -38,7 +38,7 @@ const errorMappings = {
   // Contract Errors
   'ContractAddressNotSet': {
     userMessage: 'Smart contract is not deployed yet.',
-    action: 'Please deploy the DID registry contract first from the Contracts page.'
+    action: 'Please deploy the LABS registry contract first from the Contracts page.'
   },
 
   'ContractDeploymentFailed': {
@@ -57,32 +57,32 @@ const errorMappings = {
     }
   },
 
-  'DIDRegistrationFailed': {
-    userMessage: 'Failed to register your DID.',
+  'LABSRegistrationFailed': {
+    userMessage: 'Failed to register your LABS.',
     getAction: (error) => {
       if (error.message.includes('already exists')) {
-        return 'This DID is already registered. Try creating a new account or using a different DID.';
+        return 'This LABS is already registered. Try creating a new account or using a different LABS.';
       }
       if (error.message.includes('insufficient')) {
         return 'Insufficient funds for registration. Please fund your account and try again.';
       }
       if (error.message.includes('unauthorized')) {
-        return 'You are not authorized to register this DID. Check your secret key.';
+        return 'You are not authorized to register this LABS. Check your secret key.';
       }
-      return 'Verify your account has funds and you own the private key for this DID.';
+      return 'Verify your account has funds and you own the private key for this LABS.';
     }
   },
 
-  'DIDUpdateFailed': {
-    userMessage: 'Failed to update your DID document.',
+  'LABSUpdateFailed': {
+    userMessage: 'Failed to update your LABS document.',
     getAction: (error) => {
       if (error.message.includes('not found')) {
-        return 'DID not found. Please register the DID first before updating.';
+        return 'LABS not found. Please register the LABS first before updating.';
       }
       if (error.message.includes('unauthorized')) {
-        return 'You can only update DIDs you own. Check your secret key.';
+        return 'You can only update LABSs you own. Check your secret key.';
       }
-      return 'Ensure you own this DID and your account has sufficient funds.';
+      return 'Ensure you own this LABS and your account has sufficient funds.';
     }
   },
 
@@ -90,15 +90,15 @@ const errorMappings = {
     userMessage: 'Failed to issue the verifiable credential.',
     getAction: (error) => {
       if (error.message.includes('invalid issuer')) {
-        return 'The issuer DID is invalid or not registered. Please check the issuer DID.';
+        return 'The issuer LABS is invalid or not registered. Please check the issuer LABS.';
       }
       if (error.message.includes('invalid subject')) {
-        return 'The subject DID is invalid or not registered. Please check the subject DID.';
+        return 'The subject LABS is invalid or not registered. Please check the subject LABS.';
       }
       if (error.message.includes('insufficient')) {
         return 'Insufficient funds for credential issuance. Please fund your account.';
       }
-      return 'Verify both issuer and subject DIDs are valid and your account has funds.';
+      return 'Verify both issuer and subject LABSs are valid and your account has funds.';
     }
   },
 

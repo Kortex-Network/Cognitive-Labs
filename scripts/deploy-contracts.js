@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Deploy Stellar DID Contracts Script
+ * Deploy Stellar LABS Contracts Script
  * 
- * This script deploys the DID registry contracts to the Stellar network
+ * This script deploys the LABS registry contracts to the Stellar network
  * and sets up the necessary configuration for the platform.
  */
 
-const DIDContract = require('../contracts/stellar/DIDContract');
+const LABSContract = require('../contracts/stellar/LABSContract');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -88,7 +88,7 @@ function loadContractConfig() {
 
 // Deploy contracts
 async function deployContracts() {
-  log('🚀 Deploying Stellar DID Registry Contracts', 'bright');
+  log('🚀 Deploying Stellar LABS Registry Contracts', 'bright');
   log(`Network: ${config.network}`, 'blue');
   log(`Horizon URL: ${config.horizonUrl}`, 'blue');
 
@@ -126,9 +126,9 @@ async function deployContracts() {
 
   try {
     logStep('1: Initializing contract deployment');
-    const contract = new DIDContract(config.horizonUrl);
+    const contract = new LABSContract(config.horizonUrl);
     
-    logStep('2: Deploying DID Registry contract');
+    logStep('2: Deploying LABS Registry contract');
     const deploymentResult = await contract.deploy(config.deployerSecret);
     
     logSuccess('Contract deployed successfully!');
@@ -154,14 +154,14 @@ async function deployContracts() {
       envContent = fs.readFileSync(envPath, 'utf8');
     }
     
-    // Update or add DID_CONTRACT_ADDRESS
-    if (envContent.includes('DID_CONTRACT_ADDRESS=')) {
+    // Update or add LABS_CONTRACT_ADDRESS
+    if (envContent.includes('LABS_CONTRACT_ADDRESS=')) {
       envContent = envContent.replace(
-        /DID_CONTRACT_ADDRESS=.*/,
-        `DID_CONTRACT_ADDRESS=${deploymentResult.contractAddress}`
+        /LABS_CONTRACT_ADDRESS=.*/,
+        `LABS_CONTRACT_ADDRESS=${deploymentResult.contractAddress}`
       );
     } else {
-      envContent += `\nDID_CONTRACT_ADDRESS=${deploymentResult.contractAddress}`;
+      envContent += `\nLABS_CONTRACT_ADDRESS=${deploymentResult.contractAddress}`;
     }
     
     fs.writeFileSync(envPath, envContent);
@@ -245,7 +245,7 @@ async function main() {
       break;
       
     default:
-      log('Stellar DID Contract Deployment Tool', 'bright');
+      log('Stellar LABS Contract Deployment Tool', 'bright');
       log('\nUsage:', 'cyan');
       log('  npm run deploy:contracts deploy    - Deploy contracts', 'yellow');
       log('  npm run deploy:contracts fund <pk>  - Fund testnet account', 'yellow');

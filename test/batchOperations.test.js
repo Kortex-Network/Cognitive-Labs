@@ -7,14 +7,14 @@ describe('Batch Operations API', () => {
     test('should execute a successful batch', async () => {
       const operations = [
         {
-          type: BatchOperationType.CREATE_DID,
+          type: BatchOperationType.CREATE_LABS,
           data: { serviceEndpoint: 'https://example.com' }
         },
         {
           type: BatchOperationType.ISSUE_CREDENTIAL,
           data: {
-            issuerDid: 'did:stellar:test1',
-            subjectDid: 'did:stellar:test2',
+            issuerLABS: 'LABS:stellar:test1',
+            subjectLABS: 'LABS:stellar:test2',
             claims: { name: 'John Doe' }
           }
         }
@@ -73,7 +73,7 @@ describe('Batch Operations API', () => {
       // First create a batch
       const operations = [
         {
-          type: BatchOperationType.CREATE_DID,
+          type: BatchOperationType.CREATE_COGNITIVE_LAB,
           data: { serviceEndpoint: 'https://example.com' }
         }
       ];
@@ -105,31 +105,31 @@ describe('Batch Operations API', () => {
     });
   });
 
-  describe('POST /api/batch/did/create-batch', () => {
-    test('should create multiple DIDs in batch', async () => {
-      const didConfigs = [
+  describe('POST /api/batch/cognitive-lab/create-batch', () => {
+    test('should create multiple Cognitive Labs in batch', async () => {
+      const cognitiveLabConfigs = [
         { serviceEndpoint: 'https://example1.com' },
         { serviceEndpoint: 'https://example2.com' }
       ];
 
       const response = await request(app)
-        .post('/api/batch/did/create-batch')
-        .send({ didConfigs })
+        .post('/api/batch/cognitive-lab/create-batch')
+        .send({ cognitiveLabConfigs })
         .expect(201);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.summary.totalOperations).toBe(2);
-      expect(response.body.message).toContain('2 DIDs created');
+      expect(response.body.message).toContain('2 Cognitive Labs created');
     });
 
-    test('should reject invalid didConfigs', async () => {
+    test('should reject invalid cognitiveLabConfigs', async () => {
       const response = await request(app)
-        .post('/api/batch/did/create-batch')
-        .send({ didConfigs: 'invalid' })
+        .post('/api/batch/cognitive-lab/create-batch')
+        .send({ cognitiveLabConfigs: 'invalid' })
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toContain('didConfigs array is required');
+      expect(response.body.error).toContain('cognitiveLabConfigs array is required');
     });
   });
 
@@ -137,13 +137,13 @@ describe('Batch Operations API', () => {
     test('should issue multiple credentials in batch', async () => {
       const credentials = [
         {
-          issuerDid: 'did:stellar:issuer1',
-          subjectDid: 'did:stellar:subject1',
+          issuerCognitiveLab: 'LABS:stellar:issuer1',
+          subjectCognitiveLab: 'LABS:stellar:subject1',
           claims: { name: 'John Doe', degree: 'Bachelor' }
         },
         {
-          issuerDid: 'did:stellar:issuer2',
-          subjectDid: 'did:stellar:subject2',
+          issuerCognitiveLab: 'LABS:stellar:issuer2',
+          subjectCognitiveLab: 'LABS:stellar:subject2',
           claims: { name: 'Jane Smith', license: 'Medical' }
         }
       ];
@@ -173,14 +173,14 @@ describe('Batch Operations API', () => {
     test('should execute mixed operations', async () => {
       const operations = [
         {
-          type: BatchOperationType.CREATE_DID,
+          type: BatchOperationType.CREATE_LABS,
           data: { serviceEndpoint: 'https://example.com' }
         },
         {
           type: BatchOperationType.ISSUE_CREDENTIAL,
           data: {
-            issuerDid: 'did:stellar:test1',
-            subjectDid: 'did:stellar:test2',
+            issuerLABS: 'LABS:stellar:test1',
+            subjectLABS: 'LABS:stellar:test2',
             claims: { name: 'John Doe' }
           }
         }
@@ -218,12 +218,12 @@ describe('Batch Operations API', () => {
     test('should handle batch execution failure gracefully', async () => {
       const operations = [
         {
-          type: BatchOperationType.CREATE_DID,
+          type: BatchOperationType.CREATE_COGNITIVE_LAB,
           data: { serviceEndpoint: 'https://example.com' }
         }
       ];
 
-      // Mock a failure in DID creation
+      // Mock a failure in Cognitive Lab creation
       const response = await request(app)
         .post('/api/batch/execute')
         .send({ operations })

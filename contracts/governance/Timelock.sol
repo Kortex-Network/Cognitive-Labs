@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/governance/TimelockController.sol";
 
 /**
- * @title DIDTimelock
- * @dev Timelock controller for DID governance
+ * @title LABSTimelock
+ * @dev Timelock controller for LABS governance
  * Provides time delays for executing governance decisions
  */
-contract DIDTimelock is TimelockController {
+contract LABSTimelock is TimelockController {
     
     uint256 public constant MIN_DELAY = 2 days;
     uint256 public constant MAX_DELAY = 30 days;

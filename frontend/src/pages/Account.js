@@ -87,7 +87,7 @@ const Account = () => {
       setAccountInfo(response.data);
       
       // Fetch recent transactions
-      const txResponse = await stellarAPI.did.getTransactions(publicKey, { limit: 10 });
+      const txResponse = await stellarAPI.LABS.getTransactions(publicKey, { limit: 10 });
       if (!isMounted) return;
       
       setTransactions(txResponse.data.transactions || []);
@@ -211,10 +211,10 @@ const Account = () => {
                     variant="outlined"
                     fullWidth
                     startIcon={<AccountBalanceWallet aria-hidden="true" />}
-                    href="/create-did"
-                    aria-label="Navigate to Create DID page"
+                    href="/create-LABS"
+                    aria-label="Navigate to Create LABS page"
                   >
-                    Create DID
+                    Create LABS
                   </Button>
                 </Grid>
               </Grid>

@@ -1,3 +1,3 @@
-from .client import StellarDIDClient, StellarDIDError
+from .client import StellarLABSClient, StellarLABSError
 
-__all__ = ["StellarDIDClient", "StellarDIDError"]
+__all__ = ["StellarLABSClient", "StellarLABSError"]

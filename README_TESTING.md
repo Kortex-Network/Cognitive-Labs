@@ -1,8 +1,8 @@
-# Decentralized Identity DID - Test Suite
+# Cognitive Lab - Test Suite
 
 ## Overview
 
-This repository contains a comprehensive test suite for the Decentralized Identity DID smart contracts, achieving **95%+ test coverage** with extensive edge case testing and security validation.
+This repository contains a comprehensive test suite for the Cognitive Lab smart contracts, achieving **95%+ test coverage** with extensive edge case testing and security validation.
 
 ## Test Suite Structure
 
@@ -10,7 +10,7 @@ This repository contains a comprehensive test suite for the Decentralized Identi
 test/
 ├── helpers/
 │   └── test-utils.js           # Test utilities and helper functions
-├── EthereumDIDRegistry.test.js # Unit tests for DID Registry
+├── EthereumLABSRegistry.test.js # Unit tests for Cognitive Lab Registry
 ├── RecoveryGovernance.test.js  # Unit tests for Governance
 ├── StateRecovery.test.js       # Unit tests for State Recovery (existing)
 ├── Integration.test.js         # Cross-contract integration tests
@@ -69,7 +69,7 @@ npm run test:report
 - **Branch Coverage**: 95%+
 
 ### Contracts Covered
-1. **EthereumDIDRegistry.sol** - Main DID registry contract
+1. **EthereumLABSRegistry.sol** - Main Cognitive Lab registry contract
 2. **RecoveryGovernance.sol** - Governance and oversight contract
 3. **StateRecovery.sol** - State recovery system
 
@@ -120,8 +120,8 @@ const contracts = await TestHelper.deployContracts(signers);
 // Setup roles
 await TestHelper.setupRolesAndPermissions(contracts, signers);
 
-// Create test DID setup
-const didData = await TestHelper.createCompleteDIDSetup(contracts, signers);
+// Create test Cognitive Lab setup
+const LABSData = await TestHelper.createCompleteLABSSetup(contracts, signers);
 
 // Perform governed recovery
 const result = await TestHelper.performGovernedRecovery(contracts, signers, recoveryData, reason);
@@ -129,9 +129,9 @@ const result = await TestHelper.performGovernedRecovery(contracts, signers, reco
 
 ## Test Data Generation
 
-### DID Generation
+### Cognitive Lab Generation
 ```javascript
-const did = TestHelper.generateTestDID(address);
+const Cognitive Lab = TestHelper.generateTestLABS(address);
 ```
 
 ### Public Key Generation

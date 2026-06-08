@@ -80,7 +80,7 @@ async function listIndexes(Model) {
 async function runIndexAudit() {
   // Lazy-load models to avoid circular deps
   const Credential = mongoose.model('Credential');
-  const DID = mongoose.model('DID');
+  const LABS = mongoose.model('LABS');
   const ApiKey = mongoose.model('ApiKey');
   const Session = mongoose.model('Session');
 
@@ -91,8 +91,8 @@ async function runIndexAudit() {
     { model: Credential, filter: { revoked: false },                     sort: { issued: -1 } },
     { model: Credential, filter: { issuer: '__audit__', credentialType: '__audit__' }, sort: { issued: -1 } },
     { model: Credential, filter: { subject: '__audit__', revoked: false }, sort: {} },
-    { model: DID,        filter: { owner: '__audit__' },                 sort: { created: -1 } },
-    { model: DID,        filter: { owner: '__audit__', active: true },   sort: {} },
+    { model: LABS,        filter: { owner: '__audit__' },                 sort: { created: -1 } },
+    { model: LABS,        filter: { owner: '__audit__', active: true },   sort: {} },
     { model: ApiKey,     filter: { owner: '__audit__', status: 'active' }, sort: {} },
     { model: Session,    filter: { userId: '__audit__', isValid: true }, sort: {} },
   ];

@@ -18,7 +18,7 @@ const credentialTemplateSchema = new mongoose.Schema({
     description: String,
     required: { type: Boolean, default: true },
   }],
-  issuerDid: String,
+  issuerLABS: String,
   active: {
     type: Boolean,
     default: true,
@@ -46,6 +46,6 @@ credentialTemplateSchema.pre('save', function(next) {
 credentialTemplateSchema.index({ credentialType: 1, active: 1 });
 
 // Issuer's templates
-credentialTemplateSchema.index({ issuerDid: 1, active: 1 });
+credentialTemplateSchema.index({ issuerLABS: 1, active: 1 });
 
 module.exports = mongoose.model('CredentialTemplate', credentialTemplateSchema);

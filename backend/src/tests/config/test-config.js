@@ -15,7 +15,7 @@ class TestConfig {
       REDIS_HOST: process.env.REDIS_HOST || 'localhost',
       REDIS_PORT: process.env.REDIS_PORT || 6379,
       REDIS_DB: 15, // Separate DB for tests
-      MONGODB_TEST_URI: process.env.MONGODB_TEST_URI || 'mongodb://localhost:27017/stellar-did-test',
+      MONGODB_TEST_URI: process.env.MONGODB_TEST_URI || 'mongodb://localhost:27017/stellar-LABS-test',
       STELLAR_NETWORK: 'TESTNET',
       LOG_LEVEL: 'error' // Minimal logging during tests
     };
@@ -30,11 +30,11 @@ class TestConfig {
 
     this.thresholds = {
       api: {
-        did_create: { average: 500, max: 1000 },
-        did_read: { average: 200, max: 400 },
-        did_update: { average: 300, max: 600 },
-        did_delete: { average: 200, max: 400 },
-        did_list: { average: 250, max: 500 },
+        LABS_create: { average: 500, max: 1000 },
+        LABS_read: { average: 200, max: 400 },
+        LABS_update: { average: 300, max: 600 },
+        LABS_delete: { average: 200, max: 400 },
+        LABS_list: { average: 250, max: 500 },
         credential_issue: { average: 400, max: 800 },
         credential_verify: { average: 300, max: 600 },
         credential_revoke: { average: 200, max: 400 },
@@ -81,7 +81,7 @@ class TestConfig {
         issuerRoles: ['USER', 'ISSUER'],
         verifierRoles: ['USER', 'VERIFIER']
       },
-      dids: {
+      LABSs: {
         count: 10,
         verificationMethods: 2,
         services: 2
@@ -99,7 +99,7 @@ class TestConfig {
     this.endpoints = {
       rest: {
         base: '/api/v1',
-        did: '/api/v1/did',
+        LABS: '/api/v1/LABS',
         credentials: '/api/v1/credentials',
         stellar: '/api/v1/stellar',
         contracts: '/api/v1/contracts',

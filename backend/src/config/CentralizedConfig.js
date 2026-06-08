@@ -63,10 +63,10 @@ class CentralizedConfig {
             STELLAR_FRIENDBOT_URL: Joi.string().uri().optional()
         });
 
-        // DID Configuration Schema
-        this.validationSchemas.did = Joi.object({
-            DID_METHOD: Joi.string().valid('stellar', 'ethereum', 'key').required(),
-            DID_REGISTRY_PUBLIC_KEY: Joi.string().hex().length(64).required()
+        // LABS Configuration Schema
+        this.validationSchemas.LABS = Joi.object({
+            LABS_METHOD: Joi.string().valid('stellar', 'ethereum', 'key').required(),
+            LABS_REGISTRY_PUBLIC_KEY: Joi.string().hex().length(64).required()
         });
 
         // Server Configuration Schema
@@ -104,7 +104,7 @@ class CentralizedConfig {
         this.validationSchemas.evm = Joi.object({
             EVM_RPC_URL: Joi.string().uri().required(),
             EVM_PRIVATE_KEY: Joi.string().pattern(/^0x[a-fA-F0-9]{64}$/).required(),
-            EVM_DID_REGISTRY_ADDRESS: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
+            EVM_LABS_REGISTRY_ADDRESS: Joi.string().pattern(/^0x[a-fA-F0-9]{40}$/).required(),
             EVM_CHAIN_ID: Joi.number().integer().positive().required()
         });
 

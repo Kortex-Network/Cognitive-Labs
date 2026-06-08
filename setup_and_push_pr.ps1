@@ -5,7 +5,7 @@ Write-Host "🚀 Starting Git Setup and PR Creation Process..." -ForegroundColor
 
 # Step 1: Navigate to correct directory
 Write-Host "📁 Navigating to project directory..." -ForegroundColor Yellow
-Set-Location "C:\Users\Hp\CascadeProjects\Decentralized-Identity-DID-"
+Set-Location "C:\Users\Hp\CascadeProjects\Decentralized-Identity-LABS-"
 $currentDir = Get-Location
 Write-Host "Current directory: $currentDir" -ForegroundColor Cyan
 
@@ -39,8 +39,8 @@ Write-Host "✅ Git user configured" -ForegroundColor Green
 
 # Step 5: Add remote repositories
 Write-Host "🔗 Adding remote repositories..." -ForegroundColor Yellow
-git remote add origin https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-
-git remote add fork https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-
+git remote add origin https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-
+git remote add fork https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-
 Write-Host "✅ Remote repositories added" -ForegroundColor Green
 
 # Step 6: Create and switch to feature branch
@@ -77,8 +77,8 @@ Features Implemented:
 - Complete documentation and deployment scripts
 
 Performance Results:
-- DID Creation: 30% gas reduction (120k → 84k)
-- DID Update: 30% gas reduction (80k → 56k)
+- LABS Creation: 30% gas reduction (120k → 84k)
+- LABS Update: 30% gas reduction (80k → 56k)
 - Credential Issue: 35% gas reduction (100k → 65k)
 - Batch Operations: 50% gas reduction
 
@@ -89,7 +89,7 @@ Security Features:
 - Complete operation logging
 
 This implementation addresses all acceptance criteria and provides a robust foundation
-for the DID Registry ecosystem while maintaining backward compatibility.
+for the LABS Registry ecosystem while maintaining backward compatibility.
 "@
 
 git commit -m $commitMessage
@@ -114,7 +114,7 @@ try {
 
 # Step 10: Generate PR link
 Write-Host "🔗 Generating PR creation link..." -ForegroundColor Yellow
-$prLink = "https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-/compare/main...feature/fix-issues-138-139-140"
+$prLink = "https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-/compare/main...feature/fix-issues-138-139-140"
 
 # Step 11: Display results
 Write-Host "🎉 Git Setup and PR Creation Completed Successfully!" -ForegroundColor Green
@@ -136,11 +136,11 @@ Write-Host ""
 Write-Host "  4. Add labels: enhancement, security, performance, high-priority" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "📊 Files included in this PR:" -ForegroundColor Cyan
-Write-Host "  • contracts/IntegratedDIDRegistry.sol" -ForegroundColor White
+Write-Host "  • contracts/IntegratedLABSRegistry.sol" -ForegroundColor White
 Write-Host "  • contracts/access/EnhancedAccessControl.sol" -ForegroundColor White
 Write-Host "  • contracts/proxy/EnhancedProxy.sol" -ForegroundColor White
-Write-Host "  • contracts/optimized/GasOptimizedDIDRegistry.sol" -ForegroundColor White
-Write-Host "  • test/IntegratedDIDRegistry.test.sol" -ForegroundColor White
+Write-Host "  • contracts/optimized/GasOptimizedLABSRegistry.sol" -ForegroundColor White
+Write-Host "  • test/IntegratedLABSRegistry.test.sol" -ForegroundColor White
 Write-Host "  • scripts/deploy.js" -ForegroundColor White
 Write-Host "  • docs/ISSUES_SOLUTION_SUMMARY.md" -ForegroundColor White
 Write-Host "  • README.md (updated)" -ForegroundColor White

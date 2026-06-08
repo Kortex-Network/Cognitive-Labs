@@ -51,18 +51,18 @@ blockchainInteractionQueue.process('fetch-stellar-account', async (job) => {
   }
 });
 
-// Cross-chain DID bridge worker
-crossChainBridgeQueue.process('bridge-did', async (job) => {
-  const { did, ownerAddress } = job.data;
-  logger.info(`Processing DID bridge job:`, { jobId: job.id, did });
+// Cross-chain LABS bridge worker
+crossChainBridgeQueue.process('bridge-LABS', async (job) => {
+  const { LABS, ownerAddress } = job.data;
+  logger.info(`Processing LABS bridge job:`, { jobId: job.id, LABS });
   
   try {
     job.progress(33);
-    const result = await crossChainService.bridgeDIDToEthereum(did, ownerAddress);
+    const result = await crossChainService.bridgeLABSToEthereum(LABS, ownerAddress);
     job.progress(100);
     return result;
   } catch (error) {
-    logger.error(`DID bridge failed:`, { jobId: job.id, error: error.message });
+    logger.error(`LABS bridge failed:`, { jobId: job.id, error: error.message });
     throw error;
   }
 });
@@ -85,12 +85,12 @@ crossChainBridgeQueue.process('bridge-credential', async (job) => {
 
 // Cross-chain state verification worker
 crossChainBridgeQueue.process('verify-cross-chain-state', async (job) => {
-  const { did } = job.data;
-  logger.info(`Processing cross-chain state verification job:`, { jobId: job.id, did });
+  const { LABS } = job.data;
+  logger.info(`Processing cross-chain state verification job:`, { jobId: job.id, LABS });
   
   try {
     job.progress(50);
-    const result = await crossChainService.verifyCrossChainState(did);
+    const result = await crossChainService.verifyCrossChainState(LABS);
     job.progress(100);
     return result;
   } catch (error) {

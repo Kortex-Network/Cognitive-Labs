@@ -20,7 +20,7 @@ This document describes the implementation of a Bull-based job queue system for 
    - Handles credential verification
    - Handles Stellar transaction submissions
    - Handles Stellar account fetches
-   - Handles cross-chain DID and credential bridging
+   - Handles cross-chain Cognitive Lab and credential bridging
    - Handles cross-chain state verification
 
 3. **Service Layer Updates**
@@ -65,9 +65,9 @@ const result = await fetch(`/api/v1/jobs/${job.jobId}/result`);
 - `getAccountAsync(address)` - Queue account fetch
 
 #### Cross-Chain Service
-- `bridgeDIDToEthereumAsync(did, ownerAddress)` - Queue DID bridge
+- `bridgeLABSToEthereumAsync(Cognitive Lab, ownerAddress)` - Queue Cognitive Lab bridge
 - `bridgeCredentialToEthereumAsync(credentialId, dataHash)` - Queue credential bridge
-- `verifyCrossChainStateAsync(did)` - Queue state verification
+- `verifyCrossChainStateAsync(Cognitive Lab)` - Queue state verification
 
 ### API Endpoints
 

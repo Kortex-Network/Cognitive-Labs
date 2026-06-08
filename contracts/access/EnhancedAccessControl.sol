@@ -7,15 +7,15 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 /**
  * @title EnhancedAccessControl
- * @dev Comprehensive RBAC system with fine-grained permissions for DID Registry operations
+ * @dev Comprehensive RBAC system with fine-grained permissions for LABS Registry operations
  * 
  * This contract implements a sophisticated role-based access control system that provides
- * granular permissions for different operations within the DID ecosystem. It supports
+ * granular permissions for different operations within the LABS ecosystem. It supports
  * hierarchical roles, resource-specific permissions, and dynamic permission management.
  * 
  * Key Features:
  * - Hierarchical role system with inheritance
- * - Resource-specific permissions (DID, Credential, Governance)
+ * - Resource-specific permissions (LABS, Credential, Governance)
  * - Operation-level granular permissions (Create, Read, Update, Delete, Admin)
  * - Time-based permissions with expiration
  * - Conditional permissions with context validation
@@ -27,12 +27,12 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
  * - ROLE_ADMIN: System administrator with all permissions
  * - ROLE_GOVERNOR: Governance operations and policy management
  * - ROLE_ISSUER: Credential issuance and management
- * - ROLE_VALIDATOR: DID and credential validation
- * - ROLE_USER: Basic DID operations for own identity
+ * - ROLE_VALIDATOR: LABS and credential validation
+ * - ROLE_USER: Basic LABS operations for own identity
  * - ROLE_AUDITOR: Read-only access for auditing
  * 
  * @author Fatima Sanusi
- * @notice Use this contract to manage fine-grained access control for DID operations
+ * @notice Use this contract to manage fine-grained access control for LABS operations
  * @dev Implements OpenZeppelin AccessControl with enhanced permission management
  */
 contract EnhancedAccessControl is AccessControl, ReentrancyGuard {
@@ -50,10 +50,10 @@ contract EnhancedAccessControl is AccessControl, ReentrancyGuard {
     /// @notice Issuer role for credential management
     bytes32 public constant ROLE_ISSUER = keccak256("ROLE_ISSUER");
     
-    /// @notice Validator role for DID and credential validation
+    /// @notice Validator role for LABS and credential validation
     bytes32 public constant ROLE_VALIDATOR = keccak256("ROLE_VALIDATOR");
     
-    /// @notice User role for basic DID operations
+    /// @notice User role for basic LABS operations
     bytes32 public constant ROLE_USER = keccak256("ROLE_USER");
     
     /// @notice Auditor role for read-only auditing access
@@ -63,7 +63,7 @@ contract EnhancedAccessControl is AccessControl, ReentrancyGuard {
     
     /// @notice Resource types for permissions
     enum ResourceType {
-        DID,           // DID document operations
+        LABS,           // LABS document operations
         CREDENTIAL,    // Verifiable credential operations
         GOVERNANCE,    // Governance and system operations
         SYSTEM,        // System-level operations
@@ -682,7 +682,7 @@ contract EnhancedAccessControl is AccessControl, ReentrancyGuard {
         _setRolePermission(ROLE_GOVERNOR, ResourceType.GOVERNANCE, OperationType.READ, true);
         _setRolePermission(ROLE_GOVERNOR, ResourceType.GOVERNANCE, OperationType.UPDATE, true);
         _setRolePermission(ROLE_GOVERNOR, ResourceType.GOVERNANCE, OperationType.ADMIN, true);
-        _setRolePermission(ROLE_GOVERNOR, ResourceType.DID, OperationType.VALIDATE, true);
+        _setRolePermission(ROLE_GOVERNOR, ResourceType.LABS, OperationType.VALIDATE, true);
         _setRolePermission(ROLE_GOVERNOR, ResourceType.CREDENTIAL, OperationType.VALIDATE, true);
         
         // Issuer permissions - credential operations
@@ -690,22 +690,22 @@ contract EnhancedAccessControl is AccessControl, ReentrancyGuard {
         _setRolePermission(ROLE_ISSUER, ResourceType.CREDENTIAL, OperationType.READ, true);
         _setRolePermission(ROLE_ISSUER, ResourceType.CREDENTIAL, OperationType.UPDATE, true);
         _setRolePermission(ROLE_ISSUER, ResourceType.CREDENTIAL, OperationType.DELETE, true);
-        _setRolePermission(ROLE_ISSUER, ResourceType.DID, OperationType.READ, true);
+        _setRolePermission(ROLE_ISSUER, ResourceType.LABS, OperationType.READ, true);
         
         // Validator permissions - validation operations
-        _setRolePermission(ROLE_VALIDATOR, ResourceType.DID, OperationType.READ, true);
-        _setRolePermission(ROLE_VALIDATOR, ResourceType.DID, OperationType.VALIDATE, true);
+        _setRolePermission(ROLE_VALIDATOR, ResourceType.LABS, OperationType.READ, true);
+        _setRolePermission(ROLE_VALIDATOR, ResourceType.LABS, OperationType.VALIDATE, true);
         _setRolePermission(ROLE_VALIDATOR, ResourceType.CREDENTIAL, OperationType.READ, true);
         _setRolePermission(ROLE_VALIDATOR, ResourceType.CREDENTIAL, OperationType.VALIDATE, true);
         
-        // User permissions - own DID operations
-        _setRolePermission(ROLE_USER, ResourceType.DID, OperationType.CREATE, true);
-        _setRolePermission(ROLE_USER, ResourceType.DID, OperationType.READ, true);
-        _setRolePermission(ROLE_USER, ResourceType.DID, OperationType.UPDATE, true);
-        _setRolePermission(ROLE_USER, ResourceType.DID, OperationType.DELETE, true);
+        // User permissions - own LABS operations
+        _setRolePermission(ROLE_USER, ResourceType.LABS, OperationType.CREATE, true);
+        _setRolePermission(ROLE_USER, ResourceType.LABS, OperationType.READ, true);
+        _setRolePermission(ROLE_USER, ResourceType.LABS, OperationType.UPDATE, true);
+        _setRolePermission(ROLE_USER, ResourceType.LABS, OperationType.DELETE, true);
         
         // Auditor permissions - read-only access
-        _setRolePermission(ROLE_AUDITOR, ResourceType.DID, OperationType.READ, true);
+        _setRolePermission(ROLE_AUDITOR, ResourceType.LABS, OperationType.READ, true);
         _setRolePermission(ROLE_AUDITOR, ResourceType.CREDENTIAL, OperationType.READ, true);
         _setRolePermission(ROLE_AUDITOR, ResourceType.GOVERNANCE, OperationType.READ, true);
         _setRolePermission(ROLE_AUDITOR, ResourceType.SYSTEM, OperationType.READ, true);

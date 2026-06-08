@@ -1,25 +1,25 @@
-# DID Governance System Setup Guide
+# Cognitive Lab Governance System Setup Guide
 
 ## Overview
-This document describes the DAO-style governance system implemented for contract upgrades in the DID protocol. The system provides decentralized decision-making for contract modifications through token-based voting and time-delayed execution.
+This document describes the DAO-style governance system implemented for contract upgrades in the Cognitive Lab protocol. The system provides decentralized decision-making for contract modifications through token-based voting and time-delayed execution.
 
 ## Architecture
 
 ### Core Components
 
-1. **DIDGovernanceToken (ERC20Votes)**
+1. **LABSGovernanceToken (ERC20Votes)**
    - Governance token with voting capabilities
    - 1 billion max supply, 100 million initial supply
    - Token holders can delegate voting power
    - Used for proposal creation and voting
 
-2. **DIDTimelock**
+2. **LABSTimelock**
    - Time-delay execution controller
    - 2-30 day configurable delay
    - Prevents immediate execution of governance decisions
    - Emergency cancellation capabilities
 
-3. **DIDGovernor**
+3. **LABSGovernor**
    - Main governance contract
    - Handles proposal creation, voting, and execution
    - 1-day voting delay, 7-day voting period
@@ -91,7 +91,7 @@ export TARGET_PROXY_ADDRESS="0x..."
 npx hardhat run scripts/deploy-governance.js --network mainnet
 
 # Run tests to verify deployment
-npx hardhat test test/DIDGovernance.test.js --network mainnet
+npx hardhat test test/LABSGovernance.test.js --network mainnet
 ```
 
 ### 3. Enable Governance Control
@@ -119,11 +119,11 @@ await governanceToken.connect(user).delegate(user.address);
 ### Creating an Upgrade Proposal
 
 ```javascript
-// Create proposal to upgrade DID Registry
+// Create proposal to upgrade Cognitive Lab Registry
 const proposalId = await governor.proposeContractUpgrade(
-    didProxyAddress,
+    LABSProxyAddress,
     newImplementationAddress,
-    "Upgrade DID Registry to V2 with security improvements"
+    "Upgrade Cognitive Lab Registry to V2 with security improvements"
 );
 ```
 
@@ -244,7 +244,7 @@ const votes = await governanceToken.getVotes(address);
 ## Support
 
 For questions or issues:
-- Review test cases in `test/DIDGovernance.test.js`
+- Review test cases in `test/LABSGovernance.test.js`
 - Check deployment scripts in `scripts/deploy-governance.js`
 - Consult OpenZeppelin Governor documentation
 - Join community discussions in project forums

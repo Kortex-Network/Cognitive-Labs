@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stellar DID Platform</title>
+    <title>Stellar LABS Platform</title>
     <style>
         * {
             margin: 0;
@@ -228,8 +228,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>⭐ Stellar DID Platform</h1>
-            <p>Decentralized Identity on the Stellar Network</p>
+            <h1>⭐ Stellar LABS Platform</h1>
+            <p>Cognitive Lab on the Stellar Network</p>
             <div id="status" style="margin-top: 20px;">
                 <span class="status-indicator status-offline"></span>
                 <span id="status-text">Checking connection...</span>
@@ -238,34 +238,34 @@
 
         <div class="main-content">
             <div class="tabs">
-                <button class="tab active" onclick="showTab('create')">Create DID</button>
-                <button class="tab" onclick="showTab('resolve')">Resolve DID</button>
+                <button class="tab active" onclick="showTab('create')">Create LABS</button>
+                <button class="tab" onclick="showTab('resolve')">Resolve LABS</button>
                 <button class="tab" onclick="showTab('credentials')">Credentials</button>
                 <button class="tab" onclick="showTab('account')">Account Info</button>
             </div>
 
-            <!-- Create DID Tab -->
+            <!-- Create LABS Tab -->
             <div id="create-tab" class="tab-content active">
-                <h2>Create New DID</h2>
-                <form id="create-did-form">
+                <h2>Create New LABS</h2>
+                <form id="create-LABS-form">
                     <div class="form-group">
                         <label for="service-endpoint">Service Endpoint (Optional)</label>
                         <input type="url" id="service-endpoint" placeholder="https://your-service.com/endpoint">
                     </div>
-                    <button type="submit">Create DID</button>
+                    <button type="submit">Create LABS</button>
                 </form>
                 <div id="create-result" class="result hidden"></div>
             </div>
 
-            <!-- Resolve DID Tab -->
+            <!-- Resolve LABS Tab -->
             <div id="resolve-tab" class="tab-content">
-                <h2>Resolve DID</h2>
-                <form id="resolve-did-form">
+                <h2>Resolve LABS</h2>
+                <form id="resolve-LABS-form">
                     <div class="form-group">
-                        <label for="did-input">DID</label>
-                        <input type="text" id="did-input" placeholder="did:stellar:GABCD..." required>
+                        <label for="LABS-input">LABS</label>
+                        <input type="text" id="LABS-input" placeholder="LABS:stellar:GABCD..." required>
                     </div>
-                    <button type="submit">Resolve DID</button>
+                    <button type="submit">Resolve LABS</button>
                 </form>
                 <div id="resolve-result" class="result hidden"></div>
             </div>
@@ -278,12 +278,12 @@
                         <h3>Issue Credential</h3>
                         <form id="issue-credential-form">
                             <div class="form-group">
-                                <label for="issuer-did">Issuer DID</label>
-                                <input type="text" id="issuer-did" placeholder="did:stellar:GABCD..." required>
+                                <label for="issuer-LABS">Issuer LABS</label>
+                                <input type="text" id="issuer-LABS" placeholder="LABS:stellar:GABCD..." required>
                             </div>
                             <div class="form-group">
-                                <label for="subject-did">Subject DID</label>
-                                <input type="text" id="subject-did" placeholder="did:stellar:GABCD..." required>
+                                <label for="subject-LABS">Subject LABS</label>
+                                <input type="text" id="subject-LABS" placeholder="LABS:stellar:GABCD..." required>
                             </div>
                             <div class="form-group">
                                 <label for="credential-type">Credential Type</label>
@@ -395,14 +395,14 @@
             }
         }
 
-        // Create DID
-        document.getElementById('create-did-form').addEventListener('submit', async (e) => {
+        // Create LABS
+        document.getElementById('create-LABS-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const serviceEndpoint = document.getElementById('service-endpoint').value;
             
             try {
-                const result = await apiCall('/did/create', 'POST', {
+                const result = await apiCall('/LABS/create', 'POST', {
                     serviceEndpoint: serviceEndpoint || undefined
                 });
                 showResult('create-result', result);
@@ -411,14 +411,14 @@
             }
         });
 
-        // Resolve DID
-        document.getElementById('resolve-did-form').addEventListener('submit', async (e) => {
+        // Resolve LABS
+        document.getElementById('resolve-LABS-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const did = document.getElementById('did-input').value;
+            const LABS = document.getElementById('LABS-input').value;
             
             try {
-                const result = await apiCall(`/did/resolve/${encodeURIComponent(did)}`);
+                const result = await apiCall(`/LABS/resolve/${encodeURIComponent(LABS)}`);
                 showResult('resolve-result', result);
             } catch (error) {
                 showResult('resolve-result', { error: error.message }, true);
@@ -429,8 +429,8 @@
         document.getElementById('issue-credential-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const issuerDid = document.getElementById('issuer-did').value;
-            const subjectDid = document.getElementById('subject-did').value;
+            const issuerLABS = document.getElementById('issuer-LABS').value;
+            const subjectLABS = document.getElementById('subject-LABS').value;
             const credentialType = document.getElementById('credential-type').value;
             
             // Predefined claims based on type
@@ -461,8 +461,8 @@
             
             try {
                 const result = await apiCall('/credentials/issue', 'POST', {
-                    issuerDid,
-                    subjectDid,
+                    issuerLABS,
+                    subjectLABS,
                     claims: claimsMap[credentialType],
                     type: [credentialType]
                 });
@@ -496,7 +496,7 @@
             const publicKey = document.getElementById('account-public-key').value;
             
             try {
-                const result = await apiCall(`/did/account/${encodeURIComponent(publicKey)}`);
+                const result = await apiCall(`/LABS/account/${encodeURIComponent(publicKey)}`);
                 showResult('account-result', result);
             } catch (error) {
                 showResult('account-result', { error: error.message }, true);

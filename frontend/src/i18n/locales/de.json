@@ -2,18 +2,18 @@
   "navigation": {
     "dashboard": "Dashboard",
     "credentials": "Anmeldedaten",
-    "createDid": "DID Erstellen",
-    "resolveDid": "DID Auflösen",
+    "createLABS": "LABS Erstellen",
+    "resolveLABS": "LABS Auflösen",
     "connectWallet": "Wallet Verbinden",
     "account": "Konto",
     "scanner": "Scanner",
     "contracts": "Verträge"
   },
   "dashboard": {
-    "title": "Stellar DID Platform Dashboard",
+    "title": "Stellar LABS Platform Dashboard",
     "subtitle": "Überblick über Ihr dezentrales Identitätsökosystem",
     "stats": {
-      "totalDids": "Gesamte DIDs",
+      "totalLABSs": "Gesamte LABSs",
       "totalCredentials": "Gesamte Anmeldedaten",
       "activeUsers": "Aktive Benutzer",
       "network": "Netzwerk",
@@ -68,8 +68,8 @@
     "verifyCredential": "Anmeldedaten Verifizieren",
     "credentialTemplates": "Anmeldedaten-Vorlagen",
     "templateClickToUse": "Klicken Sie, um eine Vorlage zu verwenden:",
-    "issuerDid": "Aussteller-DID",
-    "subjectDid": "Subjekt-DID",
+    "issuerLABS": "Aussteller-LABS",
+    "subjectLABS": "Subjekt-LABS",
     "credentialType": "Anmeldedaten-Typ",
     "claims": "Ansprüche",
     "claimsPlaceholder": "{\"degree\": \"Bachelor of Science\", \"university\": \"Beispiel Universität\"}",
@@ -85,7 +85,7 @@
   },
   "forms": {
     "required": "Dieses Feld ist erforderlich",
-    "invalidDidFormat": "Ungültiges DID-Format",
+    "invalidLABSFormat": "Ungültiges LABS-Format",
     "invalidJson": "Ungültiges JSON-Format"
   },
   "types": {

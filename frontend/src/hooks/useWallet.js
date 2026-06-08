@@ -6,19 +6,19 @@ export const useStellar = () => {
   const { wallet, isConnected } = useWallet();
   const [loading, setLoading] = useState(false);
 
-  const createDID = useCallback(async (serviceEndpoint) => {
+  const createLABS = useCallback(async (serviceEndpoint) => {
     if (!isConnected) throw new Error('Wallet not connected');
     
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:3001/api/v1/contracts/register-did', {
+      const response = await fetch('http://localhost:3001/api/v1/contracts/register-LABS', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          did: `did:stellar:${wallet.publicKey}`,
+          LABS: `LABS:stellar:${wallet.publicKey}`,
           publicKey: wallet.publicKey,
           serviceEndpoint,
           signerSecret: wallet.secretKey,
@@ -37,11 +37,11 @@ export const useStellar = () => {
     }
   }, [wallet, isConnected]);
 
-  const resolveDID = useCallback(async (did) => {
+  const resolveLABS = useCallback(async (LABS) => {
     setLoading(true);
     
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/contracts/did/${encodeURIComponent(did)}`);
+      const response = await fetch(`http://localhost:3001/api/v1/contracts/LABS/${encodeURIComponent(LABS)}`);
       const result = await response.json();
       
       if (result.success) {
@@ -54,7 +54,7 @@ export const useStellar = () => {
     }
   }, []);
 
-  const issueCredential = useCallback(async (issuerDID, subjectDID, credentialType, claims) => {
+  const issueCredential = useCallback(async (issuerLABS, subjectLABS, credentialType, claims) => {
     if (!isConnected) throw new Error('Wallet not connected');
     
     setLoading(true);
@@ -66,8 +66,8 @@ export const useStellar = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          issuerDID,
-          subjectDID,
+          issuerLABS,
+          subjectLABS,
           credentialType,
           claims,
           signerSecret: wallet.secretKey,
@@ -114,8 +114,8 @@ export const useStellar = () => {
 
   return {
     loading,
-    createDID,
-    resolveDID,
+    createLABS,
+    resolveLABS,
     issueCredential,
     verifyCredential,
   };

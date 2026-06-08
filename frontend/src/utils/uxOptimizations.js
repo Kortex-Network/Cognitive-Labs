@@ -190,9 +190,9 @@ class SmartForms {
             errors.push("Please enter a valid URL");
           }
           break;
-        case "did":
-          if (!this.isValidDID(value)) {
-            errors.push("Please enter a valid DID format");
+        case "LABS":
+          if (!this.isValidLABS(value)) {
+            errors.push("Please enter a valid LABS format");
           }
           break;
         case "stellar":
@@ -418,8 +418,8 @@ class SmartForms {
     }
   }
 
-  isValidDID(did) {
-    return /^did:stellar:G[A-Z0-9]{55}$/.test(did);
+  isValidLABS(LABS) {
+    return /^LABS:stellar:G[A-Z0-9]{55}$/.test(LABS);
   }
 
   isValidStellarAddress(address) {
@@ -478,7 +478,7 @@ class SmartForms {
   setupAutoComplete() {
     // Load auto-complete data
     this.autoCompleteData.set("serviceEndpoint", [
-      "https://did.example.com",
+      "https://LABS.example.com",
       "https://identity.example.com",
       "https://hub.example.com",
     ]);
@@ -781,7 +781,7 @@ class OfflineSupport {
    */
   setupOfflineStorage() {
     if ("caches" in window) {
-      this.cache = caches.open("stellar-did-offline-v1");
+      this.cache = caches.open("stellar-LABS-offline-v1");
     }
 
     if ("indexedDB" in window) {

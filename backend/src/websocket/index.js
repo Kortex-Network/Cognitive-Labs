@@ -3,11 +3,11 @@ const { logger } = require('../middleware');
 
 /*
  * Events the server can broadcast to connected clients.
- * Clients subscribe by sending: { type: 'subscribe', topics: ['did:created', ...] }
+ * Clients subscribe by sending: { type: 'subscribe', topics: ['LABS:created', ...] }
  */
 const EVENTS = {
-  DID_CREATED:          'did:created',
-  DID_UPDATED:          'did:updated',
+  LABS_CREATED:          'LABS:created',
+  LABS_UPDATED:          'LABS:updated',
   CREDENTIAL_ISSUED:    'credential:issued',
   CREDENTIAL_REVOKED:   'credential:revoked',
   CONTRACT_DEPLOYED:    'contract:deployed',
@@ -133,11 +133,11 @@ class WebSocketManager {
   /**
    * Broadcast an event to all clients subscribed to its topic.
    *
-   * @param {string} topic   One of the EVENTS constants, e.g. 'did:created'.
+   * @param {string} topic   One of the EVENTS constants, e.g. 'LABS:created'.
    * @param {object} payload Data to send alongside the event.
    *
    * @example
-   *   wsManager.broadcast('did:created', { did: 'did:stellar:GABC...', owner: '...' });
+   *   wsManager.broadcast('LABS:created', { LABS: 'LABS:stellar:GABC...', owner: '...' });
    */
   broadcast(topic, payload) {
     if (!this.wss) return;

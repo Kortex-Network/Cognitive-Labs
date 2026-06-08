@@ -74,7 +74,7 @@ const logger = winston.createLogger({
   format,
   transports,
   defaultMeta: {
-    service: 'stellar-did-backend',
+    service: 'stellar-LABS-backend',
     environment: process.env.NODE_ENV || 'development',
   },
   exceptionHandlers: [

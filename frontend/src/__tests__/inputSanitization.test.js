@@ -7,7 +7,7 @@ import {
   escapeHtml,
   sanitizeHtml,
   sanitizeText,
-  validateAndSanitizeDID,
+  validateAndSanitizeLABS,
   validateAndSanitizePublicKey,
   validateAndSanitizeSecretKey,
   validateAndSanitizeUrl,
@@ -76,26 +76,26 @@ describe('Input Sanitization Utilities', () => {
     });
   });
 
-  describe('validateAndSanitizeDID', () => {
-    test('should validate correct DID format', () => {
-      const did = 'did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
-      const result = validateAndSanitizeDID(did);
+  describe('validateAndSanitizeLABS', () => {
+    test('should validate correct LABS format', () => {
+      const LABS = 'LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+      const result = validateAndSanitizeLABS(LABS);
       expect(result.isValid).toBe(true);
-      expect(result.sanitizedDid).toBe(did);
+      expect(result.sanitizedLABS).toBe(LABS);
     });
 
-    test('should reject invalid DID format', () => {
-      const did = 'invalid:did';
-      const result = validateAndSanitizeDID(did);
+    test('should reject invalid LABS format', () => {
+      const LABS = 'invalid:LABS';
+      const result = validateAndSanitizeLABS(LABS);
       expect(result.isValid).toBe(false);
-      expect(result.sanitizedDid).toBe('invalid:did');
+      expect(result.sanitizedLABS).toBe('invalid:LABS');
     });
 
-    test('should handle XSS attempts in DID', () => {
-      const did = 'did:stellar:G<script>alert("xss")</script>';
-      const result = validateAndSanitizeDID(did);
+    test('should handle XSS attempts in LABS', () => {
+      const LABS = 'LABS:stellar:G<script>alert("xss")</script>';
+      const result = validateAndSanitizeLABS(LABS);
       expect(result.isValid).toBe(false);
-      expect(result.sanitizedDid).not.toContain('<script>');
+      expect(result.sanitizedLABS).not.toContain('<script>');
     });
   });
 

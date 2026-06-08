@@ -4,12 +4,12 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Stellar Decentralized Identity (DID) Platform API',
+      title: 'Stellar Cognitive-Labs Platform API',
       version: '1.0.0',
-      description: 'API for managing Decentralized Identifiers (DIDs) and Verifiable Credentials on the Stellar blockchain',
+      description: 'API for managing Decentralized Identifiers (LABSs) and Verifiable Credentials on the Stellar blockchain',
       contact: {
         name: 'API Support',
-        url: 'https://github.com/elizabetheonoja-art/Decentralized-Identity-DID-',
+        url: 'https://github.com/elizabetheonoja-art/Decentralized-Identity-LABS-',
       },
     },
     servers: [

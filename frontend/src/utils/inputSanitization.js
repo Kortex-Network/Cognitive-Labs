@@ -75,21 +75,21 @@ export const sanitizeText = (input) => {
 };
 
 /**
- * Validate and sanitize DID format
- * @param {string} did - The DID to validate and sanitize
- * @returns {object} - { isValid: boolean, sanitizedDid: string }
+ * Validate and sanitize LABS format
+ * @param {string} LABS - The LABS to validate and sanitize
+ * @returns {object} - { isValid: boolean, sanitizedLABS: string }
  */
-export const validateAndSanitizeDID = (did) => {
-  if (typeof did !== 'string') {
-    return { isValid: false, sanitizedDid: '' };
+export const validateAndSanitizeLABS = (LABS) => {
+  if (typeof LABS !== 'string') {
+    return { isValid: false, sanitizedLABS: '' };
   }
 
-  const sanitized = sanitizeText(did.trim());
-  const didRegex = /^did:stellar:G[A-Z2-7]{55}$/;
+  const sanitized = sanitizeText(LABS.trim());
+  const LABSRegex = /^LABS:stellar:G[A-Z2-7]{55}$/;
   
   return {
-    isValid: didRegex.test(sanitized),
-    sanitizedDid: sanitized
+    isValid: LABSRegex.test(sanitized),
+    sanitizedLABS: sanitized
   };
 };
 
@@ -223,7 +223,7 @@ export default {
   escapeHtml,
   sanitizeHtml,
   sanitizeText,
-  validateAndSanitizeDID,
+  validateAndSanitizeLABS,
   validateAndSanitizePublicKey,
   validateAndSanitizeSecretKey,
   validateAndSanitizeUrl,

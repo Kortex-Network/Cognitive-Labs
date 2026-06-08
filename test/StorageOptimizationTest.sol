@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../contracts/ethereum/EthereumDIDRegistry.sol";
-import "../contracts/optimized/OptimizedDIDRegistry.sol";
+import "../contracts/ethereum/EthereumLABSRegistry.sol";
+import "../contracts/optimized/OptimizedLABSRegistry.sol";
 
 /**
  * @title StorageOptimizationTest
@@ -12,23 +12,23 @@ import "../contracts/optimized/OptimizedDIDRegistry.sol";
  */
 contract StorageOptimizationTest is Test {
     
-    EthereumDIDRegistry public originalRegistry;
-    OptimizedDIDRegistry public optimizedRegistry;
+    EthereumLABSRegistry public originalRegistry;
+    OptimizedLABSRegistry public optimizedRegistry;
     
     address public owner = address(0x1);
     address public admin = address(0x2);
     address public user = address(0x3);
     
-    string constant DID = "did:stellar:123456789";
+    string constant LABS = "LABS:stellar:123456789";
     string constant PUBLIC_KEY = "public_key_123";
     string constant SERVICE_ENDPOINT = "https://service.example.com";
     
     function setUp() public {
         // Deploy original registry
-        originalRegistry = new EthereumDIDRegistry();
+        originalRegistry = new EthereumLABSRegistry();
         
         // Deploy optimized registry
-        optimizedRegistry = new OptimizedDIDRegistry();
+        optimizedRegistry = new OptimizedLABSRegistry();
         
         // Grant admin roles
         vm.prank(admin);
@@ -39,23 +39,23 @@ contract StorageOptimizationTest is Test {
     }
     
     /**
-     * @dev Test gas comparison for DID creation
+     * @dev Test gas comparison for LABS creation
      */
-    function testGasComparison_DIDCreation() public {
+    function testGasComparison_LABSCreation() public {
         // Test original registry
         vm.prank(admin);
         uint256 gasBefore = gasleft();
-        originalRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        originalRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         uint256 gasUsedOriginal = gasBefore - gasleft();
         
         // Test optimized registry
         vm.prank(admin);
         gasBefore = gasleft();
-        optimizedRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         uint256 gasUsedOptimized = gasBefore - gasleft();
         
-        console.log("Original DID creation gas:", gasUsedOriginal);
-        console.log("Optimized DID creation gas:", gasUsedOptimized);
+        console.log("Original LABS creation gas:", gasUsedOriginal);
+        console.log("Optimized LABS creation gas:", gasUsedOptimized);
         console.log("Gas savings:", gasUsedOriginal - gasUsedOptimized);
         
         assertTrue(gasUsedOptimized < gasUsedOriginal, "Optimized version should use less gas");
@@ -65,16 +65,16 @@ contract StorageOptimizationTest is Test {
      * @dev Test gas comparison for credential issuance
      */
     function testGasComparison_CredentialIssuance() public {
-        // Set up DIDs first
+        // Set up LABSs first
         vm.prank(admin);
-        originalRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        originalRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         vm.prank(admin);
-        optimizedRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         bytes32 credentialId = keccak256("test_credential");
-        string memory issuer = "did:stellar:issuer";
-        string memory subject = DID;
+        string memory issuer = "LABS:stellar:issuer";
+        string memory subject = LABS;
         string memory credentialType = "TestCredential";
         uint256 expires = block.timestamp + 365 days;
         bytes32 dataHash = keccak256("test_data");
@@ -102,12 +102,12 @@ contract StorageOptimizationTest is Test {
      * @dev Test batch operations gas efficiency
      */
     function testBatchOperations() public {
-        string[] memory dids = new string[](3);
+        string[] memory LABSs = new string[](3);
         string[] memory publicKeys = new string[](3);
         string[] memory serviceEndpoints = new string[](3);
         
         for (uint i = 0; i < 3; i++) {
-            dids[i] = string(abi.encodePacked("did:stellar:", i));
+            LABSs[i] = string(abi.encodePacked("LABS:stellar:", i));
             publicKeys[i] = string(abi.encodePacked("public_key_", i));
             serviceEndpoints[i] = string(abi.encodePacked("https://service", i, ".example.com"));
         }
@@ -115,7 +115,7 @@ contract StorageOptimizationTest is Test {
         // Test batch operation
         vm.prank(admin);
         uint256 gasBefore = gasleft();
-        optimizedRegistry.batchBridgeDIDs(dids, new address[](3), publicKeys, serviceEndpoints);
+        optimizedRegistry.batchBridgeLABSs(LABSs, new address[](3), publicKeys, serviceEndpoints);
         uint256 gasUsedBatch = gasBefore - gasleft();
         
         // Test individual operations
@@ -123,7 +123,7 @@ contract StorageOptimizationTest is Test {
         for (uint i = 0; i < 3; i++) {
             vm.prank(admin);
             gasBefore = gasleft();
-            optimizedRegistry.bridgeDID(dids[i], address(uint160(100 + i)), publicKeys[i], serviceEndpoints[i]);
+            optimizedRegistry.bridgeLABS(LABSs[i], address(uint160(100 + i)), publicKeys[i], serviceEndpoints[i]);
             gasUsedIndividual += (gasBefore - gasleft());
         }
         
@@ -138,18 +138,18 @@ contract StorageOptimizationTest is Test {
      * @dev Test optimized view functions
      */
     function testOptimizedViewFunctions() public {
-        // Set up a DID
+        // Set up a LABS
         vm.prank(admin);
-        optimizedRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // Test full document retrieval
         uint256 gasBefore = gasleft();
-        OptimizedDIDRegistry.DIDDocument memory doc = optimizedRegistry.getDIDDocument(DID);
+        OptimizedLABSRegistry.LABSDocument memory doc = optimizedRegistry.getLABSDocument(LABS);
         uint256 gasUsedFull = gasBefore - gasleft();
         
         // Test optimized info retrieval
         gasBefore = gasleft();
-        (address retrievedOwner, bool active, uint256 updated) = optimizedRegistry.getDIDInfo(DID);
+        (address retrievedOwner, bool active, uint256 updated) = optimizedRegistry.getLABSInfo(LABS);
         uint256 gasUsedInfo = gasBefore - gasleft();
         
         console.log("Full document retrieval gas:", gasUsedFull);
@@ -158,7 +158,7 @@ contract StorageOptimizationTest is Test {
         
         assertTrue(gasUsedInfo < gasUsedFull, "Optimized view function should use less gas");
         assertEq(retrievedOwner, owner, "Owner should match");
-        assertTrue(active, "DID should be active");
+        assertTrue(active, "LABS should be active");
         assertTrue(updated > 0, "Updated timestamp should be set");
     }
     
@@ -170,19 +170,19 @@ contract StorageOptimizationTest is Test {
         // by checking the actual storage layout
         
         vm.prank(admin);
-        optimizedRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         
-        // Get storage slots for the DID
+        // Get storage slots for the LABS
         bytes32[] memory slots = new bytes32[](10);
         
         // Calculate storage slots (this is a simplified approach)
         // In a real test, you would use vm.load to inspect actual storage
         for (uint i = 0; i < 10; i++) {
-            slots[i] = keccak256(abi.encodePacked(DID, i));
+            slots[i] = keccak256(abi.encodePacked(LABS, i));
         }
         
         // Verify that the struct is properly packed
-        OptimizedDIDRegistry.DIDDocument memory doc = optimizedRegistry.getDIDDocument(DID);
+        OptimizedLABSRegistry.LABSDocument memory doc = optimizedRegistry.getLABSDocument(LABS);
         assertEq(doc.owner, owner, "Owner should be stored correctly");
         assertTrue(doc.active, "Active flag should be stored correctly");
         assertTrue(doc.created > 0, "Created timestamp should be stored correctly");
@@ -195,20 +195,20 @@ contract StorageOptimizationTest is Test {
      * @dev Test edge cases and error conditions
      */
     function testEdgeCases() public {
-        // Test empty DID
-        vm.expectRevert("DID cannot be empty");
-        optimizedRegistry.bridgeDID("", owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        // Test empty LABS
+        vm.expectRevert("LABS cannot be empty");
+        optimizedRegistry.bridgeLABS("", owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // Test empty public key
         vm.expectRevert("Public key cannot be empty");
-        optimizedRegistry.bridgeDID(DID, owner, "", SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, "", SERVICE_ENDPOINT);
         
-        // Test duplicate DID
+        // Test duplicate LABS
         vm.prank(admin);
-        optimizedRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
         
-        vm.expectRevert("DID already exists on this chain");
+        vm.expectRevert("LABS already exists on this chain");
         vm.prank(admin);
-        optimizedRegistry.bridgeDID(DID, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
+        optimizedRegistry.bridgeLABS(LABS, owner, PUBLIC_KEY, SERVICE_ENDPOINT);
     }
 }

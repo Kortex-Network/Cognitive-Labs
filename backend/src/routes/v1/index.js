@@ -141,7 +141,7 @@ router.post('/contracts/sign-transaction', async (req, res) => {
 // router.use('/bridge', require('./bridge')); // Temporarily disabled due to ContractService issue
 // router.use('/contracts', require('./contracts')); // Temporarily disabled due to contractService issue
 // router.use('/credentials', require('./credentials'));
-// router.use('/did', require('./did'));
+// router.use('/LABS', require('./LABS'));
 // router.use('/api-keys', require('./apiKeys'));
 // router.use('/monitoring', require('./monitoring'));
 // router.use('/qr', require('./qr'));

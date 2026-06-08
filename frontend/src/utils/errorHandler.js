@@ -41,25 +41,25 @@ const errorMappings = {
     ]
   },
 
-  'DIDRegistrationFailed': {
-    title: 'DID Registration Failed',
-    getMessage: (error) => error.action || 'Unable to register your DID.',
+  'LABSRegistrationFailed': {
+    title: 'LABS Registration Failed',
+    getMessage: (error) => error.action || 'Unable to register your LABS.',
     getSuggestions: () => [
       'Ensure your Stellar account has funds',
-      'Verify you own the private key for this DID',
-      'Check that the DID format is correct',
+      'Verify you own the private key for this LABS',
+      'Check that the LABS format is correct',
       'Try creating a new account if needed'
     ]
   },
 
-  'DIDUpdateFailed': {
-    title: 'DID Update Failed',
-    getMessage: (error) => error.action || 'Unable to update your DID document.',
+  'LABSUpdateFailed': {
+    title: 'LABS Update Failed',
+    getMessage: (error) => error.action || 'Unable to update your LABS document.',
     getSuggestions: () => [
-      'Make sure you own this DID',
+      'Make sure you own this LABS',
       'Check your secret key is correct',
       'Ensure your account has sufficient funds',
-      'Verify the DID is already registered'
+      'Verify the LABS is already registered'
     ]
   },
 
@@ -67,8 +67,8 @@ const errorMappings = {
     title: 'Credential Issuance Failed',
     getMessage: (error) => error.action || 'Unable to issue the verifiable credential.',
     getSuggestions: () => [
-      'Verify both issuer and subject DIDs are valid',
-      'Check that both DIDs are registered',
+      'Verify both issuer and subject LABSs are valid',
+      'Check that both LABSs are registered',
       'Ensure your account has sufficient funds',
       'Review credential data for any issues'
     ]

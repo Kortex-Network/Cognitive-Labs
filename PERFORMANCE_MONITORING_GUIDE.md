@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a comprehensive guide to the performance monitoring and metrics implementation for the Stellar DID Backend service. The implementation includes Prometheus metrics collection, Grafana dashboards, and a complete monitoring stack.
+This document provides a comprehensive guide to the performance monitoring and metrics implementation for the Cognitive Lab Backend service. The implementation includes Prometheus metrics collection, Grafana dashboards, and a complete monitoring stack.
 
 ## Architecture
 
@@ -24,7 +24,7 @@ This document provides a comprehensive guide to the performance monitoring and m
 
 #### Application Metrics
 - Contract operations (count and duration)
-- DID registry size
+- Cognitive Lab registry size
 - Active connections
 - Cache hit rate
 - Database connections
@@ -80,7 +80,7 @@ app.get('/health', metricsMiddleware.healthWithMetrics());
 
 - Docker and Docker Compose
 - Node.js 16+
-- Access to the Stellar DID Backend codebase
+- Access to the Cognitive Lab Backend codebase
 
 ### Quick Start
 
@@ -132,7 +132,7 @@ The pre-configured Grafana dashboard includes the following panels:
 2. **HTTP Request Duration** - Response time percentiles
 3. **Contract Operations** - Blockchain operation metrics
 4. **Active Connections** - Current active connections
-5. **DID Registry Size** - Number of DIDs in registry
+5. **Cognitive Lab Registry Size** - Number of Cognitive Labs in registry
 6. **Error Rate** - Error occurrences by type and endpoint
 7. **Stellar Operations** - Stellar blockchain operations
 8. **Cache Hit Rate** - Cache performance
@@ -159,7 +159,7 @@ Create alert rules in Prometheus (`monitoring/alert-rules.yml`):
 
 ```yaml
 groups:
-  - name: stellar-did-alerts
+  - name: stellar-LABS-alerts
     rules:
       - alert: HighErrorRate
         expr: rate(error_rate_total[5m]) > 0.1
@@ -207,7 +207,7 @@ this.metricsService.recordCustomMetric(value1, value2);
 ### Business Metrics
 
 Track business-specific metrics:
-- DID creation rate
+- Cognitive Lab creation rate
 - Credential issuance volume
 - Transaction success rates
 - User activity patterns
@@ -316,6 +316,6 @@ curl -f http://localhost:9090/-/healthy || exit 1
 
 ## Conclusion
 
-This comprehensive monitoring implementation provides full visibility into the Stellar DID Backend performance, enabling proactive issue detection, performance optimization, and operational excellence.
+This comprehensive monitoring implementation provides full visibility into the Cognitive Lab Backend performance, enabling proactive issue detection, performance optimization, and operational excellence.
 
 For support or questions, refer to the project documentation or create an issue in the repository.

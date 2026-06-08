@@ -80,7 +80,7 @@ describe("EnhancedAccessControl", function () {
         });
 
         it("Should allow admin to grant permissions", async function () {
-            const resourceId = 0; // DID
+            const resourceId = 0; // LABS
             const operationId = 0; // CREATE
             const expiresAt = 0; // Never expires
             
@@ -98,7 +98,7 @@ describe("EnhancedAccessControl", function () {
         });
 
         it("Should allow admin to revoke permissions", async function () {
-            const resourceId = 0; // DID
+            const resourceId = 0; // LABS
             const operationId = 0; // CREATE
             
             // Grant first
@@ -118,7 +118,7 @@ describe("EnhancedAccessControl", function () {
         });
 
         it("Should handle time-based permissions correctly", async function () {
-            const resourceId = 0; // DID
+            const resourceId = 0; // LABS
             const operationId = 0; // CREATE
             const expiresAt = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
             
@@ -131,7 +131,7 @@ describe("EnhancedAccessControl", function () {
 
     describe("User-Specific Permissions", function () {
         it("Should allow admin to set user-specific permissions", async function () {
-            const resourceId = 0; // DID
+            const resourceId = 0; // LABS
             const operationId = 0; // CREATE
             
             await enhancedAccessControl.setUserPermission(unauthorized.address, resourceId, operationId, true);
@@ -140,7 +140,7 @@ describe("EnhancedAccessControl", function () {
         });
 
         it("Should allow admin to deny user-specific permissions", async function () {
-            const resourceId = 0; // DID
+            const resourceId = 0; // LABS
             const operationId = 0; // CREATE
             
             await enhancedAccessControl.setUserPermission(unauthorized.address, resourceId, operationId, false);
@@ -206,8 +206,8 @@ describe("EnhancedAccessControl", function () {
             expect(await enhancedAccessControl.checkPermission(governor.address, 2, 2)).to.be.true; // GOVERNANCE, UPDATE
             expect(await enhancedAccessControl.checkPermission(governor.address, 2, 4)).to.be.true; // GOVERNANCE, ADMIN
             
-            // But not all DID operations
-            expect(await enhancedAccessControl.checkPermission(governor.address, 0, 0)).to.be.false; // DID, CREATE
+            // But not all LABS operations
+            expect(await enhancedAccessControl.checkPermission(governor.address, 0, 0)).to.be.false; // LABS, CREATE
         });
 
         it("Should correctly check issuer permissions", async function () {
@@ -223,22 +223,22 @@ describe("EnhancedAccessControl", function () {
 
         it("Should correctly check validator permissions", async function () {
             // Validator should have validation permissions
-            expect(await enhancedAccessControl.checkPermission(validator.address, 0, 5)).to.be.true; // DID, VALIDATE
+            expect(await enhancedAccessControl.checkPermission(validator.address, 0, 5)).to.be.true; // LABS, VALIDATE
             expect(await enhancedAccessControl.checkPermission(validator.address, 1, 5)).to.be.true; // CREDENTIAL, VALIDATE
             
             // But not create operations
-            expect(await enhancedAccessControl.checkPermission(validator.address, 0, 0)).to.be.false; // DID, CREATE
+            expect(await enhancedAccessControl.checkPermission(validator.address, 0, 0)).to.be.false; // LABS, CREATE
         });
 
         it("Should correctly check auditor permissions", async function () {
             // Auditor should have read-only permissions
-            expect(await enhancedAccessControl.checkPermission(auditor.address, 0, 1)).to.be.true; // DID, READ
+            expect(await enhancedAccessControl.checkPermission(auditor.address, 0, 1)).to.be.true; // LABS, READ
             expect(await enhancedAccessControl.checkPermission(auditor.address, 1, 1)).to.be.true; // CREDENTIAL, READ
             expect(await enhancedAccessControl.checkPermission(auditor.address, 2, 1)).to.be.true; // GOVERNANCE, READ
             expect(await enhancedAccessControl.checkPermission(auditor.address, 3, 1)).to.be.true; // SYSTEM, READ
             
             // But not create operations
-            expect(await enhancedAccessControl.checkPermission(auditor.address, 0, 0)).to.be.false; // DID, CREATE
+            expect(await enhancedAccessControl.checkPermission(auditor.address, 0, 0)).to.be.false; // LABS, CREATE
         });
 
         it("Should return false for unauthorized users", async function () {
@@ -338,9 +338,9 @@ describe("EnhancedAccessControl", function () {
             await enhancedAccessControl.grantRole(ROLE_ISSUER, issuer.address);
             
             // Grant additional permission to governor
-            await enhancedAccessControl.grantPermission(ROLE_GOVERNOR, 0, 0, 0, ""); // DID CREATE
+            await enhancedAccessControl.grantPermission(ROLE_GOVERNOR, 0, 0, 0, ""); // LABS CREATE
             
-            // Governor should now have DID CREATE permission
+            // Governor should now have LABS CREATE permission
             expect(await enhancedAccessControl.checkPermission(governor.address, 0, 0)).to.be.true;
             
             // Set user-specific override

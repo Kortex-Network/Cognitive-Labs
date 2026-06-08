@@ -25,7 +25,7 @@ api.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-const OFFLINE_CACHE_PREFIX = "stellar-did-api-cache:";
+const OFFLINE_CACHE_PREFIX = "stellar-LABS-api-cache:";
 
 const getCacheKey = (config) => {
   const url = `${config.baseURL || ""}${config.url || ""}`;
@@ -88,36 +88,36 @@ api.interceptors.response.use(
   },
 );
 
-// Stellar DID API endpoints
+// Stellar LABS API endpoints
 export const stellarAPI = {
   // Contract operations
   contracts: {
     deploy: (data) => api.post("/contracts/deploy", data),
-    registerDID: (data) => api.post("/contracts/register-did", data),
-    updateDID: (data) => api.put("/contracts/update-did", data),
+    registerLABS: (data) => api.post("/contracts/register-LABS", data),
+    updateLABS: (data) => api.put("/contracts/update-LABS", data),
     issueCredential: (data) => api.post("/contracts/issue-credential", data),
     revokeCredential: (data) => api.post("/contracts/revoke-credential", data),
     verifyCredential: (data) => api.post("/contracts/verify-credential", data),
-    getDID: (did) => api.get(`/contracts/did/${did}`),
+    getLABS: (LABS) => api.get(`/contracts/LABS/${LABS}`),
     getCredential: (credentialId) =>
       api.get(`/contracts/credential/${credentialId}`),
-    getOwnerDIDs: (publicKey) => api.get(`/contracts/owner-dids/${publicKey}`),
+    getOwnerLABSs: (publicKey) => api.get(`/contracts/owner-LABSs/${publicKey}`),
     getInfo: () => api.get("/contracts/info"),
     createAccount: () => api.post("/contracts/create-account"),
     fundAccount: (data) => api.post("/contracts/fund-account", data),
     getAccount: (publicKey) => api.get(`/contracts/account/${publicKey}`),
   },
 
-  // DID operations
-  did: {
-    create: (data) => api.post("/did/create", data),
-    resolve: (did) => api.get(`/did/resolve/${did}`),
-    update: (did, data) => api.put(`/did/update/${did}`, data),
-    authenticate: (data) => api.post("/did/authenticate", data),
-    verifyToken: (data) => api.post("/did/verify-token", data),
-    getAccount: (publicKey) => api.get(`/did/account/${publicKey}`),
+  // LABS operations
+  LABS: {
+    create: (data) => api.post("/LABS/create", data),
+    resolve: (LABS) => api.get(`/LABS/resolve/${LABS}`),
+    update: (LABS, data) => api.put(`/LABS/update/${LABS}`, data),
+    authenticate: (data) => api.post("/LABS/authenticate", data),
+    verifyToken: (data) => api.post("/LABS/verify-token", data),
+    getAccount: (publicKey) => api.get(`/LABS/account/${publicKey}`),
     getTransactions: (publicKey, params) =>
-      api.get(`/did/transactions/${publicKey}`, { params }),
+      api.get(`/LABS/transactions/${publicKey}`, { params }),
   },
 
   // Credential operations

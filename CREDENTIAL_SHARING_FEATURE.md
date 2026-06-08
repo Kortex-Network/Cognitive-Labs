@@ -1,7 +1,7 @@
 # Credential Sharing Feature - Issue #94
 
 ## Overview
-This implementation adds secure credential sharing functionality with expiration controls to the Decentralized Identity DID platform.
+This implementation adds secure credential sharing functionality with expiration controls to the Cognitive Lab platform.
 
 ## Features Implemented
 
@@ -20,8 +20,8 @@ This implementation adds secure credential sharing functionality with expiration
 - `POST /api/sharing/share` - Share a credential
 - `POST /api/sharing/access` - Access a shared credential
 - `POST /api/sharing/revoke` - Revoke a shared credential
-- `GET /api/sharing/my-shares` - Get credentials shared by a DID
-- `GET /api/sharing/shared-with-me` - Get credentials shared with a DID
+- `GET /api/sharing/my-shares` - Get credentials shared by a Cognitive Lab
+- `GET /api/sharing/shared-with-me` - Get credentials shared with a Cognitive Lab
 - `POST /api/sharing/extend` - Extend sharing expiration
 - `POST /api/sharing/cleanup` - Clean up expired shares (admin)
 - `GET /api/sharing/statistics` - Get sharing statistics (admin)
@@ -39,7 +39,7 @@ This implementation adds secure credential sharing functionality with expiration
 
 1. **JWT-based Access Tokens**: Secure token-based authentication for accessing shared credentials
 2. **Token Hashing**: Access tokens are hashed before storage for security
-3. **DID Verification**: Both sharer and recipient DIDs are verified before sharing
+3. **Cognitive Lab Verification**: Both sharer and recipient Cognitive Labs are verified before sharing
 4. **Authorization Checks**: Only authorized parties can access shared credentials
 5. **Expiration Enforcement**: Automatic expiration of shared credentials
 6. **Access Count Limits**: Prevent unlimited access to shared credentials
@@ -52,8 +52,8 @@ This implementation adds secure credential sharing functionality with expiration
 POST /api/sharing/share
 {
   "credentialId": "urn:uuid:12345678-1234-1234-1234-123456789012",
-  "sharedByDID": "did:stellar:GABC...",
-  "sharedWithDID": "did:stellar:GXYZ...",
+  "sharedByLABS": "Cognitive Lab:stellar:GABC...",
+  "sharedWithLABS": "Cognitive Lab:stellar:GXYZ...",
   "expiresIn": 86400,
   "maxAccessCount": 5,
   "purpose": "employment-verification"
@@ -66,7 +66,7 @@ POST /api/sharing/access
 {
   "sharingId": "uuid-from-share-response",
   "accessToken": "jwt-token-from-share-response",
-  "requestorDID": "did:stellar:GXYZ..."
+  "requestorLABS": "Cognitive Lab:stellar:GXYZ..."
 }
 ```
 
@@ -75,7 +75,7 @@ POST /api/sharing/access
 POST /api/sharing/revoke
 {
   "sharingId": "uuid-from-share-response",
-  "sharedByDID": "did:stellar:GABC..."
+  "sharedByLABS": "Cognitive Lab:stellar:GABC..."
 }
 ```
 

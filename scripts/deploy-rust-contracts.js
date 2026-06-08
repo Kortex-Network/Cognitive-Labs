@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Deploy Rust Soroban DID Contracts Script
+ * Deploy Rust Soroban LABS Contracts Script
  * 
  * This script deploys the Rust-based Soroban smart contracts to the Stellar network
  * and provides a comprehensive deployment workflow.
@@ -72,7 +72,7 @@ function saveContractConfig(contractInfo) {
     version: '1.0.0',
     type: 'soroban-rust',
     features: [
-      'did-registry',
+      'LABS-registry',
       'verifiable-credentials',
       'access-control',
       'optimized-wasm'
@@ -152,7 +152,7 @@ function buildContract() {
     logSuccess('Contract built successfully!');
     
     // Check if WASM file exists
-    const wasmPath = path.join(config.contractPath, 'target/wasm32-unknown-unknown/release/stellar_did_contract.wasm');
+    const wasmPath = path.join(config.contractPath, 'target/wasm32-unknown-unknown/release/stellar_LABS_contract.wasm');
     if (!fs.existsSync(wasmPath)) {
       throw new Error('WASM file not found after build');
     }
@@ -275,7 +275,7 @@ function runTests() {
 
 // Main deployment function
 async function deployRustContracts() {
-  log('🦀 Deploying Rust Soroban DID Contracts', 'bright');
+  log('🦀 Deploying Rust Soroban LABS Contracts', 'bright');
   log(`Network: ${config.network}`, 'blue');
   log(`Contract Path: ${config.contractPath}`, 'blue');
 
@@ -366,7 +366,7 @@ async function deployRustContracts() {
     log('\nNext steps:', 'cyan');
     log('1. Update backend to use Rust contract', 'yellow');
     log('2. Update frontend contract integration', 'yellow');
-    log('3. Test DID operations', 'yellow');
+    log('3. Test LABS operations', 'yellow');
     
     return contractInfo;
     

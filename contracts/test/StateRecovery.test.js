@@ -3,16 +3,16 @@ const { ethers } = require("hardhat");
 
 describe("StateRecovery Contract Tests", function () {
     let stateRecovery;
-    let ethereumDIDRegistry;
+    let ethereumLABSRegistry;
     let owner, admin, recovery1, recovery2, recovery3, emergency, user1, user2, attacker;
     
     beforeEach(async function () {
         [owner, admin, recovery1, recovery2, recovery3, emergency, user1, user2, attacker] = await ethers.getSigners();
         
-        // Deploy EthereumDIDRegistry
-        const DIDRegistryFactory = await ethers.getContractFactory("EthereumDIDRegistry");
-        ethereumDIDRegistry = await DIDRegistryFactory.deploy();
-        await ethereumDIDRegistry.deployed();
+        // Deploy EthereumLABSRegistry
+        const LABSRegistryFactory = await ethers.getContractFactory("EthereumLABSRegistry");
+        ethereumLABSRegistry = await LABSRegistryFactory.deploy();
+        await ethereumLABSRegistry.deployed();
         
         // Deploy StateRecovery
         const StateRecoveryFactory = await ethers.getContractFactory("StateRecovery");
@@ -27,11 +27,11 @@ describe("StateRecovery Contract Tests", function () {
         await stateRecovery.grantRole(await stateRecovery.GOVERNANCE_ROLE(), admin.address);
         
         // Set target contracts
-        await stateRecovery.setTargetContracts(ethereumDIDRegistry.address, ethers.constants.AddressZero);
+        await stateRecovery.setTargetContracts(ethereumLABSRegistry.address, ethers.constants.AddressZero);
         
-        // Setup DID Registry
-        await ethereumDIDRegistry.grantRole(await ethereumDIDRegistry.RECOVERY_ROLE(), stateRecovery.address);
-        await ethereumDIDRegistry.setStateRecoveryContract(stateRecovery.address);
+        // Setup LABS Registry
+        await ethereumLABSRegistry.grantRole(await ethereumLABSRegistry.RECOVERY_ROLE(), stateRecovery.address);
+        await ethereumLABSRegistry.setStateRecoveryContract(stateRecovery.address);
     });
 
     describe("Contract Initialization", function () {
@@ -43,7 +43,7 @@ describe("StateRecovery Contract Tests", function () {
         });
 
         it("Should have correct default approval requirements", async function () {
-            expect(await stateRecovery.requiredApprovals(0)).to.equal(3); // DID_DOCUMENT
+            expect(await stateRecovery.requiredApprovals(0)).to.equal(3); // LABS_DOCUMENT
             expect(await stateRecovery.requiredApprovals(1)).to.equal(3); // VERIFIABLE_CREDENTIAL
             expect(await stateRecovery.requiredApprovals(2)).to.equal(5); // OWNERSHIP_MAPPING
             expect(await stateRecovery.requiredApprovals(3)).to.equal(7); // ROLE_ASSIGNMENT
@@ -76,7 +76,7 @@ describe("StateRecovery Contract Tests", function () {
     });
 
     describe("Recovery Proposal System", function () {
-        const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+        const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
         const newOwner = user1.address;
         const newPublicKey = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
         const newServiceEndpoint = "https://recovery.example.com";
@@ -84,12 +84,12 @@ describe("StateRecovery Contract Tests", function () {
         it("Should allow recovery role to propose recovery", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             const tx = await stateRecovery.connect(recovery1).proposeRecovery(
-                0, // DID_DOCUMENT
-                "Recover corrupted DID document",
+                0, // LABS_DOCUMENT
+                "Recover corrupted LABS document",
                 data
             );
             
@@ -98,13 +98,13 @@ describe("StateRecovery Contract Tests", function () {
             
             expect(event.args.recoveryType).to.equal(0);
             expect(event.args.proposer).to.equal(recovery1.address);
-            expect(event.args.description).to.equal("Recover corrupted DID document");
+            expect(event.args.description).to.equal("Recover corrupted LABS document");
         });
 
         it("Should prevent non-recovery role from proposing recovery", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             await expect(
@@ -125,7 +125,7 @@ describe("StateRecovery Contract Tests", function () {
 
     describe("Recovery Voting System", function () {
         let proposalId;
-        const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+        const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
         const newOwner = user1.address;
         const newPublicKey = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
         const newServiceEndpoint = "https://recovery.example.com";
@@ -133,12 +133,12 @@ describe("StateRecovery Contract Tests", function () {
         beforeEach(async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             const tx = await stateRecovery.connect(recovery1).proposeRecovery(
-                0, // DID_DOCUMENT
-                "Recover corrupted DID document",
+                0, // LABS_DOCUMENT
+                "Recover corrupted LABS document",
                 data
             );
             const receipt = await tx.wait();
@@ -180,7 +180,7 @@ describe("StateRecovery Contract Tests", function () {
         });
 
         it("Should approve proposal when enough votes are received", async function () {
-            // Get enough votes for approval (required: 3 for DID_DOCUMENT)
+            // Get enough votes for approval (required: 3 for LABS_DOCUMENT)
             await stateRecovery.connect(recovery1).voteOnRecovery(proposalId, true, "Approve 1");
             await stateRecovery.connect(recovery2).voteOnRecovery(proposalId, true, "Approve 2");
             await stateRecovery.connect(recovery3).voteOnRecovery(proposalId, true, "Approve 3");
@@ -190,7 +190,7 @@ describe("StateRecovery Contract Tests", function () {
         });
 
         it("Should reject proposal when enough rejection votes are received", async function () {
-            // Get enough votes for rejection (required: 3 for DID_DOCUMENT)
+            // Get enough votes for rejection (required: 3 for LABS_DOCUMENT)
             await stateRecovery.connect(recovery1).voteOnRecovery(proposalId, false, "Reject 1");
             await stateRecovery.connect(recovery2).voteOnRecovery(proposalId, false, "Reject 2");
             await stateRecovery.connect(recovery3).voteOnRecovery(proposalId, false, "Reject 3");
@@ -202,7 +202,7 @@ describe("StateRecovery Contract Tests", function () {
 
     describe("Recovery Execution", function () {
         let proposalId;
-        const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+        const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
         const newOwner = user1.address;
         const newPublicKey = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
         const newServiceEndpoint = "https://recovery.example.com";
@@ -210,12 +210,12 @@ describe("StateRecovery Contract Tests", function () {
         beforeEach(async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             const tx = await stateRecovery.connect(recovery1).proposeRecovery(
-                0, // DID_DOCUMENT
-                "Recover corrupted DID document",
+                0, // LABS_DOCUMENT
+                "Recover corrupted LABS document",
                 data
             );
             const receipt = await tx.wait();
@@ -227,8 +227,8 @@ describe("StateRecovery Contract Tests", function () {
             await stateRecovery.connect(recovery2).voteOnRecovery(proposalId, true, "Approve 2");
             await stateRecovery.connect(recovery3).voteOnRecovery(proposalId, true, "Approve 3");
             
-            // Enable recovery mode on DID registry
-            await ethereumDIDRegistry.enableRecoveryMode();
+            // Enable recovery mode on LABS registry
+            await ethereumLABSRegistry.enableRecoveryMode();
         });
 
         it("Should execute approved recovery proposal", async function () {
@@ -252,7 +252,7 @@ describe("StateRecovery Contract Tests", function () {
             // Create a new proposal but don't vote on it
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x9999999999999999999999999999999999999999", user2.address, newPublicKey, newServiceEndpoint]
+                ["LABS:ethereum:0x9999999999999999999999999999999999999999", user2.address, newPublicKey, newServiceEndpoint]
             );
             
             const tx = await stateRecovery.connect(recovery1).proposeRecovery(0, "Test", data);
@@ -273,21 +273,21 @@ describe("StateRecovery Contract Tests", function () {
 
     describe("Emergency Recovery", function () {
         it("Should allow emergency role to trigger immediate recovery", async function () {
-            const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+            const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
             const newOwner = user1.address;
             const newPublicKey = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
             const newServiceEndpoint = "https://recovery.example.com";
             
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             // Enable recovery mode
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             const tx = await stateRecovery.connect(emergency).emergencyRecovery(
-                0, // DID_DOCUMENT
+                0, // LABS_DOCUMENT
                 data,
                 "Critical corruption detected"
             );
@@ -304,7 +304,7 @@ describe("StateRecovery Contract Tests", function () {
         it("Should prevent non-emergency role from triggering emergency recovery", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x9999999999999999999999999999999999999999", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x9999999999999999999999999999999999999999", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             await expect(
@@ -332,23 +332,23 @@ describe("StateRecovery Contract Tests", function () {
         });
     });
 
-    describe("Integration with EthereumDIDRegistry", function () {
-        const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+    describe("Integration with EthereumLABSRegistry", function () {
+        const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
         const newOwner = user1.address;
         const newPublicKey = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
         const newServiceEndpoint = "https://recovery.example.com";
 
-        it("Should successfully recover DID document through governance process", async function () {
+        it("Should successfully recover LABS document through governance process", async function () {
             // Enable recovery mode
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             // Create and approve recovery proposal
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
-            const tx = await stateRecovery.connect(recovery1).proposeRecovery(0, "Recover DID", data);
+            const tx = await stateRecovery.connect(recovery1).proposeRecovery(0, "Recover LABS", data);
             const receipt = await tx.wait();
             const proposalId = receipt.events.find(e => e.event === "RecoveryProposed").args.proposalId;
             
@@ -364,22 +364,22 @@ describe("StateRecovery Contract Tests", function () {
             // Execute recovery
             await stateRecovery.connect(recovery1).executeRecovery(proposalId);
             
-            // Verify DID document was recovered
-            const didDoc = await ethereumDIDRegistry.getDIDDocument(did);
-            expect(didDoc.did).to.equal(did);
-            expect(didDoc.owner).to.equal(newOwner);
-            expect(didDoc.publicKey).to.equal(newPublicKey);
-            expect(didDoc.serviceEndpoint).to.equal(newServiceEndpoint);
-            expect(didDoc.active).to.be.true;
+            // Verify LABS document was recovered
+            const LABSDoc = await ethereumLABSRegistry.getLABSDocument(LABS);
+            expect(LABSDoc.LABS).to.equal(LABS);
+            expect(LABSDoc.owner).to.equal(newOwner);
+            expect(LABSDoc.publicKey).to.equal(newPublicKey);
+            expect(LABSDoc.serviceEndpoint).to.equal(newServiceEndpoint);
+            expect(LABSDoc.active).to.be.true;
         });
 
         it("Should recover verifiable credential", async function () {
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             const credentialId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("test-credential"));
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["bytes32", "string", "string", "string", "uint256", "bytes32"],
-                [credentialId, "https://issuer.example.com", "did:example:subject", "VerificationCredential", 1234567890, ethers.utils.keccak256("data")]
+                [credentialId, "https://issuer.example.com", "LABS:example:subject", "VerificationCredential", 1234567890, ethers.utils.keccak256("data")]
             );
             
             const tx = await stateRecovery.connect(recovery1).proposeRecovery(1, "Recover credential", data);
@@ -399,22 +399,22 @@ describe("StateRecovery Contract Tests", function () {
             await stateRecovery.connect(recovery1).executeRecovery(proposalId);
             
             // Verify credential was recovered
-            const credential = await ethereumDIDRegistry.getCredential(credentialId);
+            const credential = await ethereumLABSRegistry.getCredential(credentialId);
             expect(credential.id).to.equal(credentialId);
             expect(credential.issuer).to.equal("https://issuer.example.com");
-            expect(credential.subject).to.equal("did:example:subject");
+            expect(credential.subject).to.equal("LABS:example:subject");
             expect(credential.credentialType).to.equal("VerificationCredential");
         });
     });
 
     describe("Access Controls", function () {
         it("Should prevent direct calls to recovery functions", async function () {
-            const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+            const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
             
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             await expect(
-                ethereumDIDRegistry.connect(recovery1).recoverDIDDocument(did, user1.address, "0xABCDEF", "https://test.com")
+                ethereumLABSRegistry.connect(recovery1).recoverLABSDocument(LABS, user1.address, "0xABCDEF", "https://test.com")
             ).to.be.revertedWith("Only recovery contract can call this function");
         });
 

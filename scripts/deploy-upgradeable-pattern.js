@@ -8,7 +8,7 @@ require("dotenv").config();
  * - Enhanced Access Control
  * - Enhanced Proxy with governance
  * - State Migration contract
- * - Integrated DID Registry
+ * - Integrated LABS Registry
  * - Proxy Factory
  * 
  * Usage:
@@ -73,18 +73,18 @@ async function main() {
     await proxyFactory.deployed();
     console.log("   ✅ UpgradeableProxyFactory deployed to:", proxyFactory.address);
 
-    // Step 5: Deploy Gas Optimized DID Registry (Implementation)
-    console.log("\n5️⃣ Deploying Gas Optimized DID Registry Implementation...");
-    const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-    const didImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
-    await didImplementation.deployed();
-    console.log("   ✅ GasOptimizedDIDRegistry implementation deployed to:", didImplementation.address);
+    // Step 5: Deploy Gas Optimized LABS Registry (Implementation)
+    console.log("\n5️⃣ Deploying Gas Optimized LABS Registry Implementation...");
+    const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+    const LABSImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
+    await LABSImplementation.deployed();
+    console.log("   ✅ GasOptimizedLABSRegistry implementation deployed to:", LABSImplementation.address);
 
-    // Step 6: Deploy Integrated DID Registry (Upgradeable)
-    console.log("\n6️⃣ Deploying Integrated DID Registry (Upgradeable)...");
-    const IntegratedDIDRegistry = await ethers.getContractFactory("IntegratedDIDRegistry");
+    // Step 6: Deploy Integrated LABS Registry (Upgradeable)
+    console.log("\n6️⃣ Deploying Integrated LABS Registry (Upgradeable)...");
+    const IntegratedLABSRegistry = await ethers.getContractFactory("IntegratedLABSRegistry");
     const integratedRegistry = await upgrades.deployProxy(
-      IntegratedDIDRegistry,
+      IntegratedLABSRegistry,
       [
         accessControl.address,
         enhancedProxy.address,
@@ -98,18 +98,18 @@ async function main() {
       }
     );
     await integratedRegistry.deployed();
-    console.log("   ✅ IntegratedDIDRegistry deployed to:", integratedRegistry.address);
+    console.log("   ✅ IntegratedLABSRegistry deployed to:", integratedRegistry.address);
 
-    // Step 7: Upgrade Enhanced Proxy to point to DID implementation
-    console.log("\n7️⃣ Upgrading Enhanced Proxy to DID Implementation...");
-    const upgradeTx = await enhancedProxy.upgradeTo(didImplementation.address);
+    // Step 7: Upgrade Enhanced Proxy to point to LABS implementation
+    console.log("\n7️⃣ Upgrading Enhanced Proxy to LABS Implementation...");
+    const upgradeTx = await enhancedProxy.upgradeTo(LABSImplementation.address);
     await upgradeTx.wait();
-    console.log("   ✅ EnhancedProxy upgraded to DID implementation");
+    console.log("   ✅ EnhancedProxy upgraded to LABS implementation");
 
     // Step 8: Create a proxy instance using the factory
-    console.log("\n8️⃣ Creating DID Registry Proxy using Factory...");
-    const initData = didImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
-    const factoryProxy = await proxyFactory.createProxy(didImplementation.address, initData);
+    console.log("\n8️⃣ Creating LABS Registry Proxy using Factory...");
+    const initData = LABSImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
+    const factoryProxy = await proxyFactory.createProxy(LABSImplementation.address, initData);
     console.log("   ✅ Factory proxy created at:", factoryProxy);
 
     // Step 9: Setup access control permissions
@@ -135,7 +135,7 @@ async function main() {
     // Check proxy implementation
     const proxyImplementation = await enhancedProxy.getImplementation();
     console.log("   📍 Enhanced Proxy Implementation:", proxyImplementation);
-    console.log("   📍 Expected Implementation:", didImplementation.address);
+    console.log("   📍 Expected Implementation:", LABSImplementation.address);
     
     // Check integrated registry configuration
     const [rbacEnabled, upgradeabilityEnabled, gasOptimizationEnabled] = await integratedRegistry.getIntegrationConfig();
@@ -153,7 +153,7 @@ async function main() {
         stateMigration: stateMigration.address,
         enhancedProxy: enhancedProxy.address,
         proxyFactory: proxyFactory.address,
-        didImplementation: didImplementation.address,
+        LABSImplementation: LABSImplementation.address,
         integratedRegistry: integratedRegistry.address,
         factoryProxy: factoryProxy
       },
@@ -187,7 +187,7 @@ async function main() {
     console.log("   🔐 Access Control:", accessControl.address);
     console.log("   🔄 Enhanced Proxy:", enhancedProxy.address);
     console.log("   🏭 Proxy Factory:", proxyFactory.address);
-    console.log("   📄 DID Implementation:", didImplementation.address);
+    console.log("   📄 LABS Implementation:", LABSImplementation.address);
     console.log("   🎯 Integrated Registry:", integratedRegistry.address);
     console.log("   🏗️  Factory Proxy:", factoryProxy);
     console.log("   📦 State Migration:", stateMigration.address);
@@ -240,8 +240,8 @@ async function testUpgrade() {
     console.log("\\n2️⃣ Testing upgrade proposal...");
     
     // Deploy new implementation (for testing)
-    const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-    const newImplementation = await GasOptimizedDIDRegistry.deploy(addresses.accessControl);
+    const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+    const newImplementation = await GasOptimizedLABSRegistry.deploy(addresses.accessControl);
     await newImplementation.deployed();
     console.log("   📍 New implementation deployed:", newImplementation.address);
     

@@ -2,18 +2,18 @@ const TestUtils = require('./testUtils');
 
 class TestData {
   /**
-   * Generate valid DID data
+   * Generate valid LABS data
    */
-  static validDID(overrides = {}) {
+  static validLABS(overrides = {}) {
     return {
-      did: overrides.did || TestUtils.generateRandomDID(),
+      LABS: overrides.LABS || TestUtils.generateRandomLABS(),
       publicKey: overrides.publicKey || TestUtils.generateRandomStellarAddress(),
-      serviceEndpoint: overrides.serviceEndpoint || 'https://did.example.com/service',
+      serviceEndpoint: overrides.serviceEndpoint || 'https://LABS.example.com/service',
       verificationMethods: overrides.verificationMethods || [
         {
           id: 'key-1',
           type: 'Ed25519VerificationKey2018',
-          controller: overrides.did || TestUtils.generateRandomDID(),
+          controller: overrides.LABS || TestUtils.generateRandomLABS(),
           publicKeyBase58: TestUtils.generateRandomStellarAddress()
         }
       ],
@@ -29,21 +29,21 @@ class TestData {
   }
 
   /**
-   * Generate valid DID with verification methods
+   * Generate valid LABS with verification methods
    */
-  static validDIDWithVerificationMethods(overrides = {}) {
-    return this.validDID({
+  static validLABSWithVerificationMethods(overrides = {}) {
+    return this.validLABS({
       verificationMethods: [
         {
           id: 'key-1',
           type: 'Ed25519VerificationKey2018',
-          controller: TestUtils.generateRandomDID(),
+          controller: TestUtils.generateRandomLABS(),
           publicKeyBase58: TestUtils.generateRandomStellarAddress()
         },
         {
           id: 'key-2',
           type: 'Ed25519VerificationKey2018',
-          controller: TestUtils.generateRandomDID(),
+          controller: TestUtils.generateRandomLABS(),
           publicKeyBase58: TestUtils.generateRandomStellarAddress()
         }
       ],
@@ -64,11 +64,11 @@ class TestData {
   }
 
   /**
-   * Generate invalid DID data
+   * Generate invalid LABS data
    */
-  static invalidDID(overrides = {}) {
+  static invalidLABS(overrides = {}) {
     return {
-      did: 'invalid-did-format',
+      LABS: 'invalid-LABS-format',
       publicKey: 'invalid-public-key',
       serviceEndpoint: 'not-a-url',
       verificationMethods: [],
@@ -82,8 +82,8 @@ class TestData {
    */
   static validCredential(overrides = {}) {
     return {
-      issuer: overrides.issuer || TestUtils.generateRandomDID(),
-      subject: overrides.subject || TestUtils.generateRandomDID(),
+      issuer: overrides.issuer || TestUtils.generateRandomLABS(),
+      subject: overrides.subject || TestUtils.generateRandomLABS(),
       credentialType: overrides.credentialType || 'VerifiableCredential',
       claims: overrides.claims || {
         name: 'John Doe',
@@ -321,8 +321,8 @@ class TestData {
   static marketplaceListing(overrides = {}) {
     return {
       type: overrides.type || 'service',
-      title: overrides.title || 'DID Verification Service',
-      description: overrides.description || 'Professional DID verification and validation service',
+      title: overrides.title || 'LABS Verification Service',
+      description: overrides.description || 'Professional LABS verification and validation service',
       price: overrides.price || 10,
       currency: overrides.currency || 'XLM',
       tags: overrides.tags || ['verification', 'security', 'identity'],
@@ -358,8 +358,8 @@ class TestData {
   static governanceProposal(overrides = {}) {
     return {
       type: overrides.type || 'protocol_change',
-      title: overrides.title || 'Update DID Schema Version',
-      description: overrides.description || 'Proposal to update the DID document schema to version 2.0 with additional fields for enhanced functionality.',
+      title: overrides.title || 'Update LABS Schema Version',
+      description: overrides.description || 'Proposal to update the LABS document schema to version 2.0 with additional fields for enhanced functionality.',
       options: overrides.options || ['approve', 'reject', 'abstain'],
       votingPeriod: overrides.votingPeriod || 7 * 24 * 60 * 60 * 1000, // 7 days
       quorum: overrides.quorum || 0.5, // 50% participation required
@@ -421,7 +421,7 @@ class TestData {
   static webhookConfig(overrides = {}) {
     return {
       url: overrides.url || 'https://example.com/webhook',
-      events: overrides.events || ['did.created', 'credential.issued'],
+      events: overrides.events || ['LABS.created', 'credential.issued'],
       secret: overrides.secret || TestUtils.generateRandomString(32),
       active: overrides.active !== undefined ? overrides.active : true,
       retryAttempts: overrides.retryAttempts || 3,
@@ -447,9 +447,9 @@ class TestData {
    */
   static testScenario(scenario) {
     switch (scenario) {
-      case 'full-did-lifecycle':
+      case 'full-LABS-lifecycle':
         return {
-          did: this.validDID(),
+          LABS: this.validLABS(),
           updates: [
             { serviceEndpoint: 'https://updated1.example.com' },
             { publicKey: TestUtils.generateRandomStellarAddress() }
@@ -505,16 +505,16 @@ class TestData {
    */
   static performanceTestData(size = 'medium') {
     const sizes = {
-      small: { dids: 10, credentials: 20, transactions: 5 },
-      medium: { dids: 100, credentials: 200, transactions: 50 },
-      large: { dids: 1000, credentials: 2000, transactions: 500 },
-      xlarge: { dids: 10000, credentials: 20000, transactions: 5000 }
+      small: { LABSs: 10, credentials: 20, transactions: 5 },
+      medium: { LABSs: 100, credentials: 200, transactions: 50 },
+      large: { LABSs: 1000, credentials: 2000, transactions: 500 },
+      xlarge: { LABSs: 10000, credentials: 20000, transactions: 5000 }
     };
     
     const config = sizes[size] || sizes.medium;
     
     return {
-      dids: this.generateBatch(this.validDID, config.dids),
+      LABSs: this.generateBatch(this.validLABS, config.LABSs),
       credentials: this.generateBatch(this.validCredential, config.credentials),
       transactions: this.generateBatch(this.validStellarTransaction, config.transactions)
     };
@@ -526,32 +526,32 @@ class TestData {
   static edgeCaseData() {
     return {
       emptyStrings: {
-        did: '',
+        LABS: '',
         publicKey: '',
         serviceEndpoint: ''
       },
       nullValues: {
-        did: null,
+        LABS: null,
         publicKey: null,
         serviceEndpoint: null
       },
       undefinedValues: {
-        did: undefined,
+        LABS: undefined,
         publicKey: undefined,
         serviceEndpoint: undefined
       },
       veryLongStrings: {
-        did: 'did:stellar:' + 'A'.repeat(1000),
+        LABS: 'LABS:stellar:' + 'A'.repeat(1000),
         publicKey: 'G' + 'A'.repeat(100),
         serviceEndpoint: 'https://' + 'a'.repeat(1000) + '.com'
       },
       specialCharacters: {
-        did: 'did:stellar:GABC!@#$%^&*()1234567890ABCDEF',
+        LABS: 'LABS:stellar:GABC!@#$%^&*()1234567890ABCDEF',
         publicKey: 'GABC!@#$%^&*()1234567890ABCDEF',
         serviceEndpoint: 'https://example.com/path?param=value&other=123#fragment'
       },
       unicodeCharacters: {
-        did: 'did:stellar:GABCñáéíóú1234567890ABCDEF',
+        LABS: 'LABS:stellar:GABCñáéíóú1234567890ABCDEF',
         publicKey: 'GABCñáéíóú1234567890ABCDEF',
         serviceEndpoint: 'https://example.com/路径/参数'
       }

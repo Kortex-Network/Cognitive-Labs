@@ -14,8 +14,8 @@ describe('GasEstimation', () => {
         // Mock contract instance
         mockContract = {
             estimateGas: {
-                createDID: jest.fn().mockResolvedValue(ethers.BigNumber.from(85000)),
-                updateDID: jest.fn().mockResolvedValue(ethers.BigNumber.from(45000)),
+                createLABS: jest.fn().mockResolvedValue(ethers.BigNumber.from(85000)),
+                updateLABS: jest.fn().mockResolvedValue(ethers.BigNumber.from(45000)),
                 issueCredential: jest.fn().mockResolvedValue(ethers.BigNumber.from(95000)),
                 revokeCredential: jest.fn().mockResolvedValue(ethers.BigNumber.from(30000))
             }
@@ -24,13 +24,13 @@ describe('GasEstimation', () => {
         gasEstimation = new GasEstimation(mockContract);
     });
 
-    describe('DID Operations Gas Estimation', () => {
-        test('should estimate DID creation gas cost', async () => {
+    describe('LABS Operations Gas Estimation', () => {
+        test('should estimate LABS creation gas cost', async () => {
             const owner = '0x1234567890123456789012345678901234567890';
             const publicKey = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
             const serviceEndpoints = 3;
 
-            const estimate = await gasEstimation.estimateDIDCreation(owner, publicKey, serviceEndpoints);
+            const estimate = await gasEstimation.estimateLABSCreation(owner, publicKey, serviceEndpoints);
 
             expect(estimate.baseGas).toBe(85000);
             expect(estimate.variableGas).toBeGreaterThan(0);
@@ -39,22 +39,22 @@ describe('GasEstimation', () => {
             expect(estimate.estimatedCost).toBeGreaterThan(0);
         });
 
-        test('should estimate DID update gas cost', async () => {
-            const did = 'did:stellar:1234567890';
+        test('should estimate LABS update gas cost', async () => {
+            const LABS = 'LABS:stellar:1234567890';
             const changes = { publicKey: 'newPublicKey' };
 
-            const estimate = await gasEstimation.estimateDIDUpdate(did, changes);
+            const estimate = await gasEstimation.estimateLABSUpdate(LABS, changes);
 
             expect(estimate.baseGas).toBe(45000);
             expect(estimate.variableGas).toBeGreaterThan(0);
             expect(estimate.totalGas).toBeGreaterThan(estimate.baseGas);
         });
 
-        test('should estimate DID transfer gas cost', async () => {
-            const did = 'did:stellar:1234567890';
+        test('should estimate LABS transfer gas cost', async () => {
+            const LABS = 'LABS:stellar:1234567890';
             const newOwner = '0x0987654321098765432109876543210987654321';
 
-            const estimate = await gasEstimation.estimateDIDTransfer(did, newOwner);
+            const estimate = await gasEstimation.estimateLABSTransfer(LABS, newOwner);
 
             expect(estimate.baseGas).toBe(35000);
             expect(estimate.totalGas).toBeGreaterThan(estimate.baseGas);
@@ -86,7 +86,7 @@ describe('GasEstimation', () => {
 
     describe('Batch Operations Gas Estimation', () => {
         test('should estimate batch operation gas cost with discount', async () => {
-            const operationType = 'DID_CREATE';
+            const operationType = 'LABS_CREATE';
             const operationCount = 10;
             const dataComplexity = 5;
 
@@ -100,10 +100,10 @@ describe('GasEstimation', () => {
         });
 
         test('should apply correct discount based on batch size', async () => {
-            const smallBatch = await gasEstimation.estimateBatchOperation('DID_CREATE', 3, 5);
-            const mediumBatch = await gasEstimation.estimateBatchOperation('DID_CREATE', 10, 5);
-            const largeBatch = await gasEstimation.estimateBatchOperation('DID_CREATE', 30, 5);
-            const xlargeBatch = await gasEstimation.estimateBatchOperation('DID_CREATE', 60, 5);
+            const smallBatch = await gasEstimation.estimateBatchOperation('LABS_CREATE', 3, 5);
+            const mediumBatch = await gasEstimation.estimateBatchOperation('LABS_CREATE', 10, 5);
+            const largeBatch = await gasEstimation.estimateBatchOperation('LABS_CREATE', 30, 5);
+            const xlargeBatch = await gasEstimation.estimateBatchOperation('LABS_CREATE', 60, 5);
 
             expect(smallBatch.batchDiscount).toBe(5);
             expect(mediumBatch.batchDiscount).toBe(10);
@@ -173,7 +173,7 @@ describe('GasEstimation', () => {
 
     describe('Gas History and Optimization', () => {
         test('should record gas usage and update history', async () => {
-            const operationType = 'DID_CREATE';
+            const operationType = 'LABS_CREATE';
             const actualGasUsed = 90000;
 
             await gasEstimation.recordGasUsage(operationType, actualGasUsed);
@@ -187,7 +187,7 @@ describe('GasEstimation', () => {
         });
 
         test('should calculate average gas usage over multiple operations', async () => {
-            const operationType = 'DID_CREATE';
+            const operationType = 'LABS_CREATE';
             const gasUsages = [85000, 90000, 88000, 92000];
 
             for (const gasUsed of gasUsages) {
@@ -202,7 +202,7 @@ describe('GasEstimation', () => {
         });
 
         test('should provide optimized estimates based on historical data', async () => {
-            const operationType = 'DID_CREATE';
+            const operationType = 'LABS_CREATE';
             
             // Record some historical data
             await gasEstimation.recordGasUsage(operationType, 85000);
@@ -242,7 +242,7 @@ describe('GasEstimation', () => {
 
     describe('Optimization Recommendations', () => {
         test('should provide optimization recommendations', async () => {
-            const operationType = 'DID_CREATE';
+            const operationType = 'LABS_CREATE';
 
             const recommendations = gasEstimation.getOptimizationRecommendations(operationType);
 
@@ -255,7 +255,7 @@ describe('GasEstimation', () => {
         });
 
         test('should provide different recommendations based on variance', async () => {
-            const operationType = 'DID_CREATE';
+            const operationType = 'LABS_CREATE';
 
             // Record high variance data
             await gasEstimation.recordGasUsage(operationType, 50000);
@@ -276,13 +276,13 @@ describe('GasEstimation', () => {
 
         test('should handle zero operation count in batch estimation', async () => {
             await expect(
-                gasEstimation.estimateBatchOperation('DID_CREATE', 0, 5)
+                gasEstimation.estimateBatchOperation('LABS_CREATE', 0, 5)
             ).rejects.toThrow('Batch must have at least one operation');
         });
 
         test('should handle invalid data complexity in batch estimation', async () => {
             await expect(
-                gasEstimation.estimateBatchOperation('DID_CREATE', 10, 15)
+                gasEstimation.estimateBatchOperation('LABS_CREATE', 10, 15)
             ).rejects.toThrow('Invalid complexity');
         });
     });

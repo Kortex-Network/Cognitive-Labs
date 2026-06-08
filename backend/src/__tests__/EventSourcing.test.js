@@ -12,7 +12,7 @@ jest.mock('mongodb', () => ({
         connect: jest.fn().mockResolvedValue(),
         db: jest.fn().mockReturnValue({
             collection: jest.fn().mockReturnValue({
-                insertOne: jest.fn().mockResolvedValue({ insertedId: 'test-id' }),
+                insertOne: jest.fn().mockResolvedValue({ inserteLABS: 'test-id' }),
                 findOne: jest.fn().mockResolvedValue(null),
                 find: jest.fn().mockReturnValue({
                     toArray: jest.fn().mockResolvedValue([]),
@@ -49,12 +49,12 @@ describe('EventSourcing', () => {
 
         testEvent = {
             aggregateId: 'test-aggregate-123',
-            aggregateType: 'DID',
-            eventType: 'DID_CREATED',
+            aggregateType: 'LABS',
+            eventType: 'LABS_CREATED',
             version: 1,
             timestamp: new Date().toISOString(),
             data: {
-                did: 'did:stellar:test123',
+                LABS: 'LABS:stellar:test123',
                 owner: '0x1234567890123456789012345678901234567890',
                 publicKey: 'test-public-key',
                 serviceEndpoints: ['endpoint1', 'endpoint2']
@@ -84,14 +84,14 @@ describe('EventSourcing', () => {
         });
 
         test('should initialize event types', () => {
-            expect(eventSourcing.eventTypes.has('DID_CREATED')).toBe(true);
-            expect(eventSourcing.eventTypes.has('DID_UPDATED')).toBe(true);
+            expect(eventSourcing.eventTypes.has('LABS_CREATED')).toBe(true);
+            expect(eventSourcing.eventTypes.has('LABS_UPDATED')).toBe(true);
             expect(eventSourcing.eventTypes.has('CREDENTIAL_ISSUED')).toBe(true);
             expect(eventSourcing.eventTypes.has('GOVERNANCE_PROPOSAL_CREATED')).toBe(true);
         });
 
         test('should initialize event schemas', () => {
-            expect(eventSourcing.eventSchemas['DID_CREATED']).toBeDefined();
+            expect(eventSourcing.eventSchemas['LABS_CREATED']).toBeDefined();
             expect(eventSourcing.eventSchemas['CREDENTIAL_ISSUED']).toBeDefined();
             expect(eventSourcing.eventSchemas['GOVERNANCE_PROPOSAL_CREATED']).toBeDefined();
         });
@@ -104,7 +104,7 @@ describe('EventSourcing', () => {
             expect(storedEvent.eventId).toBeDefined();
             expect(storedEvent.hash).toBeDefined();
             expect(storedEvent.storedAt).toBeDefined();
-            expect(storedEvent.eventType).toBe('DID_CREATED');
+            expect(storedEvent.eventType).toBe('LABS_CREATED');
             expect(storedEvent.aggregateId).toBe('test-aggregate-123');
         });
 
@@ -192,7 +192,7 @@ describe('EventSourcing', () => {
         test('should validate against event schema', async () => {
             const invalidEvent = {
                 ...testEvent,
-                eventType: 'DID_CREATED',
+                eventType: 'LABS_CREATED',
                 data: { invalid: 'structure' }
             };
             
@@ -207,7 +207,7 @@ describe('EventSourcing', () => {
                 testEvent,
                 {
                     ...testEvent,
-                    eventType: 'DID_UPDATED',
+                    eventType: 'LABS_UPDATED',
                     version: 2,
                     data: { changes: { publicKey: 'updated-key' } }
                 },
@@ -229,9 +229,9 @@ describe('EventSourcing', () => {
                 await eventSourcing.storeEvent(event);
             }
             
-            const state = await eventSourcing.replayEvents('test-aggregate-123', 'DID');
+            const state = await eventSourcing.replayEvents('test-aggregate-123', 'LABS');
             
-            expect(state.did).toBe('did:stellar:test123');
+            expect(state.LABS).toBe('LABS:stellar:test123');
             expect(state.owner).toBe('0x1234567890123456789012345678901234567890');
             expect(state.publicKey).toBe('updated-key');
             expect(state.credentials).toBeDefined();
@@ -243,13 +243,13 @@ describe('EventSourcing', () => {
                 testEvent,
                 {
                     ...testEvent,
-                    eventType: 'DID_UPDATED',
+                    eventType: 'LABS_UPDATED',
                     version: 2,
                     data: { changes: { publicKey: 'updated-key' } }
                 },
                 {
                     ...testEvent,
-                    eventType: 'DID_UPDATED',
+                    eventType: 'LABS_UPDATED',
                     version: 3,
                     data: { changes: { publicKey: 'final-key' } }
                 }
@@ -259,7 +259,7 @@ describe('EventSourcing', () => {
                 await eventSourcing.storeEvent(event);
             }
             
-            const state = await eventSourcing.replayEvents('test-aggregate-123', 'DID', 2);
+            const state = await eventSourcing.replayEvents('test-aggregate-123', 'LABS', 2);
             
             expect(state.publicKey).toBe('updated-key');
         });
@@ -268,16 +268,16 @@ describe('EventSourcing', () => {
             // Create snapshot
             const snapshot = {
                 aggregateId: 'test-aggregate-123',
-                aggregateType: 'DID',
+                aggregateType: 'LABS',
                 version: 5,
-                state: { did: 'did:stellar:test123', owner: 'test-owner' }
+                state: { LABS: 'LABS:stellar:test123', owner: 'test-owner' }
             };
             
             eventSourcing.snapshotStore.findOne.mockResolvedValue(snapshot);
             
-            const state = await eventSourcing.replayEvents('test-aggregate-123', 'DID');
+            const state = await eventSourcing.replayEvents('test-aggregate-123', 'LABS');
             
-            expect(state.did).toBe('did:stellar:test123');
+            expect(state.LABS).toBe('LABS:stellar:test123');
             expect(state.owner).toBe('test-owner');
         });
 
@@ -285,7 +285,7 @@ describe('EventSourcing', () => {
             await eventSourcing.storeEvent(testEvent);
             
             const initialMetrics = { ...eventSourcing.metrics };
-            await eventSourcing.replayEvents('test-aggregate-123', 'DID');
+            await eventSourcing.replayEvents('test-aggregate-123', 'LABS');
             
             expect(eventSourcing.metrics.eventsReplayed).toBe(initialMetrics.eventsReplayed + 1);
             expect(eventSourcing.metrics.replayLatency).toBeGreaterThan(0);
@@ -293,35 +293,35 @@ describe('EventSourcing', () => {
     });
 
     describe('Event Application', () => {
-        test('should apply DID_CREATED event', async () => {
+        test('should apply LABS_CREATED event', async () => {
             const currentState = {};
             const newState = await eventSourcing.applyEvent(currentState, testEvent);
             
-            expect(newState.did).toBe('did:stellar:test123');
+            expect(newState.LABS).toBe('LABS:stellar:test123');
             expect(newState.owner).toBe('0x1234567890123456789012345678901234567890');
             expect(newState.active).toBe(true);
             expect(newState.createdAt).toBeDefined();
             expect(newState.updatedAt).toBeDefined();
         });
 
-        test('should apply DID_UPDATED event', async () => {
-            const currentState = { did: 'did:stellar:test123', owner: 'original-owner' };
+        test('should apply LABS_UPDATED event', async () => {
+            const currentState = { LABS: 'LABS:stellar:test123', owner: 'original-owner' };
             const updateEvent = {
                 ...testEvent,
-                eventType: 'DID_UPDATED',
+                eventType: 'LABS_UPDATED',
                 data: { changes: { publicKey: 'new-key' } }
             };
             
             const newState = await eventSourcing.applyEvent(currentState, updateEvent);
             
-            expect(newState.did).toBe('did:stellar:test123');
+            expect(newState.LABS).toBe('LABS:stellar:test123');
             expect(newState.owner).toBe('original-owner');
             expect(newState.publicKey).toBe('new-key');
             expect(newState.updatedAt).toBeDefined();
         });
 
         test('should apply CREDENTIAL_ISSUED event', async () => {
-            const currentState = { did: 'did:stellar:test123' };
+            const currentState = { LABS: 'LABS:stellar:test123' };
             const credentialEvent = {
                 ...testEvent,
                 eventType: 'CREDENTIAL_ISSUED',
@@ -344,7 +344,7 @@ describe('EventSourcing', () => {
 
         test('should apply CREDENTIAL_REVOKED event', async () => {
             const currentState = {
-                did: 'did:stellar:test123',
+                LABS: 'LABS:stellar:test123',
                 credentials: [
                     {
                         id: 'cred-123',
@@ -401,12 +401,12 @@ describe('EventSourcing', () => {
         test('should get events for aggregate', async () => {
             await eventSourcing.storeEvent(testEvent);
             
-            const events = await eventSourcing.getEvents('test-aggregate-123', 'DID');
+            const events = await eventSourcing.getEvents('test-aggregate-123', 'LABS');
             
             expect(Array.isArray(events)).toBe(true);
             expect(events.length).toBeGreaterThan(0);
             expect(events[0].aggregateId).toBe('test-aggregate-123');
-            expect(events[0].aggregateType).toBe('DID');
+            expect(events[0].aggregateType).toBe('LABS');
         });
 
         test('should filter events by version range', async () => {
@@ -420,7 +420,7 @@ describe('EventSourcing', () => {
                 await eventSourcing.storeEvent(event);
             }
             
-            const filteredEvents = await eventSourcing.getEvents('test-aggregate-123', 'DID', {
+            const filteredEvents = await eventSourcing.getEvents('test-aggregate-123', 'LABS', {
                 fromVersion: 2,
                 toVersion: 3
             });
@@ -433,7 +433,7 @@ describe('EventSourcing', () => {
         test('should filter events by event types', async () => {
             const events = [
                 testEvent,
-                { ...testEvent, eventType: 'DID_UPDATED', version: 2 },
+                { ...testEvent, eventType: 'LABS_UPDATED', version: 2 },
                 { ...testEvent, eventType: 'CREDENTIAL_ISSUED', version: 3 }
             ];
             
@@ -441,12 +441,12 @@ describe('EventSourcing', () => {
                 await eventSourcing.storeEvent(event);
             }
             
-            const filteredEvents = await eventSourcing.getEvents('test-aggregate-123', 'DID', {
-                eventTypes: ['DID_CREATED', 'DID_UPDATED']
+            const filteredEvents = await eventSourcing.getEvents('test-aggregate-123', 'LABS', {
+                eventTypes: ['LABS_CREATED', 'LABS_UPDATED']
             });
             
             expect(filteredEvents.length).toBe(2);
-            expect(filteredEvents.every(e => e.eventType === 'DID_CREATED' || e.eventType === 'DID_UPDATED')).toBe(true);
+            expect(filteredEvents.every(e => e.eventType === 'LABS_CREATED' || e.eventType === 'LABS_UPDATED')).toBe(true);
         });
 
         test('should get state at specific timestamp', async () => {
@@ -457,9 +457,9 @@ describe('EventSourcing', () => {
                 timestamp
             });
             
-            const state = await eventSourcing.getStateAtTimestamp('test-aggregate-123', 'DID', timestamp);
+            const state = await eventSourcing.getStateAtTimestamp('test-aggregate-123', 'LABS', timestamp);
             
-            expect(state.did).toBe('did:stellar:test123');
+            expect(state.LABS).toBe('LABS:stellar:test123');
         });
     });
 
@@ -533,7 +533,7 @@ describe('EventSourcing', () => {
         test('should search events by text', async () => {
             await eventSourcing.storeEvent(testEvent);
             
-            const searchResults = await eventSourcing.searchEvents('DID_CREATED');
+            const searchResults = await eventSourcing.searchEvents('LABS_CREATED');
             
             expect(Array.isArray(searchResults)).toBe(true);
         });
@@ -541,7 +541,7 @@ describe('EventSourcing', () => {
         test('should limit search results', async () => {
             await eventSourcing.storeEvent(testEvent);
             
-            const searchResults = await eventSourcing.searchEvents('DID', { limit: 5 });
+            const searchResults = await eventSourcing.searchEvents('LABS', { limit: 5 });
             
             expect(searchResults.length).toBeLessThanOrEqual(5);
         });
@@ -572,7 +572,7 @@ describe('EventSourcing', () => {
                 toArray: jest.fn().mockRejectedValue(new Error('Query error'))
             });
             
-            await expect(eventSourcing.replayEvents('test-aggregate-123', 'DID'))
+            await expect(eventSourcing.replayEvents('test-aggregate-123', 'LABS'))
                 .rejects.toThrow('Query error');
         });
 

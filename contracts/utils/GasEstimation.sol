@@ -7,10 +7,10 @@ import "../interfaces/IERC735.sol";
 
 /**
  * @title GasEstimation
- * @dev Comprehensive gas estimation utility for all DID contract operations
+ * @dev Comprehensive gas estimation utility for all LABS contract operations
  * 
- * This contract provides gas estimation functions for all major DID operations
- * including DID creation, credential management, governance operations, and
+ * This contract provides gas estimation functions for all major LABS operations
+ * including LABS creation, credential management, governance operations, and
  * recovery procedures. It uses historical data and dynamic pricing to provide
  * accurate gas estimates.
  * 
@@ -22,7 +22,7 @@ import "../interfaces/IERC735.sol";
  * - Gas optimization recommendations
  * 
  * @author Fatima Sanusi
- * @notice Use this contract to estimate gas costs for DID operations
+ * @notice Use this contract to estimate gas costs for LABS operations
  */
 contract GasEstimation {
     using SafeMath for uint256;
@@ -61,10 +61,10 @@ contract GasEstimation {
     // ===== OPERATION TYPES =====
     
     enum OperationType {
-        DID_CREATE,
-        DID_UPDATE,
-        DID_TRANSFER,
-        DID_DELETE,
+        LABS_CREATE,
+        LABS_UPDATE,
+        LABS_TRANSFER,
+        LABS_DELETE,
         CREDENTIAL_ISSUE,
         CREDENTIAL_REVOKE,
         CREDENTIAL_UPDATE,
@@ -96,10 +96,10 @@ contract GasEstimation {
     
     // ===== BASE GAS COSTS (in wei) =====
     
-    uint256 public constant BASE_DID_CREATE = 85000;
-    uint256 public constant BASE_DID_UPDATE = 45000;
-    uint256 public constant BASE_DID_TRANSFER = 35000;
-    uint256 public constant BASE_DID_DELETE = 25000;
+    uint256 public constant BASE_LABS_CREATE = 85000;
+    uint256 public constant BASE_LABS_UPDATE = 45000;
+    uint256 public constant BASE_LABS_TRANSFER = 35000;
+    uint256 public constant BASE_LABS_DELETE = 25000;
     uint256 public constant BASE_CREDENTIAL_ISSUE = 95000;
     uint256 public constant BASE_CREDENTIAL_REVOKE = 30000;
     uint256 public constant BASE_CREDENTIAL_UPDATE = 55000;
@@ -143,25 +143,25 @@ contract GasEstimation {
     // ===== PUBLIC FUNCTIONS =====
     
     /**
-     * @dev Estimates gas cost for DID creation
+     * @dev Estimates gas cost for LABS creation
      * @param owner Owner address
      * @param publicKey Public key bytes
      * @param serviceEndpoints Number of service endpoints
      * @return estimate Gas estimation details
      */
-    function estimateDIDCreation(
+    function estimateLABSCreation(
         address owner,
         bytes calldata publicKey,
         uint256 serviceEndpoints
     ) external view returns (GasEstimate memory estimate) {
-        uint256 baseCost = BASE_DID_CREATE;
+        uint256 baseCost = BASE_LABS_CREATE;
         uint256 variableCost = calculateVariableCost(
             publicKey.length,
             serviceEndpoints * 1000, // 1000 gas per service endpoint
             owner != address(0) ? 0 : 5000 // Additional cost if owner is zero
         );
         
-        estimate = createGasEstimate(OperationType.DID_CREATE, baseCost, variableCost);
+        estimate = createGasEstimate(OperationType.LABS_CREATE, baseCost, variableCost);
     }
     
     /**
@@ -403,10 +403,10 @@ contract GasEstimation {
      * @return baseCost Base gas cost
      */
     function getBaseGasCost(OperationType operation) internal pure returns (uint256 baseCost) {
-        if (operation == OperationType.DID_CREATE) return BASE_DID_CREATE;
-        if (operation == OperationType.DID_UPDATE) return BASE_DID_UPDATE;
-        if (operation == OperationType.DID_TRANSFER) return BASE_DID_TRANSFER;
-        if (operation == OperationType.DID_DELETE) return BASE_DID_DELETE;
+        if (operation == OperationType.LABS_CREATE) return BASE_LABS_CREATE;
+        if (operation == OperationType.LABS_UPDATE) return BASE_LABS_UPDATE;
+        if (operation == OperationType.LABS_TRANSFER) return BASE_LABS_TRANSFER;
+        if (operation == OperationType.LABS_DELETE) return BASE_LABS_DELETE;
         if (operation == OperationType.CREDENTIAL_ISSUE) return BASE_CREDENTIAL_ISSUE;
         if (operation == OperationType.CREDENTIAL_REVOKE) return BASE_CREDENTIAL_REVOKE;
         if (operation == OperationType.CREDENTIAL_UPDATE) return BASE_CREDENTIAL_UPDATE;

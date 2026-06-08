@@ -7,7 +7,7 @@ class MetricsService {
 
     // Add a default label to all metrics
     this.register.setDefaultLabels({
-      app: 'stellar-did-backend'
+      app: 'stellar-LABS-backend'
     });
 
     // Enable the collection of default metrics
@@ -50,9 +50,9 @@ class MetricsService {
       registers: [this.register]
     });
 
-    this.didRegistrySize = new client.Gauge({
-      name: 'did_registry_size',
-      help: 'Number of DIDs in the registry',
+    this.LABSRegistrySize = new client.Gauge({
+      name: 'LABS_registry_size',
+      help: 'Number of LABSs in the registry',
       registers: [this.register]
     });
 
@@ -180,9 +180,9 @@ class MetricsService {
     this.activeConnections.set(count);
   }
 
-  // DID registry metrics
-  setDidRegistrySize(size) {
-    this.didRegistrySize.set(size);
+  // LABS registry metrics
+  setLABSRegistrySize(size) {
+    this.LABSRegistrySize.set(size);
   }
 
   // Credential metrics

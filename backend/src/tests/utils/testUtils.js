@@ -45,7 +45,7 @@ class TestUtils {
   static async setupTestDatabase() {
     try {
       // Connect to test database
-      const mongoUri = process.env.MONGODB_TEST_URI || 'mongodb://localhost:27017/stellar-did-test';
+      const mongoUri = process.env.MONGODB_TEST_URI || 'mongodb://localhost:27017/stellar-LABS-test';
       
       await mongoose.connect(mongoUri, {
         useNewUrlParser: true,
@@ -142,8 +142,8 @@ class TestUtils {
 
     return jwt.sign(payload, process.env.JWT_SECRET || 'test-jwt-secret', {
       expiresIn,
-      issuer: 'stellar-did-platform',
-      audience: 'stellar-did-users'
+      issuer: 'stellar-LABS-platform',
+      audience: 'stellar-LABS-users'
     });
   }
 
@@ -380,11 +380,11 @@ class TestUtils {
   }
 
   /**
-   * Generate random DID
+   * Generate random LABS
    */
-  static generateRandomDID() {
+  static generateRandomLABS() {
     const address = this.generateRandomStellarAddress();
-    return `did:stellar:${address}`;
+    return `LABS:stellar:${address}`;
   }
 
   /**

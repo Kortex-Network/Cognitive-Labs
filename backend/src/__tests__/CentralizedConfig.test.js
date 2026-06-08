@@ -21,8 +21,8 @@ describe('CentralizedConfig', () => {
         process.env.STELLAR_NETWORK = 'TESTNET';
         process.env.STELLAR_HORIZON_URL = 'https://horizon-testnet.stellar.org';
         process.env.STELLAR_PASSPHRASE = 'Test SDF Network ; September 2015';
-        process.env.DID_METHOD = 'stellar';
-        process.env.DID_REGISTRY_PUBLIC_KEY = 'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+        process.env.LABS_METHOD = 'stellar';
+        process.env.LABS_REGISTRY_PUBLIC_KEY = 'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
         process.env.PORT = '3001';
         process.env.FRONTEND_URL = 'http://localhost:3000';
         process.env.MONGODB_URL = 'mongodb://localhost:27017/test';
@@ -34,7 +34,7 @@ describe('CentralizedConfig', () => {
         process.env.RATE_LIMIT_MAX_REQUESTS = '100';
         process.env.EVM_RPC_URL = 'https://rpc2.sepolia.org';
         process.env.EVM_PRIVATE_KEY = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-        process.env.EVM_DID_REGISTRY_ADDRESS = '0xabcdef1234567890abcdef1234567890abcdef12';
+        process.env.EVM_LABS_REGISTRY_ADDRESS = '0xabcdef1234567890abcdef1234567890abcdef12';
         process.env.EVM_CHAIN_ID = '11155111';
         process.env.LOG_LEVEL = 'info';
         process.env.LOG_FORMAT = 'combined';
@@ -69,12 +69,12 @@ describe('CentralizedConfig', () => {
             expect(stellarConfig.STELLAR_PASSPHRASE).toBe('Test SDF Network ; September 2015');
         });
 
-        test('should validate DID configuration', async () => {
+        test('should validate LABS configuration', async () => {
             config = new CentralizedConfig();
             
-            const didConfig = config.get('did');
-            expect(didConfig.DID_METHOD).toBe('stellar');
-            expect(didConfig.DID_REGISTRY_PUBLIC_KEY).toBe('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890');
+            const LABSConfig = config.get('LABS');
+            expect(LABSConfig.LABS_METHOD).toBe('stellar');
+            expect(LABSConfig.LABS_REGISTRY_PUBLIC_KEY).toBe('abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890');
         });
 
         test('should validate server configuration', async () => {
@@ -117,7 +117,7 @@ describe('CentralizedConfig', () => {
             const evmConfig = config.get('evm');
             expect(evmConfig.EVM_RPC_URL).toBe('https://rpc2.sepolia.org');
             expect(evmConfig.EVM_PRIVATE_KEY).toBe('0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef');
-            expect(evmConfig.EVM_DID_REGISTRY_ADDRESS).toBe('0xabcdef1234567890abcdef1234567890abcdef12');
+            expect(evmConfig.EVM_LABS_REGISTRY_ADDRESS).toBe('0xabcdef1234567890abcdef1234567890abcdef12');
             expect(evmConfig.EVM_CHAIN_ID).toBe(11155111);
         });
 
@@ -150,8 +150,8 @@ describe('CentralizedConfig', () => {
             }).toThrow('Configuration validation failed');
         });
 
-        test('should reject invalid DID method', async () => {
-            process.env.DID_METHOD = 'invalid_method';
+        test('should reject invalid LABS method', async () => {
+            process.env.LABS_METHOD = 'invalid_method';
             
             expect(() => {
                 new CentralizedConfig();
@@ -191,7 +191,7 @@ describe('CentralizedConfig', () => {
         });
 
         test('should reject invalid EVM contract address', async () => {
-            process.env.EVM_DID_REGISTRY_ADDRESS = 'invalid_address';
+            process.env.EVM_LABS_REGISTRY_ADDRESS = 'invalid_address';
             
             expect(() => {
                 new CentralizedConfig();

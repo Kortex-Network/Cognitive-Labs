@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const VALID_TYPES = ["did", "credential", "connection"];
+const VALID_TYPES = ["LABS", "credential", "connection"];
 
 /**
  * Validates a QR payload against the expected schema.
@@ -28,9 +28,9 @@ function validateSchema(payload) {
     return { valid: false, errors };
   }
 
-  if (payload.type === "did") {
-    if (!payload.did) {
-      errors.push({ field: "did", reason: "required" });
+  if (payload.type === "LABS") {
+    if (!payload.LABS) {
+      errors.push({ field: "LABS", reason: "required" });
     }
   } else if (payload.type === "credential") {
     if (!payload.credentialId) {
@@ -53,7 +53,7 @@ function validateSchema(payload) {
 function encodeDeepLink(payload) {
   const json = JSON.stringify(payload);
   const encoded = Buffer.from(json).toString("base64url");
-  return `did-marketplace://qr?payload=${encoded}`;
+  return `LABS-marketplace://qr?payload=${encoded}`;
 }
 
 /**

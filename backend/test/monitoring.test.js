@@ -22,7 +22,7 @@ describe('Performance Monitoring Tests', () => {
       expect(metricsService.contractOperationsTotal).toBeDefined();
       expect(metricsService.contractOperationDuration).toBeDefined();
       expect(metricsService.activeConnections).toBeDefined();
-      expect(metricsService.didRegistrySize).toBeDefined();
+      expect(metricsService.LABSRegistrySize).toBeDefined();
       expect(metricsService.credentialsIssuedTotal).toBeDefined();
       expect(metricsService.stellarOperationsTotal).toBeDefined();
       expect(metricsService.stellarOperationDuration).toBeDefined();
@@ -38,7 +38,7 @@ describe('Performance Monitoring Tests', () => {
     });
 
     test('should record HTTP request metrics', () => {
-      metricsService.recordHttpRequest('GET', '/api/v1/dids', 200, 0.5);
+      metricsService.recordHttpRequest('GET', '/api/v1/LABSs', 200, 0.5);
       
       // Verify metrics are recorded (would need to check actual values in real test)
       expect(metricsService.httpRequestsTotal).toBeDefined();
@@ -74,14 +74,14 @@ describe('Performance Monitoring Tests', () => {
 
     test('should set gauge metrics', () => {
       metricsService.setActiveConnections(10);
-      metricsService.setDidRegistrySize(1000);
+      metricsService.setLABSRegistrySize(1000);
       metricsService.setCacheHitRate(85.5);
       metricsService.setDatabaseConnections('active', 5);
       metricsService.setQueueSize('processing', 25);
       metricsService.setBlockchainSyncStatus('stellar', 1);
       
       expect(metricsService.activeConnections).toBeDefined();
-      expect(metricsService.didRegistrySize).toBeDefined();
+      expect(metricsService.LABSRegistrySize).toBeDefined();
       expect(metricsService.cacheHitRate).toBeDefined();
       expect(metricsService.databaseConnections).toBeDefined();
       expect(metricsService.queueSize).toBeDefined();
@@ -135,8 +135,8 @@ describe('Performance Monitoring Tests', () => {
   describe('Integration Tests', () => {
     test('should handle complete request lifecycle', () => {
       // Simulate request lifecycle
-      metricsService.recordHttpRequest('POST', '/api/v1/dids', 201, 1.2);
-      metricsService.recordApiResponseSize('/api/v1/dids', 'POST', 1024);
+      metricsService.recordHttpRequest('POST', '/api/v1/LABSs', 201, 1.2);
+      metricsService.recordApiResponseSize('/api/v1/LABSs', 'POST', 1024);
       metricsService.recordAuthenticationAttempt('success', 'jwt');
       
       const metrics = metricsService.getMetrics();
@@ -146,7 +146,7 @@ describe('Performance Monitoring Tests', () => {
     });
 
     test('should handle error scenarios', () => {
-      metricsService.recordError('ValidationError', '/api/v1/dids');
+      metricsService.recordError('ValidationError', '/api/v1/LABSs');
       metricsService.recordError('DatabaseError', '/api/v1/credentials');
       
       const metrics = metricsService.getMetrics();

@@ -5,7 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { 
-  validateAndSanitizeDID, 
+  validateAndSanitizeLABS, 
   validateAndSanitizePublicKey, 
   validateAndSanitizeSecretKey, 
   validateAndSanitizeUrl,
@@ -36,8 +36,8 @@ export const useInputValidation = (validationRules = {}) => {
     let result = { isValid: true, sanitizedValue: value, error: null };
 
     switch (rule.type) {
-      case 'did':
-        result = validateAndSanitizeDID(value);
+      case 'LABS':
+        result = validateAndSanitizeLABS(value);
         break;
       
       case 'publicKey':
@@ -185,11 +185,11 @@ export const useInputValidation = (validationRules = {}) => {
 };
 
 /**
- * Predefined validation rules for common DID operations
+ * Predefined validation rules for common LABS operations
  */
-export const DID_VALIDATION_RULES = {
-  did: {
-    type: 'did',
+export const LABS_VALIDATION_RULES = {
+  LABS: {
+    type: 'LABS',
     required: true
   },
   publicKey: {
@@ -207,12 +207,12 @@ export const DID_VALIDATION_RULES = {
 };
 
 export const CREDENTIAL_VALIDATION_RULES = {
-  issuerDID: {
-    type: 'did',
+  issuerLABS: {
+    type: 'LABS',
     required: true
   },
-  subjectDID: {
-    type: 'did',
+  subjectLABS: {
+    type: 'LABS',
     required: true
   },
   credentialType: {
@@ -229,9 +229,9 @@ export const CREDENTIAL_VALIDATION_RULES = {
   }
 };
 
-export const RESOLVE_DID_VALIDATION_RULES = {
-  did: {
-    type: 'did',
+export const RESOLVE_LABS_VALIDATION_RULES = {
+  LABS: {
+    type: 'LABS',
     required: true
   }
 };

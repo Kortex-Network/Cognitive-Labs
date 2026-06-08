@@ -223,7 +223,7 @@ const AdvancedSearch = ({ onSearch, onFiltersChange, loading }) => {
                   label="Issuer"
                   value={searchParams.issuer}
                   onChange={(e) => updateParam('issuer', e.target.value)}
-                  placeholder="Filter by issuer DID..."
+                  placeholder="Filter by issuer LABS..."
                 />
               </Grid>
 
@@ -233,7 +233,7 @@ const AdvancedSearch = ({ onSearch, onFiltersChange, loading }) => {
                   label="Subject"
                   value={searchParams.subject}
                   onChange={(e) => updateParam('subject', e.target.value)}
-                  placeholder="Filter by subject DID..."
+                  placeholder="Filter by subject LABS..."
                 />
               </Grid>
 

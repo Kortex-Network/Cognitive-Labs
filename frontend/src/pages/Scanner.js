@@ -6,8 +6,8 @@ import QRGenerator from "../components/QRGenerator";
 import { resolveRoute } from "../utils/qrPayload";
 
 const SAMPLE_PAYLOAD = {
-  type: "did",
-  did: "did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  type: "LABS",
+  LABS: "LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
 };
 
 const Scanner = () => {
@@ -28,7 +28,7 @@ const Scanner = () => {
         QR Code Scanner
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Scan a QR code to resolve a DID, verify a credential, or initiate a
+        Scan a QR code to resolve a LABS, verify a credential, or initiate a
         wallet connection.
       </Typography>
 

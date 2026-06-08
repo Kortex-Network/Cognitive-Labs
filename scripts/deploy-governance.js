@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
 async function main() {
-    console.log("Deploying DID Governance System...");
+    console.log("Deploying LABS Governance System...");
     
     const [deployer, proposer, executor, voter1, voter2, voter3] = await ethers.getSigners();
     
@@ -11,11 +11,11 @@ async function main() {
     console.log("Executor address:", executor.address);
     
     // 1. Deploy Governance Token
-    console.log("\n1. Deploying DID Governance Token...");
-    const DIDGovernanceToken = await ethers.getContractFactory("DIDGovernanceToken");
-    const governanceToken = await DIDGovernanceToken.deploy();
+    console.log("\n1. Deploying LABS Governance Token...");
+    const LABSGovernanceToken = await ethers.getContractFactory("LABSGovernanceToken");
+    const governanceToken = await LABSGovernanceToken.deploy();
     await governanceToken.deployed();
-    console.log("DIDGovernanceToken deployed to:", governanceToken.address);
+    console.log("LABSGovernanceToken deployed to:", governanceToken.address);
     
     // 2. Deploy Timelock
     console.log("\n2. Deploying Timelock...");
@@ -24,17 +24,17 @@ async function main() {
     const executors = [executor.address];
     const admin = deployer.address;
     
-    const DIDTimelock = await ethers.getContractFactory("DIDTimelock");
-    const timelock = await DIDTimelock.deploy(minDelay, proposers, executors, admin);
+    const LABSTimelock = await ethers.getContractFactory("LABSTimelock");
+    const timelock = await LABSTimelock.deploy(minDelay, proposers, executors, admin);
     await timelock.deployed();
-    console.log("DIDTimelock deployed to:", timelock.address);
+    console.log("LABSTimelock deployed to:", timelock.address);
     
     // 3. Deploy Governor
     console.log("\n3. Deploying Governor...");
-    const DIDGovernor = await ethers.getContractFactory("DIDGovernor");
-    const governor = await DIDGovernor.deploy(governanceToken.address, timelock.address);
+    const LABSGovernor = await ethers.getContractFactory("LABSGovernor");
+    const governor = await LABSGovernor.deploy(governanceToken.address, timelock.address);
     await governor.deployed();
-    console.log("DIDGovernor deployed to:", governor.address);
+    console.log("LABSGovernor deployed to:", governor.address);
     
     // 4. Deploy Governance Proxy
     console.log("\n4. Deploying Governance Proxy...");

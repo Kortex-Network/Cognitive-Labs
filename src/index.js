@@ -8,7 +8,7 @@ const { errorHandler, sendError } = require("./middleware/errorHandler");
 dotenv.config();
 
 // Import routes
-const didRoutes = require("./routes/did");
+const LABSRoutes = require("./routes/LABS");
 const credentialRoutes = require("./routes/credentials");
 const batchRoutes = require("./routes/batch");
 const sharingRoutes = require("./routes/credentialSharing");
@@ -36,7 +36,7 @@ const redisClient = require("./config/redis");
 app.set("redisClient", redisClient);
 
 // Routes
-app.use("/api/did", didRoutes);
+app.use("/api/LABS", LABSRoutes);
 app.use("/api/credentials", credentialRoutes);
 app.use("/api/batch", batchRoutes);
 app.use("/api/sharing", sharingRoutes);
@@ -45,11 +45,11 @@ app.use("/api/health", healthRoutes);
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({
-    name: "Stellar DID Platform",
+    name: "Stellar LABS Platform",
     version: "1.0.0",
-    description: "Decentralized Identity platform on Stellar network",
+    description: "Cognitive Lab platform on Stellar network",
     endpoints: {
-      did: "/api/did",
+      LABS: "/api/LABS",
       credentials: "/api/credentials",
       batch: "/api/batch",
       sharing: "/api/sharing",
@@ -73,7 +73,7 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Stellar DID Platform running on port ${PORT}`);
+  console.log(`🚀 Stellar LABS Platform running on port ${PORT}`);
   console.log(`📡 Network: ${process.env.STELLAR_NETWORK || "TESTNET"}`);
   console.log(`🌐 Horizon: ${process.env.STELLAR_HORIZON_URL}`);
   console.log(`🔗 API: http://localhost:${PORT}/api`);

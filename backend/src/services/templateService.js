@@ -18,7 +18,7 @@ class TemplateService {
     try {
       const query = { active: true };
       if (filters.credentialType) query.credentialType = filters.credentialType;
-      if (filters.issuerDid) query.issuerDid = filters.issuerDid;
+      if (filters.issuerLABS) query.issuerLABS = filters.issuerLABS;
       
       return await CredentialTemplate.find(query).sort({ name: 1 });
     } catch (error) {

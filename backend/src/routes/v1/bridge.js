@@ -15,9 +15,9 @@ const crossChainService = new CrossChainService();
 
 /**
  * @openapi
- * /bridge/did:
+ * /bridge/LABS:
  *   post:
- *     summary: Bridge a Stellar DID to Ethereum
+ *     summary: Bridge a Stellar LABS to Ethereum
  *     tags: [Bridge]
  *     security:
  *       - bearerAuth: []
@@ -27,17 +27,17 @@ const crossChainService = new CrossChainService();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [did, ownerAddress]
+ *             required: [LABS, ownerAddress]
  *             properties:
- *               did:
+ *               LABS:
  *                 type: string
- *                 description: DID to bridge
+ *                 description: LABS to bridge
  *               ownerAddress:
  *                 type: string
  *                 description: Ethereum address of the owner
  *     responses:
  *       200:
- *         description: DID bridged successfully
+ *         description: LABS bridged successfully
  *         content:
  *           application/json:
  *             schema:
@@ -50,23 +50,23 @@ const crossChainService = new CrossChainService();
  *                 transactionHash:
  *                   type: string
  */
-router.post('/did', authMiddleware, async (req, res) => {
+router.post('/LABS', authMiddleware, async (req, res) => {
   try {
-    const { did, ownerAddress } = req.body;
+    const { LABS, ownerAddress } = req.body;
 
-    if (!did || !ownerAddress) {
-      return res.status(400).json({ error: 'Please provide did and ownerAddress' });
+    if (!LABS || !ownerAddress) {
+      return res.status(400).json({ error: 'Please provide LABS and ownerAddress' });
     }
 
-    const receipt = await crossChainService.bridgeDIDToEthereum(did, ownerAddress);
+    const receipt = await crossChainService.bridgeLABSToEthereum(LABS, ownerAddress);
 
     res.json({
       success: true,
-      message: 'DID bridged successfully',
+      message: 'LABS bridged successfully',
       transactionHash: receipt.hash
     });
   } catch (error) {
-    logger.error('Bridge DID Error:', error);
+    logger.error('Bridge LABS Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -130,15 +130,15 @@ router.post('/credential', authMiddleware, async (req, res) => {
 
 /**
  * @openapi
- * /bridge/status/{did}:
+ * /bridge/status/{LABS}:
  *   get:
- *     summary: Check cross-chain status of a DID
+ *     summary: Check cross-chain status of a LABS
  *     tags: [Bridge]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: did
+ *         name: LABS
  *         required: true
  *         schema:
  *           type: string
@@ -155,11 +155,11 @@ router.post('/credential', authMiddleware, async (req, res) => {
  *                 status:
  *                   type: object
  */
-router.get('/status/:did', authMiddleware, async (req, res) => {
+router.get('/status/:LABS', authMiddleware, async (req, res) => {
   try {
-    const { did } = req.params;
+    const { LABS } = req.params;
 
-    const status = await crossChainService.verifyCrossChainState(did);
+    const status = await crossChainService.verifyCrossChainState(LABS);
 
     res.json({
       success: true,

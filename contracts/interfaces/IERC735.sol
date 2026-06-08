@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
  * @title IERC735
  * @dev Interface for ERC735 Claim Management standard with comprehensive functionality
  * 
- * This interface defines the standard for claim management in decentralized identity
+ * This interface defines the standard for claim management in cognitive labs identity
  * systems. It enables identity owners to add, remove, and manage claims issued by
  * various parties, providing a standardized way to handle verifiable credentials
  * and attestations.

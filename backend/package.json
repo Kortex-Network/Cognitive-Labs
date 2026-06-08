@@ -1,19 +1,19 @@
 {
-  "name": "stellar-did-backend",
+  "name": "stellar-LABS-backend",
   "version": "1.0.0",
-  "description": "Backend microservice for Stellar DID Platform",
+  "description": "Backend microservice for Stellar LABS Platform",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest",
     "build": "echo 'Backend build completed'",
-    "docker:build": "docker build -t stellar-did-backend .",
-    "docker:run": "docker run -p 3001:3001 stellar-did-backend"
+    "docker:build": "docker build -t stellar-LABS-backend .",
+    "docker:run": "docker run -p 3001:3001 stellar-LABS-backend"
   },
   "keywords": [
     "stellar",
-    "did",
+    "LABS",
     "backend",
     "microservice",
     "blockchain",
@@ -74,7 +74,7 @@
       "<rootDir>/src/__tests__/setup.js"
     ],
     "moduleNameMapper": {
-      ".*/contracts/stellar/DIDContract": "<rootDir>/src/__tests__/__mocks__/DIDContract.js"
+      ".*/contracts/stellar/LABSContract": "<rootDir>/src/__tests__/__mocks__/LABSContract.js"
     }
   }
 }

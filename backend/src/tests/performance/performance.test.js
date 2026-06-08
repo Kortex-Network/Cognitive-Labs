@@ -48,7 +48,7 @@ describe('Performance Test Suite', function() {
 
   describe('API Response Time Performance', function() {
     
-    it('should handle DID operations within performance thresholds', async function() {
+    it('should handle LABS operations within performance thresholds', async function() {
       const operations = ['create', 'read', 'update', 'delete'];
       const thresholds = { create: 500, read: 200, update: 300, delete: 200 };
       
@@ -57,55 +57,55 @@ describe('Performance Test Suite', function() {
           switch (operation) {
             case 'create':
               await request(app)
-                .post('/api/v1/did')
+                .post('/api/v1/LABS')
                 .set('Authorization', `Bearer ${authToken}`)
-                .send(TestData.validDID())
+                .send(TestData.validLABS())
                 .expect(201);
               break;
               
             case 'read':
               await request(app)
-                .get('/api/v1/did')
+                .get('/api/v1/LABS')
                 .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
               break;
               
             case 'update':
-              // First create a DID
+              // First create a LABS
               const createResponse = await request(app)
-                .post('/api/v1/did')
+                .post('/api/v1/LABS')
                 .set('Authorization', `Bearer ${authToken}`)
-                .send(TestData.validDID())
+                .send(TestData.validLABS())
                 .expect(201);
               
               // Then update it
               await request(app)
-                .put(`/api/v1/did/${createResponse.body.data.did}`)
+                .put(`/api/v1/LABS/${createResponse.body.data.LABS}`)
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({ serviceEndpoint: 'https://updated.example.com' })
                 .expect(200);
               break;
               
             case 'delete':
-              // First create a DID
+              // First create a LABS
               const deleteCreateResponse = await request(app)
-                .post('/api/v1/did')
+                .post('/api/v1/LABS')
                 .set('Authorization', `Bearer ${authToken}`)
-                .send(TestData.validDID())
+                .send(TestData.validLABS())
                 .expect(201);
               
               // Then delete it
               await request(app)
-                .delete(`/api/v1/did/${deleteCreateResponse.body.data.did}`)
+                .delete(`/api/v1/LABS/${deleteCreateResponse.body.data.LABS}`)
                 .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
               break;
           }
         }, 10);
         
-        performanceData.api[`did_${operation}`] = performance;
+        performanceData.api[`LABS_${operation}`] = performance;
         
-        console.log(`DID ${operation} performance:`, {
+        console.log(`LABS ${operation} performance:`, {
           average: `${performance.average.toFixed(2)}ms`,
           min: `${performance.min}ms`,
           max: `${performance.max}ms`,
@@ -243,19 +243,19 @@ describe('Performance Test Suite', function() {
 
   describe('Concurrent Request Performance', function() {
     
-    it('should handle concurrent DID creation efficiently', async function() {
+    it('should handle concurrent LABS creation efficiently', async function() {
       const concurrencyLevels = [10, 25, 50, 100];
       
       for (const concurrency of concurrencyLevels) {
         const loadTest = await TestUtils.runLoadTest(async () => {
           await request(app)
-            .post('/api/v1/did')
+            .post('/api/v1/LABS')
             .set('Authorization', `Bearer ${authToken}`)
-            .send(TestData.validDID())
+            .send(TestData.validLABS())
             .expect(201);
         }, concurrency, 10000); // 10 seconds
         
-        console.log(`DID creation load test (${concurrency} concurrent):`, {
+        console.log(`LABS creation load test (${concurrency} concurrent):`, {
           total: loadTest.total,
           success: loadTest.success,
           errors: loadTest.errors,
@@ -300,7 +300,7 @@ describe('Performance Test Suite', function() {
     it('should handle mixed concurrent operations efficiently', async function() {
       const concurrency = 50;
       const operations = [
-        () => request(app).get('/api/v1/did').set('Authorization', `Bearer ${authToken}`).expect(200),
+        () => request(app).get('/api/v1/LABS').set('Authorization', `Bearer ${authToken}`).expect(200),
         () => request(app).get('/api/v1/credentials').set('Authorization', `Bearer ${authToken}`).expect(200),
         () => request(app).get('/api/v1/stellar/account/GABC1234567890ABCDEF1234567890ABCDEF1234567890').set('Authorization', `Bearer ${authToken}`).expect(200)
       ];
@@ -330,12 +330,12 @@ describe('Performance Test Suite', function() {
     it('should maintain memory usage within acceptable limits', async function() {
       const initialMemory = process.memoryUsage();
       
-      // Create large number of DIDs
+      // Create large number of LABSs
       for (let i = 0; i < 1000; i++) {
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(TestData.validDID())
+          .send(TestData.validLABS())
           .expect(201);
       }
       
@@ -344,7 +344,7 @@ describe('Performance Test Suite', function() {
       // Perform many read operations
       for (let i = 0; i < 1000; i++) {
         await request(app)
-          .get('/api/v1/did')
+          .get('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
       }
@@ -385,23 +385,23 @@ describe('Performance Test Suite', function() {
 
     it('should handle large payload operations efficiently', async function() {
       // Test with large verification methods and services
-      const largeDID = TestData.validDIDWithVerificationMethods();
+      const largeLABS = TestData.validLABSWithVerificationMethods();
       
       // Add many verification methods
-      largeDID.verificationMethods = [];
+      largeLABS.verificationMethods = [];
       for (let i = 0; i < 50; i++) {
-        largeDID.verificationMethods.push({
+        largeLABS.verificationMethods.push({
           id: `key-${i}`,
           type: 'Ed25519VerificationKey2018',
-          controller: largeDID.did,
+          controller: largeLABS.LABS,
           publicKeyBase58: TestUtils.generateRandomStellarAddress()
         });
       }
       
       // Add many services
-      largeDID.services = [];
+      largeLABS.services = [];
       for (let i = 0; i < 20; i++) {
-        largeDID.services.push({
+        largeLABS.services.push({
           id: `service-${i}`,
           type: 'ServiceType',
           serviceEndpoint: `https://service${i}.example.com`
@@ -410,17 +410,17 @@ describe('Performance Test Suite', function() {
       
       const performance = await TestUtils.measurePerformance(async () => {
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(largeDID)
+          .send(largeLABS)
           .expect(201);
       }, 5);
       
-      console.log('Large payload DID creation performance:', {
+      console.log('Large payload LABS creation performance:', {
         average: `${performance.average.toFixed(2)}ms`,
         min: `${performance.min}ms`,
         max: `${performance.max}ms`,
-        payloadSize: `${JSON.stringify(largeDID).length} bytes`
+        payloadSize: `${JSON.stringify(largeLABS).length} bytes`
       });
       
       // Should handle large payloads within reasonable time
@@ -432,21 +432,21 @@ describe('Performance Test Suite', function() {
   describe('Cache Performance', function() {
     
     it('should demonstrate cache effectiveness', async function() {
-      // Create a DID first
-      const didData = TestData.validDID();
+      // Create a LABS first
+      const LABSData = TestData.validLABS();
       
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      const did = createResponse.body.data;
+      const LABS = createResponse.body.data;
       
       // First request (cache miss)
       const firstRequestStart = Date.now();
       await request(app)
-        .get(`/api/v1/did/${did.did}`)
+        .get(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       const firstRequestTime = Date.now() - firstRequestStart;
@@ -454,7 +454,7 @@ describe('Performance Test Suite', function() {
       // Second request (cache hit)
       const secondRequestStart = Date.now();
       const secondResponse = await request(app)
-        .get(`/api/v1/did/${did.did}`)
+        .get(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       const secondRequestTime = Date.now() - secondRequestStart;
@@ -475,33 +475,33 @@ describe('Performance Test Suite', function() {
     });
 
     it('should handle cache invalidation correctly', async function() {
-      // Create a DID
-      const didData = TestData.validDID();
+      // Create a LABS
+      const LABSData = TestData.validLABS();
       
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      const did = createResponse.body.data;
+      const LABS = createResponse.body.data;
       
       // First request to populate cache
       await request(app)
-        .get(`/api/v1/did/${did.did}`)
+        .get(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
-      // Update DID (should invalidate cache)
+      // Update LABS (should invalidate cache)
       await request(app)
-        .put(`/api/v1/did/${did.did}`)
+        .put(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ serviceEndpoint: 'https://updated.example.com' })
         .expect(200);
       
       // Request again (should be cache miss due to invalidation)
       const response = await request(app)
-        .get(`/api/v1/did/${did.did}`)
+        .get(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
@@ -523,14 +523,14 @@ describe('Performance Test Suite', function() {
           performance[operation] = await TestUtils.measurePerformance(async () => {
             switch (operation) {
               case 'insert':
-                // Insert multiple DIDs
+                // Insert multiple LABSs
                 const insertPromises = [];
                 for (let i = 0; i < batchSize; i++) {
                   insertPromises.push(
                     request(app)
-                      .post('/api/v1/did')
+                      .post('/api/v1/LABS')
                       .set('Authorization', `Bearer ${authToken}`)
-                      .send(TestData.validDID())
+                      .send(TestData.validLABS())
                       .expect(201)
                   );
                 }
@@ -538,20 +538,20 @@ describe('Performance Test Suite', function() {
                 break;
                 
               case 'select':
-                // Select multiple DIDs
+                // Select multiple LABSs
                 await request(app)
-                  .get(`/api/v1/did?limit=${batchSize}`)
+                  .get(`/api/v1/LABS?limit=${batchSize}`)
                   .set('Authorization', `Bearer ${authToken}`)
                   .expect(200);
                 break;
                 
               case 'update':
-                // Update multiple DIDs
+                // Update multiple LABSs
                 const updatePromises = [];
                 for (let i = 0; i < Math.min(batchSize, 10); i++) {
                   updatePromises.push(
                     request(app)
-                      .put(`/api/v1/did/did:stellar:GABC${i.toString().padStart(54, '0')}`)
+                      .put(`/api/v1/LABS/LABS:stellar:GABC${i.toString().padStart(54, '0')}`)
                       .set('Authorization', `Bearer ${authToken}`)
                       .send({ serviceEndpoint: `https://updated${i}.example.com` })
                       .expect(200)
@@ -561,12 +561,12 @@ describe('Performance Test Suite', function() {
                 break;
                 
               case 'delete':
-                // Delete multiple DIDs
+                // Delete multiple LABSs
                 const deletePromises = [];
                 for (let i = 0; i < Math.min(batchSize, 10); i++) {
                   deletePromises.push(
                     request(app)
-                      .delete(`/api/v1/did/did:stellar:GABC${i.toString().padStart(54, '0')}`)
+                      .delete(`/api/v1/LABS/LABS:stellar:GABC${i.toString().padStart(54, '0')}`)
                       .set('Authorization', `Bearer ${authToken}`)
                       .expect(200)
                   );
@@ -611,7 +611,7 @@ describe('Performance Test Suite', function() {
           
           try {
             await request(app)
-              .get('/api/v1/did')
+              .get('/api/v1/LABS')
               .set('Authorization', `Bearer ${authToken}`)
               .expect(200);
             
@@ -666,7 +666,7 @@ describe('Performance Test Suite', function() {
       const exhaustionTest = async () => {
         try {
           await request(app)
-            .get('/api/v1/did')
+            .get('/api/v1/LABS')
             .set('Authorization', `Bearer ${authToken}`)
             .expect(200);
           
@@ -700,7 +700,7 @@ describe('Performance Test Suite', function() {
       // Test recovery with normal load
       const recoveryTest = await TestUtils.measurePerformance(async () => {
         await request(app)
-          .get('/api/v1/did')
+          .get('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
       }, 5);
@@ -720,8 +720,8 @@ describe('Performance Test Suite', function() {
     it('should detect performance regressions', function() {
       // Define performance baselines (these would be stored from previous runs)
       const baselines = {
-        did_create: { average: 200, max: 400 },
-        did_read: { average: 100, max: 200 },
+        LABS_create: { average: 200, max: 400 },
+        LABS_read: { average: 100, max: 200 },
         credential_issue: { average: 150, max: 300 },
         stellar_account: { average: 200, max: 400 }
       };

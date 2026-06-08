@@ -1,4 +1,4 @@
-const CACHE_NAME = "did-app-v2";
+const CACHE_NAME = "LABS-app-v2";
 const STATIC_CACHE_URLS = ["/", "/index.html", "/offline.html"];
 
 self.addEventListener("install", (event) => {

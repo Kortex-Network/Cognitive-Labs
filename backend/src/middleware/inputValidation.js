@@ -53,13 +53,13 @@ const sanitizeText = (content) => {
  * Validation schemas for different input types
  */
 const schemas = {
-  // DID validation schema
-  did: Joi.string()
+  // LABS validation schema
+  LABS: Joi.string()
     .required()
-    .pattern(/^did:stellar:G[A-Z0-7]{55}$/)
+    .pattern(/^LABS:stellar:G[A-Z0-7]{55}$/)
     .messages({
-      'string.pattern.base': 'Invalid DID format. Expected format: did:stellar:G...',
-      'any.required': 'DID is required'
+      'string.pattern.base': 'Invalid LABS format. Expected format: LABS:stellar:G...',
+      'any.required': 'LABS is required'
     }),
 
   // Stellar public key validation
@@ -290,17 +290,17 @@ const sanitizeParams = (req, res, next) => {
  * Custom validation schemas for specific endpoints
  */
 const customSchemas = {
-  // Register DID endpoint
-  registerDID: Joi.object({
-    did: schemas.did,
+  // Register LABS endpoint
+  registerLABS: Joi.object({
+    LABS: schemas.LABS,
     publicKey: schemas.publicKey,
     serviceEndpoint: schemas.url.optional(),
     signerSecret: schemas.secretKey
   }),
 
-  // Update DID endpoint
-  updateDID: Joi.object({
-    did: schemas.did,
+  // Update LABS endpoint
+  updateLABS: Joi.object({
+    LABS: schemas.LABS,
     updates: Joi.object({
       publicKey: schemas.publicKey.optional(),
       serviceEndpoint: schemas.url.optional()
@@ -310,8 +310,8 @@ const customSchemas = {
 
   // Issue credential endpoint
   issueCredential: Joi.object({
-    issuerDID: schemas.did,
-    subjectDID: schemas.did,
+    issuerLABS: schemas.LABS,
+    subjectLABS: schemas.LABS,
     credentialType: schemas.credentialType,
     claims: schemas.claims,
     signerSecret: schemas.secretKey
@@ -417,8 +417,8 @@ const customSchemas = {
   }),
 
   // Bridge endpoints
-  bridgeDID: Joi.object({
-    did: schemas.did,
+  bridgeLABS: Joi.object({
+    LABS: schemas.LABS,
     ownerAddress: Joi.string()
       .required()
       .pattern(/^0x[a-fA-F0-9]{40}$/)
@@ -440,12 +440,12 @@ const customSchemas = {
   }),
 
   bridgeStatus: Joi.object({
-    did: schemas.did
+    LABS: schemas.LABS
   }),
 
   // QR endpoints
   generateQR: Joi.object({
-    did: schemas.did,
+    LABS: schemas.LABS,
     action: Joi.string()
       .valid('sign', 'verify', 'issue', 'revoke')
       .optional(),

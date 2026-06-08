@@ -11,8 +11,8 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Credentials from './pages/Credentials';
 import PerformanceTest from './pages/PerformanceTest';
-import CreateDID from './pages/CreateDID';
-import ResolveDID from './pages/ResolveDID';
+import CreateCognitiveLab from './pages/CreateCognitiveLab';
+import ResolveCognitiveLab from './pages/ResolveCognitiveLab';
 import ConnectWallet from './pages/ConnectWallet';
 import Account from './pages/Account';
 import Scanner from './pages/Scanner';
@@ -35,8 +35,8 @@ function AppContent() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/credentials" element={<Credentials />} />
               <Route path="/performance-test" element={<PerformanceTest />} />
-              <Route path="/create-did" element={<CreateDID />} />
-              <Route path="/resolve-did" element={<ResolveDID />} />
+              <Route path="/create-cognitive-lab" element={<CreateCognitiveLab />} />
+              <Route path="/resolve-cognitive-lab" element={<ResolveCognitiveLab />} />
               <Route path="/connect-wallet" element={<ConnectWallet />} />
               <Route path="/account" element={<Account />} />
               <Route path="/scanner" element={<Scanner />} />

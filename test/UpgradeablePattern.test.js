@@ -11,7 +11,7 @@ const { ethers, upgrades } = require("hardhat");
 describe("Upgradeable Contract Pattern", function () {
   let deployer, governor, issuer, user, auditor;
   let accessControl, stateMigration, enhancedProxy, proxyFactory;
-  let didImplementation, integratedRegistry, factoryProxy;
+  let LABSImplementation, integratedRegistry, factoryProxy;
   let deploymentInfo;
 
   beforeEach(async function () {
@@ -56,15 +56,15 @@ describe("Upgradeable Contract Pattern", function () {
     );
     await proxyFactory.deployed();
 
-    // Deploy DID Implementation
-    const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-    didImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
-    await didImplementation.deployed();
+    // Deploy LABS Implementation
+    const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+    LABSImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
+    await LABSImplementation.deployed();
 
     // Deploy Integrated Registry
-    const IntegratedDIDRegistry = await ethers.getContractFactory("IntegratedDIDRegistry");
+    const IntegratedLABSRegistry = await ethers.getContractFactory("IntegratedLABSRegistry");
     integratedRegistry = await upgrades.deployProxy(
-      IntegratedDIDRegistry,
+      IntegratedLABSRegistry,
       [
         accessControl.address,
         enhancedProxy.address,
@@ -89,7 +89,7 @@ describe("Upgradeable Contract Pattern", function () {
       stateMigration: stateMigration.address,
       enhancedProxy: enhancedProxy.address,
       proxyFactory: proxyFactory.address,
-      didImplementation: didImplementation.address,
+      LABSImplementation: LABSImplementation.address,
       integratedRegistry: integratedRegistry.address
     };
   });
@@ -108,16 +108,16 @@ describe("Upgradeable Contract Pattern", function () {
       expect(
         await accessControl.checkPermission(
           deployer.address,
-          0, // ResourceType.DID
+          0, // ResourceType.LABS
           0  // OperationType.CREATE
         )
       ).to.be.true;
 
-      // Check user permissions for own DID operations
+      // Check user permissions for own LABS operations
       expect(
         await accessControl.checkPermission(
           user.address,
-          0, // ResourceType.DID
+          0, // ResourceType.LABS
           0  // OperationType.CREATE
         )
       ).to.be.true;
@@ -126,7 +126,7 @@ describe("Upgradeable Contract Pattern", function () {
       expect(
         await accessControl.checkPermission(
           auditor.address,
-          0, // ResourceType.DID
+          0, // ResourceType.LABS
           1  // OperationType.READ
         )
       ).to.be.true;
@@ -144,8 +144,8 @@ describe("Upgradeable Contract Pattern", function () {
 
     it("Should propose upgrade correctly", async function () {
       // Deploy new implementation for testing
-      const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-      const newImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
+      const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+      const newImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
       await newImplementation.deployed();
 
       // Propose upgrade
@@ -166,8 +166,8 @@ describe("Upgradeable Contract Pattern", function () {
 
     it("Should approve upgrade correctly", async function () {
       // Deploy new implementation
-      const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-      const newImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
+      const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+      const newImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
       await newImplementation.deployed();
 
       // Propose upgrade
@@ -195,8 +195,8 @@ describe("Upgradeable Contract Pattern", function () {
       await enhancedProxy.connect(deployer).activateEmergencyMode("Test emergency");
 
       // Deploy new implementation
-      const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-      const newImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
+      const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+      const newImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
       await newImplementation.deployed();
 
       // Emergency upgrade (should work without delay and approvals)
@@ -214,17 +214,17 @@ describe("Upgradeable Contract Pattern", function () {
 
   describe("Proxy Factory", function () {
     it("Should create proxy correctly", async function () {
-      const initData = didImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
+      const initData = LABSImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
       
       const tx = await proxyFactory.connect(governor).createProxy(
-        didImplementation.address,
+        LABSImplementation.address,
         initData
       );
       const receipt = await tx.wait();
       
       const event = receipt.events.find(e => e.event === "ProxyCreated");
       expect(event).to.not.be.undefined;
-      expect(event.args.implementation).to.equal(didImplementation.address);
+      expect(event.args.implementation).to.equal(LABSImplementation.address);
       expect(event.args.creator).to.equal(governor.address);
       
       // Verify proxy is registered
@@ -232,10 +232,10 @@ describe("Upgradeable Contract Pattern", function () {
     });
 
     it("Should batch create proxies", async function () {
-      const implementations = [didImplementation.address, didImplementation.address];
+      const implementations = [LABSImplementation.address, LABSImplementation.address];
       const initDataArray = [
-        didImplementation.interface.encodeFunctionData("initialize", [accessControl.address]),
-        didImplementation.interface.encodeFunctionData("initialize", [accessControl.address])
+        LABSImplementation.interface.encodeFunctionData("initialize", [accessControl.address]),
+        LABSImplementation.interface.encodeFunctionData("initialize", [accessControl.address])
       ];
       
       const tx = await proxyFactory.connect(governor).batchCreateProxies(
@@ -256,14 +256,14 @@ describe("Upgradeable Contract Pattern", function () {
 
     it("Should upgrade proxy correctly", async function () {
       // Create a proxy first
-      const initData = didImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
-      const createTx = await proxyFactory.connect(governor).createProxy(didImplementation.address, initData);
+      const initData = LABSImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
+      const createTx = await proxyFactory.connect(governor).createProxy(LABSImplementation.address, initData);
       const createReceipt = await createTx.wait();
       const proxyAddress = createReceipt.events.find(e => e.event === "ProxyCreated").args.proxy;
       
       // Deploy new implementation
-      const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-      const newImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
+      const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+      const newImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
       await newImplementation.deployed();
       
       // Upgrade proxy
@@ -272,7 +272,7 @@ describe("Upgradeable Contract Pattern", function () {
       
       const event = upgradeReceipt.events.find(e => e.event === "ProxyUpgraded");
       expect(event).to.not.be.undefined;
-      expect(event.args.oldImplementation).to.equal(didImplementation.address);
+      expect(event.args.oldImplementation).to.equal(LABSImplementation.address);
       expect(event.args.newImplementation).to.equal(newImplementation.address);
     });
   });
@@ -280,8 +280,8 @@ describe("Upgradeable Contract Pattern", function () {
   describe("State Migration", function () {
     it("Should create migration plan correctly", async function () {
       const tx = await stateMigration.connect(governor).createMigrationPlan(
-        didImplementation.address,
-        didImplementation.address, // same for testing
+        LABSImplementation.address,
+        LABSImplementation.address, // same for testing
         Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
         "Test migration",
         false // not emergency
@@ -290,7 +290,7 @@ describe("Upgradeable Contract Pattern", function () {
       
       const event = receipt.events.find(e => e.event === "MigrationPlanCreated");
       expect(event).to.not.be.undefined;
-      expect(event.args.fromImplementation).to.equal(didImplementation.address);
+      expect(event.args.fromImplementation).to.equal(LABSImplementation.address);
       expect(event.args.proposedBy).to.equal(governor.address);
       expect(event.args.emergency).to.be.false;
     });
@@ -298,8 +298,8 @@ describe("Upgradeable Contract Pattern", function () {
     it("Should approve migration plan", async function () {
       // Create migration plan
       const createTx = await stateMigration.connect(governor).createMigrationPlan(
-        didImplementation.address,
-        didImplementation.address,
+        LABSImplementation.address,
+        LABSImplementation.address,
         Math.floor(Date.now() / 1000) + 3600,
         "Test migration",
         false
@@ -319,8 +319,8 @@ describe("Upgradeable Contract Pattern", function () {
     it("Should add data entries for migration", async function () {
       // Create migration plan
       const createTx = await stateMigration.connect(governor).createMigrationPlan(
-        didImplementation.address,
-        didImplementation.address,
+        LABSImplementation.address,
+        LABSImplementation.address,
         Math.floor(Date.now() / 1000) + 3600,
         "Test migration",
         false
@@ -356,44 +356,44 @@ describe("Upgradeable Contract Pattern", function () {
       expect(gasOptimizationEnabled).to.be.true;
     });
 
-    it("Should create DID with integrated features", async function () {
-      const tx = await integratedRegistry.connect(user).createDIDIntegrated(
-        "did:example:123",
+    it("Should create LABS with integrated features", async function () {
+      const tx = await integratedRegistry.connect(user).createLABSIntegrated(
+        "LABS:example:123",
         "public_key_123",
         "https://example.com/service"
       );
       
       expect(tx).to.not.be.undefined;
       
-      // Verify DID was created
-      const exists = await integratedRegistry.didExistsOptimized("did:example:123");
+      // Verify LABS was created
+      const exists = await integratedRegistry.LABSExistsOptimized("LABS:example:123");
       expect(exists).to.be.true;
     });
 
-    it("Should batch create DIDs", async function () {
-      const dids = ["did:example:1", "did:example:2"];
+    it("Should batch create LABSs", async function () {
+      const LABSs = ["LABS:example:1", "LABS:example:2"];
       const publicKeys = ["key1", "key2"];
       const serviceEndpoints = ["https://example1.com", "https://example2.com"];
       
-      const tx = await integratedRegistry.connect(user).batchCreateDIDsIntegrated(
-        dids,
+      const tx = await integratedRegistry.connect(user).batchCreateLABSsIntegrated(
+        LABSs,
         publicKeys,
         serviceEndpoints
       );
       
       expect(tx).to.not.be.undefined;
       
-      // Verify DIDs were created
-      for (const did of dids) {
-        const exists = await integratedRegistry.didExistsOptimized(did);
+      // Verify LABSs were created
+      for (const LABS of LABSs) {
+        const exists = await integratedRegistry.LABSExistsOptimized(LABS);
         expect(exists).to.be.true;
       }
     });
 
     it("Should issue credentials with integrated features", async function () {
       const tx = await integratedRegistry.connect(issuer).issueCredentialIntegrated(
-        "did:example:issuer",
-        "did:example:subject",
+        "LABS:example:issuer",
+        "LABS:example:subject",
         "VerifiableCredential",
         Math.floor(Date.now() / 1000) + 86400, // expires in 24 hours
         ethers.utils.keccak256(ethers.utils.toUtf8Bytes("credential_data"))
@@ -406,23 +406,23 @@ describe("Upgradeable Contract Pattern", function () {
   describe("Data Integrity During Upgrade", function () {
     it("Should preserve data during upgrade", async function () {
       // Create some data in the original implementation
-      await integratedRegistry.connect(user).createDIDIntegrated(
-        "did:example:test123",
+      await integratedRegistry.connect(user).createLABSIntegrated(
+        "LABS:example:test123",
         "test_public_key",
         "https://test.example.com/service"
       );
       
       // Verify data exists
-      const existsBefore = await integratedRegistry.didExistsOptimized("did:example:test123");
+      const existsBefore = await integratedRegistry.LABSExistsOptimized("LABS:example:test123");
       expect(existsBefore).to.be.true;
       
-      // Get DID document before upgrade
-      const docBefore = await integratedRegistry.getDIDDocumentOptimized("did:example:test123");
+      // Get LABS document before upgrade
+      const docBefore = await integratedRegistry.getLABSDocumentOptimized("LABS:example:test123");
       expect(docBefore.owner).to.equal(user.address);
       
       // Deploy new implementation
-      const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-      const newImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
+      const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+      const newImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
       await newImplementation.deployed();
       
       // Upgrade the proxy
@@ -432,11 +432,11 @@ describe("Upgradeable Contract Pattern", function () {
       );
       
       // Verify data still exists after upgrade
-      const existsAfter = await integratedRegistry.didExistsOptimized("did:example:test123");
+      const existsAfter = await integratedRegistry.LABSExistsOptimized("LABS:example:test123");
       expect(existsAfter).to.be.true;
       
-      // Get DID document after upgrade
-      const docAfter = await integratedRegistry.getDIDDocumentOptimized("did:example:test123");
+      // Get LABS document after upgrade
+      const docAfter = await integratedRegistry.getLABSDocumentOptimized("LABS:example:test123");
       expect(docAfter.owner).to.equal(user.address);
       expect(docAfter.publicKey).to.equal(docBefore.publicKey);
       expect(docAfter.serviceEndpoint).to.equal(docBefore.serviceEndpoint);
@@ -444,14 +444,14 @@ describe("Upgradeable Contract Pattern", function () {
 
     it("Should preserve performance metrics across upgrades", async function () {
       // Perform some operations to generate metrics
-      await integratedRegistry.connect(user).createDIDIntegrated(
-        "did:example:metrics1",
+      await integratedRegistry.connect(user).createLABSIntegrated(
+        "LABS:example:metrics1",
         "metrics_key1",
         "https://metrics1.example.com"
       );
       
-      await integratedRegistry.connect(user).createDIDIntegrated(
-        "did:example:metrics2",
+      await integratedRegistry.connect(user).createLABSIntegrated(
+        "LABS:example:metrics2",
         "metrics_key2",
         "https://metrics2.example.com"
       );
@@ -463,8 +463,8 @@ describe("Upgradeable Contract Pattern", function () {
       expect(optimizedOps).to.be.greaterThan(0);
       
       // Deploy new implementation
-      const GasOptimizedDIDRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
-      const newImplementation = await GasOptimizedDIDRegistry.deploy(accessControl.address);
+      const GasOptimizedLABSRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
+      const newImplementation = await GasOptimizedLABSRegistry.deploy(accessControl.address);
       await newImplementation.deployed();
       
       // Upgrade the proxy
@@ -490,10 +490,10 @@ describe("Upgradeable Contract Pattern", function () {
       expect(await proxyFactory.emergencyPaused()).to.be.true;
       
       // Try to create proxy (should fail)
-      const initData = didImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
+      const initData = LABSImplementation.interface.encodeFunctionData("initialize", [accessControl.address]);
       
       await expect(
-        proxyFactory.connect(governor).createProxy(didImplementation.address, initData)
+        proxyFactory.connect(governor).createProxy(LABSImplementation.address, initData)
       ).to.be.revertedWith("UpgradeableProxyFactory: emergency paused");
       
       // Unpause
@@ -508,8 +508,8 @@ describe("Upgradeable Contract Pattern", function () {
       
       // Create migration plan with emergency flag
       const tx = await stateMigration.connect(governor).createMigrationPlan(
-        didImplementation.address,
-        didImplementation.address,
+        LABSImplementation.address,
+        LABSImplementation.address,
         Math.floor(Date.now() / 1000) + 100, // short delay for testing
         "Emergency migration test",
         true // emergency
@@ -528,8 +528,8 @@ describe("Upgradeable Contract Pattern", function () {
   describe("Gas Optimization Verification", function () {
     it("Should track gas usage correctly", async function () {
       // Perform operations
-      await integratedRegistry.connect(user).createDIDIntegrated(
-        "did:example:gas1",
+      await integratedRegistry.connect(user).createLABSIntegrated(
+        "LABS:example:gas1",
         "gas_key1",
         "https://gas1.example.com"
       );
@@ -543,13 +543,13 @@ describe("Upgradeable Contract Pattern", function () {
     });
 
     it("Should show gas optimization benefits in batch operations", async function () {
-      const dids = ["did:example:batch1", "did:example:batch2", "did:example:batch3"];
+      const LABSs = ["LABS:example:batch1", "LABS:example:batch2", "LABS:example:batch3"];
       const publicKeys = ["batch_key1", "batch_key2", "batch_key3"];
       const serviceEndpoints = ["https://batch1.example.com", "https://batch2.example.com", "https://batch3.example.com"];
       
       // Perform batch operation
-      const tx = await integratedRegistry.connect(user).batchCreateDIDsIntegrated(
-        dids,
+      const tx = await integratedRegistry.connect(user).batchCreateLABSsIntegrated(
+        LABSs,
         publicKeys,
         serviceEndpoints
       );
@@ -558,9 +558,9 @@ describe("Upgradeable Contract Pattern", function () {
       // Verify batch operation was successful
       expect(receipt.status).to.equal(1);
       
-      // Verify all DIDs were created
-      for (const did of dids) {
-        const exists = await integratedRegistry.didExistsOptimized(did);
+      // Verify all LABSs were created
+      for (const LABS of LABSs) {
+        const exists = await integratedRegistry.LABSExistsOptimized(LABS);
         expect(exists).to.be.true;
       }
     });

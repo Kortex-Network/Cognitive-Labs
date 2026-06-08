@@ -1,4 +1,4 @@
-// Responsive Image Helper for Stellar DID Platform
+// Responsive Image Helper for Stellar LABS Platform
 // Provides utilities for optimized image delivery with WebP support
 import { useState, useEffect } from 'react';
 
@@ -69,14 +69,14 @@ export const useLazyImage = (src, placeholder = null) => {
 
   useEffect(() => {
     let observer;
-    let didCancel = false;
+    let LABSCancel = false;
 
     if (imageRef && imageSrc !== src) {
       if (IntersectionObserver) {
         observer = new IntersectionObserver(
           entries => {
             entries.forEach(entry => {
-              if (entry.isIntersecting && !didCancel) {
+              if (entry.isIntersecting && !LABSCancel) {
                 setImageSrc(src);
                 observer.unobserve(imageRef);
               }
@@ -92,7 +92,7 @@ export const useLazyImage = (src, placeholder = null) => {
     }
 
     return () => {
-      didCancel = true;
+      LABSCancel = true;
       if (observer && observer.unobserve) {
         observer.unobserve(imageRef);
       }

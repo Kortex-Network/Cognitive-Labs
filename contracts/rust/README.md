@@ -1,14 +1,14 @@
-# 🦀 Stellar DID Smart Contract (Rust/Soroban)
+# 🦀 Cognitive Lab Smart Contract (Rust/Soroban)
 
-A production-ready Decentralized Identity (DID) smart contract built with Rust and Soroban for the Stellar network.
+A production-ready Cognitive Labs smart contract built with Rust and Soroban for the Stellar network.
 
 ## 🚀 Features
 
-### **DID Management**
-- ✅ Register new DIDs
-- ✅ Resolve DID documents
-- ✅ Update DID documents
-- ✅ Deactivate DIDs
+### **Cognitive Lab Management**
+- ✅ Register new Cognitive Labs
+- ✅ Resolve Cognitive Lab documents
+- ✅ Update Cognitive Lab documents
+- ✅ Deactivate Cognitive Labs
 - ✅ Authorization control
 
 ### **Verifiable Credentials**
@@ -98,15 +98,15 @@ make init-contract
 
 ## 📖 API Reference
 
-### **DID Operations**
+### **Cognitive Lab Operations**
 
-#### `register_did`
-Register a new decentralized identity.
+#### `register_LABS`
+Register a new cognitive labs identity.
 
 ```rust
-pub fn register_did(
+pub fn register_LABS(
     env: Env,
-    did: Bytes,
+    Cognitive Lab: Bytes,
     public_key: Bytes,
     service_endpoint: Option<String>,
     owner: Address,
@@ -114,36 +114,36 @@ pub fn register_did(
 ```
 
 **Parameters:**
-- `did`: DID identifier (bytes)
+- `Cognitive Lab`: Cognitive Lab identifier (bytes)
 - `public_key`: Stellar public key
 - `service_endpoint`: Optional service endpoint URL
 - `owner`: Contract owner address
 
-#### `resolve_did`
-Resolve a DID document.
+#### `resolve_LABS`
+Resolve a Cognitive Lab document.
 
 ```rust
-pub fn resolve_did(env: Env, did: Bytes) -> Result<DIDDocument, Error>
+pub fn resolve_LABS(env: Env, Cognitive Lab: Bytes) -> Result<LABSDocument, Error>
 ```
 
-#### `update_did`
-Update an existing DID document.
+#### `update_LABS`
+Update an existing Cognitive Lab document.
 
 ```rust
-pub fn update_did(
+pub fn update_LABS(
     env: Env,
-    did: Bytes,
+    Cognitive Lab: Bytes,
     public_key: Option<Bytes>,
     service_endpoint: Option<String>,
     updater: Address,
 ) -> Result<(), Error>
 ```
 
-#### `deactivate_did`
-Deactivate a DID.
+#### `deactivate_LABS`
+Deactivate a Cognitive Lab.
 
 ```rust
-pub fn deactivate_did(env: Env, did: Bytes, deactivator: Address) -> Result<(), Error>
+pub fn deactivate_LABS(env: Env, Cognitive Lab: Bytes, deactivator: Address) -> Result<(), Error>
 ```
 
 ### **Credential Operations**
@@ -190,11 +190,11 @@ Get contract metadata.
 pub fn get_contract_info(env: Env) -> Result<ContractInfo, Error>
 ```
 
-#### `did_exists`
-Check if a DID exists.
+#### `LABS_exists`
+Check if a Cognitive Lab exists.
 
 ```rust
-pub fn did_exists(env: Env, did: Bytes) -> bool
+pub fn LABS_exists(env: Env, Cognitive Lab: Bytes) -> bool
 ```
 
 #### `credential_exists`
@@ -206,10 +206,10 @@ pub fn credential_exists(env: Env, credential_id: Bytes) -> bool
 
 ## 🔧 Data Structures
 
-### **DIDDocument**
+### **LABSDocument**
 ```rust
-pub struct DIDDocument {
-    pub did: Bytes,
+pub struct LABSDocument {
+    pub Cognitive Lab: Bytes,
     pub owner: Address,
     pub public_key: Bytes,
     pub service_endpoint: Option<String>,
@@ -242,7 +242,7 @@ Run the comprehensive test suite:
 make test
 
 # Run specific test
-cargo test test_register_and_resolve_did
+cargo test test_register_and_resolve_LABS
 
 # Run tests with output
 cargo test -- --nocapture
@@ -250,8 +250,8 @@ cargo test -- --nocapture
 
 ### **Test Coverage**
 - ✅ Contract initialization
-- ✅ DID registration and resolution
-- ✅ DID updates and deactivation
+- ✅ Cognitive Lab registration and resolution
+- ✅ Cognitive Lab updates and deactivation
 - ✅ Authorization controls
 - ✅ Credential issuance and verification
 - ✅ Credential revocation
@@ -287,19 +287,19 @@ make init-contract
 
 ## 📊 Usage Examples
 
-### **Register a DID**
+### **Register a Cognitive Lab**
 ```bash
-export DID="did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ"
+export Cognitive Lab="Cognitive Lab:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ"
 export PUBLIC_KEY="GABCDEFGHIJKLMNOPQRSTUVWXYZ"
-export SERVICE_ENDPOINT="https://example.com/did"
+export SERVICE_ENDPOINT="https://example.com/Cognitive Lab"
 
-make register-did
+make register-Cognitive Lab
 ```
 
 ### **Issue a Credential**
 ```bash
-export ISSUER_DID="did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ"
-export SUBJECT_DID="did:stellar:BCDEFGHIJKLMNOPQRSTUVWXYZABCDEF"
+export ISSUER_LABS="Cognitive Lab:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ"
+export SUBJECT_LABS="Cognitive Lab:stellar:BCDEFGHIJKLMNOPQRSTUVWXYZABCDEF"
 export CREDENTIAL_TYPE="UniversityDegree"
 export CLAIMS_HASH="hash_of_claims_data"
 export EXPIRES="1704067200"  # Unix timestamp
@@ -317,9 +317,9 @@ make verify-credential
 ## 🔒 Security Considerations
 
 ### **Access Control**
-- Only DID owners can update/deactivate their DIDs
+- Only Cognitive Lab owners can update/deactivate their Cognitive Labs
 - Only credential issuers can revoke credentials
-- Contract owner can initialize but not modify individual DIDs
+- Contract owner can initialize but not modify individual Cognitive Labs
 
 ### **Data Privacy**
 - Claims are stored as hashes, not raw data
@@ -352,8 +352,8 @@ soroban contract invoke \
   --network $NETWORK \
   --source $USER_SECRET \
   -- \
-  resolve_did \
-  --did "test-did"
+  resolve_LABS \
+  --Cognitive Lab "test-Cognitive Lab"
 ```
 
 ## 🔄 Integration
@@ -369,17 +369,17 @@ const contract = new Contract({
   rpcUrl: 'https://horizon-testnet.stellar.org',
 });
 
-// Resolve DID
-const result = await contract.call('resolve_did', {
-  did: 'did:stellar:G...'
+// Resolve Cognitive Lab
+const result = await contract.call('resolve_LABS', {
+  Cognitive Lab: 'Cognitive Lab:stellar:G...'
 });
 ```
 
 ### **Frontend Integration**
 ```typescript
 // TypeScript example
-interface DIDDocument {
-  did: string;
+interface LABSDocument {
+  Cognitive Lab: string;
   owner: string;
   public_key: string;
   service_endpoint?: string;
@@ -388,7 +388,7 @@ interface DIDDocument {
   active: boolean;
 }
 
-async function resolveDID(did: string): Promise<DIDDocument> {
+async function resolveLABS(Cognitive Lab: string): Promise<LABSDocument> {
   // Contract call implementation
 }
 ```
@@ -406,7 +406,7 @@ async function resolveDID(did: string): Promise<DIDDocument> {
 soroban contract logs --id $CONTRACT_ID --network $NETWORK
 
 # Inspect WASM
-wasm-objdump -d target/wasm32-unknown-unknown/release/stellar_did_contract.wasm
+wasm-objdump -d target/wasm32-unknown-unknown/release/stellar_LABS_contract.wasm
 
 # Run with debug output
 RUST_LOG=debug cargo test
@@ -429,7 +429,7 @@ MIT License - see LICENSE file for details.
 
 - **Stellar Development Foundation** - Soroban platform
 - **Rust Community** - Tooling and ecosystem
-- **W3C DID Working Group** - DID standards
+- **W3C Cognitive Lab Working Group** - Cognitive Lab standards
 
 ---
 

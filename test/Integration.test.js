@@ -2,16 +2,16 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Contract Integration Tests", function () {
-    let didRegistry;
+    let LABSRegistry;
     let stateRecovery;
     let recoveryGovernance;
     let owner, admin, governor, guardian, auditor, issuer, recovery, user1, user2, user3, attacker;
     
     // Test constants
-    const TEST_DID = "did:ethereum:0x1234567890123456789012345678901234567890";
-    const TEST_DID_2 = "did:ethereum:0x9876543210987654321098765432109876543210";
+    const TEST_LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
+    const TEST_LABS_2 = "LABS:ethereum:0x9876543210987654321098765432109876543210";
     const TEST_PUBLIC_KEY = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
-    const TEST_SERVICE_ENDPOINT = "https://did.example.com/endpoint";
+    const TEST_SERVICE_ENDPOINT = "https://LABS.example.com/endpoint";
     const TEST_CREDENTIAL_ID = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("test-credential"));
 
     beforeEach(async function () {
@@ -22,9 +22,9 @@ describe("Contract Integration Tests", function () {
         stateRecovery = await StateRecoveryFactory.deploy();
         await stateRecovery.deployed();
         
-        const DIDRegistryFactory = await ethers.getContractFactory("EthereumDIDRegistry");
-        didRegistry = await DIDRegistryFactory.deploy();
-        await didRegistry.deployed();
+        const LABSRegistryFactory = await ethers.getContractFactory("EthereumLABSRegistry");
+        LABSRegistry = await LABSRegistryFactory.deploy();
+        await LABSRegistry.deployed();
         
         const RecoveryGovernanceFactory = await ethers.getContractFactory("RecoveryGovernance");
         recoveryGovernance = await RecoveryGovernanceFactory.deploy(stateRecovery.address);
@@ -35,10 +35,10 @@ describe("Contract Integration Tests", function () {
     });
 
     async function setupRolesAndPermissions() {
-        // DID Registry roles
-        await didRegistry.grantRole(await didRegistry.ADMIN_ROLE(), admin.address);
-        await didRegistry.grantRole(await didRegistry.ISSUER_ROLE(), issuer.address);
-        await didRegistry.grantRole(await didRegistry.RECOVERY_ROLE(), recovery.address);
+        // LABS Registry roles
+        await LABSRegistry.grantRole(await LABSRegistry.ADMIN_ROLE(), admin.address);
+        await LABSRegistry.grantRole(await LABSRegistry.ISSUER_ROLE(), issuer.address);
+        await LABSRegistry.grantRole(await LABSRegistry.RECOVERY_ROLE(), recovery.address);
         
         // State Recovery roles
         await stateRecovery.grantRole(await stateRecovery.RECOVERY_ROLE(), recovery.address);
@@ -51,78 +51,78 @@ describe("Contract Integration Tests", function () {
         await recoveryGovernance.grantRole(await recoveryGovernance.AUDITOR_ROLE(), auditor.address);
         
         // Set up contract relationships
-        await didRegistry.setStateRecoveryContract(stateRecovery.address);
-        await stateRecovery.setTargetContracts(didRegistry.address, ethers.constants.AddressZero);
+        await LABSRegistry.setStateRecoveryContract(stateRecovery.address);
+        await stateRecovery.setTargetContracts(LABSRegistry.address, ethers.constants.AddressZero);
         await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
         
         // Grant recovery contract permissions
-        await didRegistry.grantRole(await didRegistry.RECOVERY_ROLE(), stateRecovery.address);
-        await stateRecovery.grantRole(await stateRecovery.RECOVERY_ROLE(), didRegistry.address);
+        await LABSRegistry.grantRole(await LABSRegistry.RECOVERY_ROLE(), stateRecovery.address);
+        await stateRecovery.grantRole(await stateRecovery.RECOVERY_ROLE(), LABSRegistry.address);
     }
 
-    describe("Complete DID Lifecycle Integration", function () {
-        it("Should handle complete DID lifecycle with governance oversight", async function () {
-            // 1. Bridge DID to Ethereum
-            await didRegistry.connect(admin).bridgeDID(
-                TEST_DID,
+    describe("Complete LABS Lifecycle Integration", function () {
+        it("Should handle complete LABS lifecycle with governance oversight", async function () {
+            // 1. Bridge LABS to Ethereum
+            await LABSRegistry.connect(admin).bridgeLABS(
+                TEST_LABS,
                 user1.address,
                 TEST_PUBLIC_KEY,
                 TEST_SERVICE_ENDPOINT
             );
             
-            // Verify DID was bridged
-            let didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user1.address);
-            expect(didDoc.publicKey).to.equal(TEST_PUBLIC_KEY);
+            // Verify LABS was bridged
+            let LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user1.address);
+            expect(LABSDoc.publicKey).to.equal(TEST_PUBLIC_KEY);
             
-            // 2. Add claims to DID
+            // 2. Add claims to LABS
             const claimTopic = 1;
             const claimScheme = 1;
             const claimSignature = ethers.utils.toUtf8Bytes("claim signature");
             const claimData = ethers.utils.toUtf8Bytes("claim data");
             const claimUri = "https://claim.example.com";
             
-            await didRegistry.connect(user1).addClaim(claimTopic, claimScheme, issuer.address, claimSignature, claimData, claimUri);
+            await LABSRegistry.connect(user1).addClaim(claimTopic, claimScheme, issuer.address, claimSignature, claimData, claimUri);
             
             // 3. Bridge credential
             const expires = Math.floor(Date.now() / 1000) + 86400;
             const dataHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("credential data"));
             
-            await didRegistry.connect(admin).bridgeCredential(
+            await LABSRegistry.connect(admin).bridgeCredential(
                 TEST_CREDENTIAL_ID,
                 "https://issuer.example.com",
-                TEST_DID,
+                TEST_LABS,
                 "VerificationCredential",
                 expires,
                 dataHash
             );
             
             // Verify credential was bridged
-            const credential = await didRegistry.getCredential(TEST_CREDENTIAL_ID);
+            const credential = await LABSRegistry.getCredential(TEST_CREDENTIAL_ID);
             expect(credential.issuer).to.equal("https://issuer.example.com");
-            expect(credential.subject).to.equal(TEST_DID);
+            expect(credential.subject).to.equal(TEST_LABS);
             
             // 4. Simulate corruption and recovery through governance
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xNEWKEY1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890", "https://new.endpoint.com"]
+                [TEST_LABS, user2.address, "0xNEWKEY1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890", "https://new.endpoint.com"]
             );
             
             // 5. Governed recovery
             await recoveryGovernance.connect(governor).governedRecovery(
-                0, // DID_DOCUMENT
+                0, // LABS_DOCUMENT
                 recoveryData,
-                "Recover DID ownership",
+                "Recover LABS ownership",
                 false
             );
             
             // Verify recovery was successful
-            didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user2.address);
-            expect(didDoc.publicKey).to.equal("0xNEWKEY1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890");
-            expect(didDoc.serviceEndpoint).to.equal("https://new.endpoint.com");
+            LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
+            expect(LABSDoc.publicKey).to.equal("0xNEWKEY1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890");
+            expect(LABSDoc.serviceEndpoint).to.equal("https://new.endpoint.com");
             
             // 6. Audit the recovery operation
             const history = await recoveryGovernance.getOperationHistory(0, 10);
@@ -133,36 +133,36 @@ describe("Contract Integration Tests", function () {
             
             expect(executor).to.equal(governor.address);
             expect(emergency).to.be.false;
-            expect(reason).to.equal("Recover DID ownership");
+            expect(reason).to.equal("Recover LABS ownership");
             expect(successful).to.be.true;
         });
 
         it("Should handle emergency recovery scenario", async function () {
-            // 1. Bridge DID
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Bridge LABS
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Activate emergency mode
             await recoveryGovernance.connect(governor).activateEmergencyMode("Critical security vulnerability");
             
             // 3. Emergency recovery
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             const emergencyData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xEMERGENCYKEY", "https://emergency.endpoint.com"]
+                [TEST_LABS, user2.address, "0xEMERGENCYKEY", "https://emergency.endpoint.com"]
             );
             
             await recoveryGovernance.connect(governor).governedRecovery(
-                0, // DID_DOCUMENT
+                0, // LABS_DOCUMENT
                 emergencyData,
                 "Emergency security recovery",
                 true // emergency
             );
             
             // Verify emergency recovery
-            const didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user2.address);
-            expect(didDoc.publicKey).to.equal("0xEMERGENCYKEY");
+            const LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
+            expect(LABSDoc.publicKey).to.equal("0xEMERGENCYKEY");
             
             // 4. Verify emergency statistics
             const [total, successful, emergency, failed] = await recoveryGovernance.getRecoveryStatistics();
@@ -179,18 +179,18 @@ describe("Contract Integration Tests", function () {
 
     describe("Cross-Contract State Consistency", function () {
         it("Should maintain state consistency across contracts", async function () {
-            // 1. Create DID
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Create LABS
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Add claims
-            await didRegistry.connect(user1).addClaim(
+            await LABSRegistry.connect(user1).addClaim(
                 1, 1, issuer.address, 
                 ethers.utils.toUtf8Bytes("sig1"), 
                 ethers.utils.toUtf8Bytes("data1"), 
                 "https://claim1.com"
             );
             
-            await didRegistry.connect(user1).addClaim(
+            await LABSRegistry.connect(user1).addClaim(
                 2, 1, issuer.address, 
                 ethers.utils.toUtf8Bytes("sig2"), 
                 ethers.utils.toUtf8Bytes("data2"), 
@@ -198,8 +198,8 @@ describe("Contract Integration Tests", function () {
             );
             
             // 3. Verify state before recovery
-            const didDocBefore = await didRegistry.getDIDDocument(TEST_DID);
-            const claimIds = await didRegistry.connect(user1).getClaimIdsByTopic(1);
+            const LABSDocBefore = await LABSRegistry.getLABSDocument(TEST_LABS);
+            const claimIds = await LABSRegistry.connect(user1).getClaimIdsByTopic(1);
             expect(claimIds.length).to.equal(1);
             
             // 4. Create state snapshot
@@ -207,42 +207,42 @@ describe("Contract Integration Tests", function () {
             const snapshotId = await stateRecovery.connect(recovery).createStateSnapshot(merkleRoot, "Pre-recovery snapshot");
             
             // 5. Perform recovery
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xRECOVEREDKEY", "https://recovered.endpoint.com"]
+                [TEST_LABS, user2.address, "0xRECOVEREDKEY", "https://recovered.endpoint.com"]
             );
             
             await recoveryGovernance.connect(governor).governedRecovery(0, recoveryData, "State consistency test", false);
             
             // 6. Verify state after recovery
-            const didDocAfter = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDocAfter.owner).to.equal(user2.address);
-            expect(didDocAfter.publicKey).to.equal("0xRECOVEREDKEY");
+            const LABSDocAfter = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDocAfter.owner).to.equal(user2.address);
+            expect(LABSDocAfter.publicKey).to.equal("0xRECOVEREDKEY");
             
             // 7. Verify claims are still accessible (should be maintained)
-            const claimIdsAfter = await didRegistry.connect(user2).getClaimIdsByTopic(1);
+            const claimIdsAfter = await LABSRegistry.connect(user2).getClaimIdsByTopic(1);
             expect(claimIdsAfter.length).to.equal(1);
         });
 
         it("Should handle concurrent operations safely", async function () {
-            // 1. Bridge multiple DIDs
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
-            await didRegistry.connect(admin).bridgeDID(TEST_DID_2, user2.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Bridge multiple LABSs
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS_2, user2.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Enable recovery mode
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             // 3. Create concurrent recovery proposals
             const recoveryData1 = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user3.address, "0xCONCURRENT1", "https://concurrent1.com"]
+                [TEST_LABS, user3.address, "0xCONCURRENT1", "https://concurrent1.com"]
             );
             
             const recoveryData2 = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID_2, user3.address, "0xCONCURRENT2", "https://concurrent2.com"]
+                [TEST_LABS_2, user3.address, "0xCONCURRENT2", "https://concurrent2.com"]
             );
             
             // 4. Execute recoveries through governance
@@ -253,11 +253,11 @@ describe("Contract Integration Tests", function () {
             await Promise.all([tx1, tx2]);
             
             // 6. Verify both recoveries succeeded
-            const didDoc1 = await didRegistry.getDIDDocument(TEST_DID);
-            const didDoc2 = await didRegistry.getDIDDocument(TEST_DID_2);
+            const LABSDoc1 = await LABSRegistry.getLABSDocument(TEST_LABS);
+            const LABSDoc2 = await LABSRegistry.getLABSDocument(TEST_LABS_2);
             
-            expect(didDoc1.owner).to.equal(user3.address);
-            expect(didDoc2.owner).to.equal(user3.address);
+            expect(LABSDoc1.owner).to.equal(user3.address);
+            expect(LABSDoc2.owner).to.equal(user3.address);
             
             // 7. Verify operation history
             const history = await recoveryGovernance.getOperationHistory(0, 10);
@@ -267,19 +267,19 @@ describe("Contract Integration Tests", function () {
 
     describe("Governance and Recovery Integration", function () {
         it("Should handle full governance workflow", async function () {
-            // 1. Create DID and enable scenarios
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Create LABS and enable scenarios
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Create recovery proposal through state recovery
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             const proposalData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xGOVERNANCE", "https://governance.endpoint.com"]
+                [TEST_LABS, user2.address, "0xGOVERNANCE", "https://governance.endpoint.com"]
             );
             
             const proposalId = await stateRecovery.connect(recovery).proposeRecovery(
-                0, // DID_DOCUMENT
+                0, // LABS_DOCUMENT
                 "Governance workflow test",
                 proposalData
             );
@@ -300,25 +300,25 @@ describe("Contract Integration Tests", function () {
             const history = await recoveryGovernance.getOperationHistory(0, 10);
             expect(history.length).to.be.greaterThan(0);
             
-            // 7. Verify DID was recovered
-            const didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user2.address);
+            // 7. Verify LABS was recovered
+            const LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
         });
 
         it("Should handle contract pausing during operations", async function () {
-            // 1. Create DID
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Create LABS
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Authorize and pause state recovery contract
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
             await recoveryGovernance.connect(guardian).pauseContract(stateRecovery.address, "Security audit");
             
             // 3. Attempt recovery through governance (should fail)
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xPAUSED", "https://paused.endpoint.com"]
+                [TEST_LABS, user2.address, "0xPAUSED", "https://paused.endpoint.com"]
             );
             
             await expect(
@@ -331,23 +331,23 @@ describe("Contract Integration Tests", function () {
             await recoveryGovernance.connect(governor).governedRecovery(0, recoveryData, "Unpaused recovery test", false);
             
             // 5. Verify recovery succeeded
-            const didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user2.address);
+            const LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
         });
     });
 
     describe("Error Handling and Edge Cases", function () {
         it("Should handle failed recovery gracefully", async function () {
-            // 1. Create DID
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Create LABS
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Enable recovery mode
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             // 3. Attempt recovery with invalid data
             const invalidData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address"], // Missing required parameters
-                [TEST_DID, user2.address]
+                [TEST_LABS, user2.address]
             );
             
             // 4. This should fail but not break the system
@@ -358,41 +358,41 @@ describe("Contract Integration Tests", function () {
             // 5. Verify system is still functional
             const validData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xVALID", "https://valid.endpoint.com"]
+                [TEST_LABS, user2.address, "0xVALID", "https://valid.endpoint.com"]
             );
             
             await recoveryGovernance.connect(governor).governedRecovery(0, validData, "Valid recovery test", false);
             
-            const didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user2.address);
+            const LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
         });
 
         it("Should handle role revocation scenarios", async function () {
-            // 1. Create DID and setup roles
-            await didRegistry.connect(admin).bridgeDID(TEST_DID, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            // 1. Create LABS and setup roles
+            await LABSRegistry.connect(admin).bridgeLABS(TEST_LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             
             // 2. Enable recovery mode
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             // 3. Perform recovery
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user2.address, "0xBEFOREREVOKE", "https://before.endpoint.com"]
+                [TEST_LABS, user2.address, "0xBEFOREREVOKE", "https://before.endpoint.com"]
             );
             
             await recoveryGovernance.connect(governor).governedRecovery(0, recoveryData, "Before revoke", false);
             
             // 4. Verify recovery worked
-            let didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user2.address);
+            let LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
             
             // 5. Revoke recovery role from state recovery contract
-            await didRegistry.connect(admin).revokeRole(await didRegistry.RECOVERY_ROLE(), stateRecovery.address);
+            await LABSRegistry.connect(admin).revokeRole(await LABSRegistry.RECOVERY_ROLE(), stateRecovery.address);
             
             // 6. Attempt another recovery (should fail)
             const secondRecoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TEST_DID, user3.address, "0xAFTERREVOKE", "https://after.endpoint.com"]
+                [TEST_LABS, user3.address, "0xAFTERREVOKE", "https://after.endpoint.com"]
             );
             
             await expect(
@@ -400,59 +400,59 @@ describe("Contract Integration Tests", function () {
             ).to.be.reverted;
             
             // 7. Restore role and verify functionality
-            await didRegistry.connect(admin).grantRole(await didRegistry.RECOVERY_ROLE(), stateRecovery.address);
+            await LABSRegistry.connect(admin).grantRole(await LABSRegistry.RECOVERY_ROLE(), stateRecovery.address);
             
             await recoveryGovernance.connect(governor).governedRecovery(0, secondRecoveryData, "Restored recovery", false);
             
-            didDoc = await didRegistry.getDIDDocument(TEST_DID);
-            expect(didDoc.owner).to.equal(user3.address);
+            LABSDoc = await LABSRegistry.getLABSDocument(TEST_LABS);
+            expect(LABSDoc.owner).to.equal(user3.address);
         });
 
         it("Should handle gas limit scenarios", async function () {
-            // 1. Create multiple DIDs to test batch operations
-            const dids = [];
+            // 1. Create multiple LABSs to test batch operations
+            const LABSs = [];
             for (let i = 0; i < 5; i++) {
-                const did = `did:ethereum:0x${i.toString().padStart(40, '0')}`;
-                dids.push(did);
-                await didRegistry.connect(admin).bridgeDID(did, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+                const LABS = `LABS:ethereum:0x${i.toString().padStart(40, '0')}`;
+                LABSs.push(LABS);
+                await LABSRegistry.connect(admin).bridgeLABS(LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             }
             
             // 2. Enable recovery mode
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             // 3. Perform multiple recoveries in sequence
-            for (let i = 0; i < dids.length; i++) {
+            for (let i = 0; i < LABSs.length; i++) {
                 const recoveryData = ethers.utils.defaultAbiCoder.encode(
                     ["string", "address", "string", "string"],
-                    [dids[i], user2.address, `0xGASLIMIT${i}`, `https://gas${i}.endpoint.com`]
+                    [LABSs[i], user2.address, `0xGASLIMIT${i}`, `https://gas${i}.endpoint.com`]
                 );
                 
                 await recoveryGovernance.connect(governor).governedRecovery(0, recoveryData, `Gas test ${i}`, false);
             }
             
             // 4. Verify all recoveries succeeded
-            for (const did of dids) {
-                const didDoc = await didRegistry.getDIDDocument(did);
-                expect(didDoc.owner).to.equal(user2.address);
+            for (const LABS of LABSs) {
+                const LABSDoc = await LABSRegistry.getLABSDocument(LABS);
+                expect(LABSDoc.owner).to.equal(user2.address);
             }
         });
     });
 
     describe("Performance and Scalability", function () {
         it("Should handle high volume operations", async function () {
-            // 1. Create many DIDs
-            const didCount = 10;
-            const dids = [];
+            // 1. Create many LABSs
+            const LABSCount = 10;
+            const LABSs = [];
             
-            for (let i = 0; i < didCount; i++) {
-                const did = `did:ethereum:0x${i.toString().padStart(40, '0')}`;
-                dids.push(did);
-                await didRegistry.connect(admin).bridgeDID(did, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
+            for (let i = 0; i < LABSCount; i++) {
+                const LABS = `LABS:ethereum:0x${i.toString().padStart(40, '0')}`;
+                LABSs.push(LABS);
+                await LABSRegistry.connect(admin).bridgeLABS(LABS, user1.address, TEST_PUBLIC_KEY, TEST_SERVICE_ENDPOINT);
             }
             
-            // 2. Add claims to each DID
-            for (const did of dids) {
-                await didRegistry.connect(user1).addClaim(
+            // 2. Add claims to each LABS
+            for (const LABS of LABSs) {
+                await LABSRegistry.connect(user1).addClaim(
                     1, 1, issuer.address,
                     ethers.utils.toUtf8Bytes("batch signature"),
                     ethers.utils.toUtf8Bytes("batch data"),
@@ -461,14 +461,14 @@ describe("Contract Integration Tests", function () {
             }
             
             // 3. Enable recovery mode
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             // 4. Batch recovery through governance
             const recoveryPromises = [];
-            for (let i = 0; i < dids.length; i++) {
+            for (let i = 0; i < LABSs.length; i++) {
                 const recoveryData = ethers.utils.defaultAbiCoder.encode(
                     ["string", "address", "string", "string"],
-                    [dids[i], user2.address, `0xBATCH${i}`, `https://batch${i}.endpoint.com`]
+                    [LABSs[i], user2.address, `0xBATCH${i}`, `https://batch${i}.endpoint.com`]
                 );
                 
                 recoveryPromises.push(
@@ -480,15 +480,15 @@ describe("Contract Integration Tests", function () {
             await Promise.all(recoveryPromises);
             
             // 6. Verify all recoveries succeeded
-            for (const did of dids) {
-                const didDoc = await didRegistry.getDIDDocument(did);
-                expect(didDoc.owner).to.equal(user2.address);
+            for (const LABS of LABSs) {
+                const LABSDoc = await LABSRegistry.getLABSDocument(LABS);
+                expect(LABSDoc.owner).to.equal(user2.address);
             }
             
             // 7. Check operation statistics
             const [total, successful, emergency, failed] = await recoveryGovernance.getRecoveryStatistics();
-            expect(total).to.equal(didCount);
-            expect(successful).to.equal(didCount);
+            expect(total).to.equal(LABSCount);
+            expect(successful).to.equal(LABSCount);
             expect(emergency).to.equal(0);
             expect(failed).to.equal(0);
         });

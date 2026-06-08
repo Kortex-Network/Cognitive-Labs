@@ -51,7 +51,7 @@ app.get('/api/config', (req, res) => {
   // Only expose non-sensitive configuration to frontend
   const publicConfig = {
     STELLAR_NETWORK: process.env.STELLAR_NETWORK,
-    DID_METHOD: process.env.DID_METHOD,
+    LABS_METHOD: process.env.LABS_METHOD,
     ENABLE_FREIGHTER: process.env.ENABLE_FREIGHTER !== 'false',
     ENABLE_ADVANCED_FEATURES: process.env.ENABLE_ADVANCED_FEATURES !== 'false',
   };

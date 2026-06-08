@@ -2,7 +2,7 @@
  * QR Payload utilities for parsing and routing QR code payloads.
  */
 
-const ALLOWED_TYPES = ["did", "credential", "connection"];
+const ALLOWED_TYPES = ["LABS", "credential", "connection"];
 
 /**
  * Parse a raw QR code string into a validated QRPayload.
@@ -35,8 +35,8 @@ export function parsePayload(rawString) {
  */
 export function resolveRoute(payload) {
   switch (payload.type) {
-    case "did":
-      return { route: "/resolve-did", fieldValue: payload.did };
+    case "LABS":
+      return { route: "/resolve-LABS", fieldValue: payload.LABS };
     case "credential":
       return { route: "/credentials", fieldValue: payload.credentialId };
     case "connection":

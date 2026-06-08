@@ -359,7 +359,7 @@ const QRScanner = ({ onScan, onError, onClose, allowedTypes }) => {
             value={manualInput}
             onChange={(e) => setManualInput(e.target.value)}
             onKeyDown={handleManualKeyDown}
-            placeholder='{"type":"did","did":"did:stellar:G..."}'
+            placeholder='{"type":"LABS","LABS":"LABS:stellar:G..."}'
             multiline
             rows={3}
             sx={{ mb: 1 }}

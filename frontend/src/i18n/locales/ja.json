@@ -2,18 +2,18 @@
   "navigation": {
     "dashboard": "ダッシュボード",
     "credentials": "認証情報",
-    "createDid": "DID作成",
-    "resolveDid": "DID解決",
+    "createLABS": "LABS作成",
+    "resolveLABS": "LABS解決",
     "connectWallet": "ウォレット接続",
     "account": "アカウント",
     "scanner": "スキャナー",
     "contracts": "契約"
   },
   "dashboard": {
-    "title": "Stellar DIDプラットフォームダッシュボード",
+    "title": "Stellar LABSプラットフォームダッシュボード",
     "subtitle": "分散型アイデンティティエコシステムの概要",
     "stats": {
-      "totalDids": "DID総数",
+      "totalLABSs": "LABS総数",
       "totalCredentials": "認証情報総数",
       "activeUsers": "アクティブユーザー",
       "network": "ネットワーク",
@@ -68,8 +68,8 @@
     "verifyCredential": "認証情報検証",
     "credentialTemplates": "認証情報テンプレート",
     "templateClickToUse": "テンプレートを使用するにはクリック：",
-    "issuerDid": "発行者DID",
-    "subjectDid": "主題DID",
+    "issuerLABS": "発行者LABS",
+    "subjectLABS": "主題LABS",
     "credentialType": "認証情報タイプ",
     "claims": "クレーム",
     "claimsPlaceholder": "{\"degree\": \"学士号\", \"university\": \"例大学\"}",
@@ -85,7 +85,7 @@
   },
   "forms": {
     "required": "この項目は必須です",
-    "invalidDidFormat": "無効なDID形式です",
+    "invalidLABSFormat": "無効なLABS形式です",
     "invalidJson": "無効なJSON形式です"
   },
   "types": {

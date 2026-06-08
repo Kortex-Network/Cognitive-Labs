@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 describe("RecoveryGovernance Contract Tests", function () {
     let recoveryGovernance;
     let stateRecovery;
-    let ethereumDIDRegistry;
+    let ethereumLABSRegistry;
     let owner, governor, guardian, auditor, user1, user2, attacker;
     
     beforeEach(async function () {
@@ -15,10 +15,10 @@ describe("RecoveryGovernance Contract Tests", function () {
         stateRecovery = await StateRecoveryFactory.deploy();
         await stateRecovery.deployed();
         
-        // Deploy EthereumDIDRegistry
-        const DIDRegistryFactory = await ethers.getContractFactory("EthereumDIDRegistry");
-        ethereumDIDRegistry = await DIDRegistryFactory.deploy();
-        await ethereumDIDRegistry.deployed();
+        // Deploy EthereumLABSRegistry
+        const LABSRegistryFactory = await ethers.getContractFactory("EthereumLABSRegistry");
+        ethereumLABSRegistry = await LABSRegistryFactory.deploy();
+        await ethereumLABSRegistry.deployed();
         
         // Deploy RecoveryGovernance
         const RecoveryGovernanceFactory = await ethers.getContractFactory("RecoveryGovernance");
@@ -31,9 +31,9 @@ describe("RecoveryGovernance Contract Tests", function () {
         await recoveryGovernance.grantRole(await recoveryGovernance.AUDITOR_ROLE(), auditor.address);
         
         // Setup state recovery
-        await stateRecovery.setTargetContracts(ethereumDIDRegistry.address, ethers.constants.AddressZero);
-        await ethereumDIDRegistry.setStateRecoveryContract(stateRecovery.address);
-        await ethereumDIDRegistry.grantRole(await ethereumDIDRegistry.RECOVERY_ROLE(), stateRecovery.address);
+        await stateRecovery.setTargetContracts(ethereumLABSRegistry.address, ethers.constants.AddressZero);
+        await ethereumLABSRegistry.setStateRecoveryContract(stateRecovery.address);
+        await ethereumLABSRegistry.grantRole(await ethereumLABSRegistry.RECOVERY_ROLE(), stateRecovery.address);
     });
 
     describe("Contract Initialization", function () {
@@ -113,55 +113,55 @@ describe("RecoveryGovernance Contract Tests", function () {
 
     describe("Contract Authorization", function () {
         it("Should allow governor to authorize contract", async function () {
-            await recoveryGovernance.connect(governor).authorizeContract(ethereumDIDRegistry.address);
-            expect(await recoveryGovernance.authorizedContracts(ethereumDIDRegistry.address)).to.be.true;
+            await recoveryGovernance.connect(governor).authorizeContract(ethereumLABSRegistry.address);
+            expect(await recoveryGovernance.authorizedContracts(ethereumLABSRegistry.address)).to.be.true;
         });
 
         it("Should allow governor to deauthorize contract", async function () {
-            await recoveryGovernance.connect(governor).authorizeContract(ethereumDIDRegistry.address);
-            await recoveryGovernance.connect(governor).deauthorizeContract(ethereumDIDRegistry.address);
-            expect(await recoveryGovernance.authorizedContracts(ethereumDIDRegistry.address)).to.be.false;
+            await recoveryGovernance.connect(governor).authorizeContract(ethereumLABSRegistry.address);
+            await recoveryGovernance.connect(governor).deauthorizeContract(ethereumLABSRegistry.address);
+            expect(await recoveryGovernance.authorizedContracts(ethereumLABSRegistry.address)).to.be.false;
         });
 
         it("Should prevent non-governor from authorizing contracts", async function () {
             await expect(
-                recoveryGovernance.connect(attacker).authorizeContract(ethereumDIDRegistry.address)
+                recoveryGovernance.connect(attacker).authorizeContract(ethereumLABSRegistry.address)
             ).to.be.revertedWith("RecoveryGovernance: caller missing GOVERNOR_ROLE");
         });
 
         it("Should prevent non-governor from deauthorizing contracts", async function () {
             await expect(
-                recoveryGovernance.connect(attacker).deauthorizeContract(ethereumDIDRegistry.address)
+                recoveryGovernance.connect(attacker).deauthorizeContract(ethereumLABSRegistry.address)
             ).to.be.revertedWith("RecoveryGovernance: caller missing GOVERNOR_ROLE");
         });
     });
 
     describe("Contract Pausing", function () {
         beforeEach(async function () {
-            await recoveryGovernance.connect(governor).authorizeContract(ethereumDIDRegistry.address);
+            await recoveryGovernance.connect(governor).authorizeContract(ethereumLABSRegistry.address);
         });
 
         it("Should allow guardian to pause contract", async function () {
             const reason = "Security audit in progress";
-            const tx = await recoveryGovernance.connect(guardian).pauseContract(ethereumDIDRegistry.address, reason);
+            const tx = await recoveryGovernance.connect(guardian).pauseContract(ethereumLABSRegistry.address, reason);
             const receipt = await tx.wait();
             const event = receipt.events.find(e => e.event === "ContractPaused");
             
-            expect(event.args.contractAddress).to.equal(ethereumDIDRegistry.address);
+            expect(event.args.contractAddress).to.equal(ethereumLABSRegistry.address);
             expect(event.args.reason).to.equal(reason);
             
             const config = await recoveryGovernance.config();
-            expect(config.pausedContract).to.equal(ethereumDIDRegistry.address);
+            expect(config.pausedContract).to.equal(ethereumLABSRegistry.address);
         });
 
         it("Should allow guardian to unpause contract", async function () {
-            await recoveryGovernance.connect(guardian).pauseContract(ethereumDIDRegistry.address, "Test pause");
+            await recoveryGovernance.connect(guardian).pauseContract(ethereumLABSRegistry.address, "Test pause");
             
-            const tx = await recoveryGovernance.connect(guardian).unpauseContract(ethereumDIDRegistry.address);
+            const tx = await recoveryGovernance.connect(guardian).unpauseContract(ethereumLABSRegistry.address);
             const receipt = await tx.wait();
             const event = receipt.events.find(e => e.event === "ContractUnpaused");
             
-            expect(event.args.contractAddress).to.equal(ethereumDIDRegistry.address);
+            expect(event.args.contractAddress).to.equal(ethereumLABSRegistry.address);
             
             const config = await recoveryGovernance.config();
             expect(config.pausedContract).to.equal(ethers.constants.AddressZero);
@@ -169,13 +169,13 @@ describe("RecoveryGovernance Contract Tests", function () {
 
         it("Should prevent non-guardian from pausing contracts", async function () {
             await expect(
-                recoveryGovernance.connect(attacker).pauseContract(ethereumDIDRegistry.address, "Malicious pause")
+                recoveryGovernance.connect(attacker).pauseContract(ethereumLABSRegistry.address, "Malicious pause")
             ).to.be.revertedWith("RecoveryGovernance: caller missing GUARDIAN_ROLE");
         });
 
         it("Should prevent non-guardian from unpausing contracts", async function () {
             await expect(
-                recoveryGovernance.connect(attacker).unpauseContract(ethereumDIDRegistry.address)
+                recoveryGovernance.connect(attacker).unpauseContract(ethereumLABSRegistry.address)
             ).to.be.revertedWith("RecoveryGovernance: caller missing GUARDIAN_ROLE");
         });
 
@@ -193,13 +193,13 @@ describe("RecoveryGovernance Contract Tests", function () {
 
         it("Should prevent unpausing non-paused contracts", async function () {
             await expect(
-                recoveryGovernance.connect(guardian).unpauseContract(ethereumDIDRegistry.address)
+                recoveryGovernance.connect(guardian).unpauseContract(ethereumLABSRegistry.address)
             ).to.be.revertedWith("Contract not paused");
         });
 
         it("Should automatically unpause when deauthorizing", async function () {
-            await recoveryGovernance.connect(guardian).pauseContract(ethereumDIDRegistry.address, "Test");
-            await recoveryGovernance.connect(governor).deauthorizeContract(ethereumDIDRegistry.address);
+            await recoveryGovernance.connect(guardian).pauseContract(ethereumLABSRegistry.address, "Test");
+            await recoveryGovernance.connect(governor).deauthorizeContract(ethereumLABSRegistry.address);
             
             const config = await recoveryGovernance.config();
             expect(config.pausedContract).to.equal(ethers.constants.AddressZero);
@@ -247,26 +247,26 @@ describe("RecoveryGovernance Contract Tests", function () {
     });
 
     describe("Governed Recovery", function () {
-        const did = "did:ethereum:0x1234567890123456789012345678901234567890";
+        const LABS = "LABS:ethereum:0x1234567890123456789012345678901234567890";
         const newOwner = user1.address;
         const newPublicKey = "0xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890";
         const newServiceEndpoint = "https://recovery.example.com";
 
         beforeEach(async function () {
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
         });
 
         it("Should allow governor to execute governed recovery", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             const tx = await recoveryGovernance.connect(governor).governedRecovery(
-                0, // DID_DOCUMENT
+                0, // LABS_DOCUMENT
                 data,
-                "Recover corrupted DID document",
+                "Recover corrupted LABS document",
                 false // not emergency
             );
             
@@ -283,11 +283,11 @@ describe("RecoveryGovernance Contract Tests", function () {
             
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             const tx = await recoveryGovernance.connect(governor).governedRecovery(
-                0, // DID_DOCUMENT
+                0, // LABS_DOCUMENT
                 data,
                 "Emergency recovery",
                 true // emergency
@@ -304,7 +304,7 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should prevent non-governor from executing governed recovery", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             await expect(
@@ -317,7 +317,7 @@ describe("RecoveryGovernance Contract Tests", function () {
             
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             await expect(
@@ -328,7 +328,7 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should prevent emergency recovery when emergency mode is not activated", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             await expect(
@@ -339,7 +339,7 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should prevent empty reason", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [did, newOwner, newPublicKey, newServiceEndpoint]
+                [LABS, newOwner, newPublicKey, newServiceEndpoint]
             );
             
             await expect(
@@ -353,11 +353,11 @@ describe("RecoveryGovernance Contract Tests", function () {
 
         beforeEach(async function () {
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             const tx = await recoveryGovernance.connect(governor).governedRecovery(0, data, "Test recovery", false);
@@ -395,13 +395,13 @@ describe("RecoveryGovernance Contract Tests", function () {
     describe("Operation History", function () {
         beforeEach(async function () {
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             // Create multiple operations
             for (let i = 0; i < 5; i++) {
                 const data = ethers.utils.defaultAbiCoder.encode(
                     ["string", "address", "string", "string"],
-                    [`did:ethereum:0x${i.toString().padStart(40, '0')}`, user1.address, "0xABCDEF", "https://test.com"]
+                    [`LABS:ethereum:0x${i.toString().padStart(40, '0')}`, user1.address, "0xABCDEF", "https://test.com"]
                 );
                 
                 await recoveryGovernance.connect(governor).governedRecovery(0, data, `Test recovery ${i}`, false);
@@ -436,7 +436,7 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should validate compliant recovery operations", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             const [compliant, issue] = await recoveryGovernance.validateRecoveryCompliance(0, data, false);
@@ -447,7 +447,7 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should reject invalid recovery type", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             const [compliant, issue] = await recoveryGovernance.validateRecoveryCompliance(5, data, false);
@@ -458,7 +458,7 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should reject emergency operations when not in emergency mode", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             const [compliant, issue] = await recoveryGovernance.validateRecoveryCompliance(0, data, true);
@@ -472,21 +472,21 @@ describe("RecoveryGovernance Contract Tests", function () {
             expect(issue).to.equal("Empty recovery data");
         });
 
-        it("Should validate DID recovery data format", async function () {
+        it("Should validate LABS recovery data format", async function () {
             const validData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
-            const isValid = await recoveryGovernance._validateDIDRecoveryData(validData);
+            const isValid = await recoveryGovernance._validateLABSRecoveryData(validData);
             expect(isValid).to.be.true;
             
             const invalidData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF"]
             );
             
-            const isInvalid = await recoveryGovernance._validateDIDRecoveryData(invalidData);
+            const isInvalid = await recoveryGovernance._validateLABSRecoveryData(invalidData);
             expect(isInvalid).to.be.false;
         });
     });
@@ -504,11 +504,11 @@ describe("RecoveryGovernance Contract Tests", function () {
 
         it("Should update status with operations", async function () {
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             await recoveryGovernance.connect(governor).governedRecovery(0, data, "Test", false);
@@ -521,7 +521,7 @@ describe("RecoveryGovernance Contract Tests", function () {
     describe("Recovery Statistics", function () {
         beforeEach(async function () {
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
         });
 
         it("Should track recovery statistics", async function () {
@@ -529,7 +529,7 @@ describe("RecoveryGovernance Contract Tests", function () {
             for (let i = 0; i < 3; i++) {
                 const data = ethers.utils.defaultAbiCoder.encode(
                     ["string", "address", "string", "string"],
-                    [`did:ethereum:0x${i.toString().padStart(40, '0')}`, user1.address, "0xABCDEF", "https://test.com"]
+                    [`LABS:ethereum:0x${i.toString().padStart(40, '0')}`, user1.address, "0xABCDEF", "https://test.com"]
                 );
                 
                 await recoveryGovernance.connect(governor).governedRecovery(0, data, `Success ${i}`, false);
@@ -539,7 +539,7 @@ describe("RecoveryGovernance Contract Tests", function () {
             await recoveryGovernance.connect(governor).activateEmergencyMode("Test emergency");
             const emergencyData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x9999999999999999999999999999999999999999", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x9999999999999999999999999999999999999999", user1.address, "0xABCDEF", "https://test.com"]
             );
             await recoveryGovernance.connect(governor).governedRecovery(0, emergencyData, "Emergency", true);
             
@@ -567,12 +567,12 @@ describe("RecoveryGovernance Contract Tests", function () {
             // The actual reentrancy attack would require a malicious contract
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             // First call should succeed
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             const tx = await recoveryGovernance.connect(governor).governedRecovery(0, data, "Test", false);
             expect(tx).to.be.ok;
@@ -587,11 +587,11 @@ describe("RecoveryGovernance Contract Tests", function () {
         it("Should handle invalid recovery type in governed recovery", async function () {
             const data = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                ["did:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
+                ["LABS:ethereum:0x1234567890123456789012345678901234567890", user1.address, "0xABCDEF", "https://test.com"]
             );
             
             await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
-            await ethereumDIDRegistry.enableRecoveryMode();
+            await ethereumLABSRegistry.enableRecoveryMode();
             
             // This should fail at the state recovery level
             await expect(

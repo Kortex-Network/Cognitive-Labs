@@ -30,7 +30,7 @@ class TestRunner {
    * Run all tests
    */
   async runAll(options = {}) {
-    console.log(chalk.blue.bold('\n🧪 Stellar DID Platform - Test Suite\n'));
+    console.log(chalk.blue.bold('\n🧪 Stellar LABS Platform - Test Suite\n'));
     
     const testSuites = [
       { name: 'unit', description: 'Unit Tests', required: true },
@@ -498,7 +498,7 @@ if (require.main === module) {
       case '--help':
       case '-h':
         console.log(`
-Stellar DID Platform Test Runner
+Stellar LABS Platform Test Runner
 
 Usage: node runner.js [options]
 
@@ -513,7 +513,7 @@ Options:
 Examples:
   node runner.js                    # Run all tests
   node runner.js --suite unit       # Run unit tests only
-  node runner.js --suite api --grep "DID"  # Run API tests matching "DID"
+  node runner.js --suite api --grep "LABS"  # Run API tests matching "LABS"
   node runner.js --coverage         # Run tests with coverage
   node runner.js --watch            # Watch mode
         `);

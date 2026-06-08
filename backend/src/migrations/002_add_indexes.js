@@ -8,11 +8,11 @@ const mongoose = require('mongoose');
  *   credentials  - issuer+issued, subject+issued, credentialType+issued,
  *                  revoked+issued, expires, issuer+credentialType+issued,
  *                  subject+revoked
- *   dids         - owner+created, owner+active, active+created
+ *   LABSs         - owner+created, owner+active, active+created
  *   apikeys      - owner+status, expiresAt (sparse)
  *   sessions     - userId+isValid
  *   webhooks     - active, events+active
- *   credentialtemplates - credentialType+active, issuerDid+active
+ *   credentialtemplates - credentialType+active, issuerLABS+active
  */
 
 const INDEX_SPECS = {
@@ -25,7 +25,7 @@ const INDEX_SPECS = {
     { key: { issuer: 1, credentialType: 1, issued: -1 }, options: { name: 'issuer_credentialType_issued' } },
     { key: { subject: 1, revoked: 1 },           options: { name: 'subject_revoked' } },
   ],
-  dids: [
+  LABSs: [
     { key: { owner: 1, created: -1 },  options: { name: 'owner_created' } },
     { key: { owner: 1, active: 1 },    options: { name: 'owner_active' } },
     { key: { active: 1, created: -1 }, options: { name: 'active_created' } },
@@ -43,7 +43,7 @@ const INDEX_SPECS = {
   ],
   credentialtemplates: [
     { key: { credentialType: 1, active: 1 }, options: { name: 'credentialType_active' } },
-    { key: { issuerDid: 1, active: 1 },      options: { name: 'issuerDid_active' } },
+    { key: { issuerLABS: 1, active: 1 },      options: { name: 'issuerLABS_active' } },
   ],
 };
 

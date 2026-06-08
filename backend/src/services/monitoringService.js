@@ -4,7 +4,7 @@ const { logger } = require('../middleware');
 class MonitoringService {
   constructor() {
     this.server = new Server(process.env.STELLAR_HORIZON_URL || 'https://horizon-testnet.stellar.org');
-    this.contractAddress = process.env.DID_CONTRACT_ADDRESS;
+    this.contractAddress = process.env.LABS_CONTRACT_ADDRESS;
     this.wsManager = null;
     this.closeStream = null;
     this.alerts = [];
@@ -22,7 +22,7 @@ class MonitoringService {
 
   startMonitoring() {
     if (!this.contractAddress) {
-      logger.warn('DID_CONTRACT_ADDRESS not set. MonitoringService is inactive.');
+      logger.warn('LABS_CONTRACT_ADDRESS not set. MonitoringService is inactive.');
       return;
     }
 

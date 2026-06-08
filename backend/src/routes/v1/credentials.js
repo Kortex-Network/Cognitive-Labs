@@ -181,8 +181,8 @@ router.get('/search',
 // POST /credentials/issue - Issue new credential
 router.post('/issue',
   [
-    body('issuer').isString().withMessage('Issuer DID is required'),
-    body('subject').isString().withMessage('Subject DID is required'),
+    body('issuer').isString().withMessage('Issuer LABS is required'),
+    body('subject').isString().withMessage('Subject LABS is required'),
     body('credentialType').isString().withMessage('Credential type is required'),
     body('claims').isObject().withMessage('Claims must be an object'),
     body('expires').optional().isISO8601().withMessage('Expiration date must be valid ISO8601')

@@ -15,7 +15,7 @@ services:
       - BACKEND_PORT=3001
       - FRONTEND_URL=http://localhost:3000
       - REDIS_URL=redis://redis:6379
-      - MONGODB_URL=mongodb://mongo:27017/stellar-did
+      - MONGODB_URL=mongodb://mongo:27017/stellar-cognitive-lab
     depends_on:
       - redis
       - mongo
@@ -23,7 +23,7 @@ services:
       - ./backend:/app
       - /app/node_modules
     networks:
-      - stellar-did-network
+      - stellar-cognitive-lab-network
     restart: unless-stopped
 
   # Frontend React Application
@@ -42,7 +42,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     networks:
-      - stellar-did-network
+      - stellar-cognitive-lab-network
     restart: unless-stopped
 
   # Redis for caching and sessions
@@ -53,7 +53,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - stellar-did-network
+      - stellar-cognitive-lab-network
     restart: unless-stopped
     command: redis-server --appendonly yes
 
@@ -65,12 +65,12 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=stellar-did
+      - MONGO_INITDB_DATABASE=stellar-cognitive-lab
     volumes:
       - mongo_data:/data/db
       - ./backend/scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
-      - stellar-did-network
+      - stellar-cognitive-lab-network
     restart: unless-stopped
 
   # Nginx Reverse Proxy (Optional)
@@ -86,7 +86,7 @@ services:
       - frontend
       - backend
     networks:
-      - stellar-did-network
+      - stellar-cognitive-lab-network
     restart: unless-stopped
 
 volumes:
@@ -96,5 +96,5 @@ volumes:
     driver: local
 
 networks:
-  stellar-did-network:
+  stellar-cognitive-lab-network:
     driver: bridge

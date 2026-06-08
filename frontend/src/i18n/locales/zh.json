@@ -2,18 +2,18 @@
   "navigation": {
     "dashboard": "仪表板",
     "credentials": "凭证",
-    "createDid": "创建DID",
-    "resolveDid": "解析DID",
+    "createLABS": "创建LABS",
+    "resolveLABS": "解析LABS",
     "connectWallet": "连接钱包",
     "account": "账户",
     "scanner": "扫描器",
     "contracts": "合约"
   },
   "dashboard": {
-    "title": "Stellar DID平台仪表板",
+    "title": "Stellar LABS平台仪表板",
     "subtitle": "您的去中心化身份生态系统概览",
     "stats": {
-      "totalDids": "DID总数",
+      "totalLABSs": "LABS总数",
       "totalCredentials": "凭证总数",
       "activeUsers": "活跃用户",
       "network": "网络",
@@ -68,8 +68,8 @@
     "verifyCredential": "验证凭证",
     "credentialTemplates": "凭证模板",
     "templateClickToUse": "点击使用模板：",
-    "issuerDid": "颁发者DID",
-    "subjectDid": "主题DID",
+    "issuerLABS": "颁发者LABS",
+    "subjectLABS": "主题LABS",
     "credentialType": "凭证类型",
     "claims": "声明",
     "claimsPlaceholder": "{\"degree\": \"学士学位\", \"university\": \"示例大学\"}",
@@ -85,7 +85,7 @@
   },
   "forms": {
     "required": "此字段为必填项",
-    "invalidDidFormat": "DID格式无效",
+    "invalidLABSFormat": "LABS格式无效",
     "invalidJson": "JSON格式无效"
   },
   "types": {

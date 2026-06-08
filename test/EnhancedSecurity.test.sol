@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../contracts/optimized/EnhancedDIDRegistry.sol";
-import "../contracts/governance/EnhancedDIDGovernanceToken.sol";
-import "../contracts/governance/EnhancedDIDGovernor.sol";
+import "../contracts/optimized/EnhancedLABSRegistry.sol";
+import "../contracts/governance/EnhancedLABSGovernanceToken.sol";
+import "../contracts/governance/EnhancedLABSGovernor.sol";
 import "@openzeppelin/contracts/governance/TimelockController.sol";
 
 /**
@@ -19,9 +19,9 @@ import "@openzeppelin/contracts/governance/TimelockController.sol";
 contract EnhancedSecurityTest is Test {
     
     // ===== CONTRACT INSTANCES =====
-    EnhancedDIDRegistry public didRegistry;
-    EnhancedDIDGovernanceToken public governanceToken;
-    EnhancedDIDGovernor public governor;
+    EnhancedLABSRegistry public LABSRegistry;
+    EnhancedLABSGovernanceToken public governanceToken;
+    EnhancedLABSGovernor public governor;
     TimelockController public timelock;
     
     // ===== TEST ADDRESSES =====
@@ -35,17 +35,17 @@ contract EnhancedSecurityTest is Test {
     address public pauser3 = address(0x8);
     
     // ===== TEST CONSTANTS =====
-    string public constant DID = "did:stellar:1234567890";
+    string public constant LABS = "LABS:stellar:1234567890";
     string public constant PUBLIC_KEY = "public_key_123";
     string public constant SERVICE_ENDPOINT = "https://api.example.com";
     bytes32 public constant CREDENTIAL_ID = bytes32(uint256(1));
-    string public constant ISSUER = "did:stellar:issuer";
-    string public constant SUBJECT = "did:stellar:subject";
+    string public constant ISSUER = "LABS:stellar:issuer";
+    string public constant SUBJECT = "LABS:stellar:subject";
     string public constant CREDENTIAL_TYPE = "VerifiableCredential";
     
     // ===== EVENTS FOR VERIFICATION =====
-    event DIDBridged(
-        string indexed did,
+    event LABSBridged(
+        string indexed LABS,
         address indexed owner,
         string publicKey,
         string serviceEndpoint,
@@ -74,7 +74,7 @@ contract EnhancedSecurityTest is Test {
     );
     
     event ExecutionFailed(
-        string indexed did,
+        string indexed LABS,
         address indexed owner,
         address indexed target,
         uint256 value,
@@ -87,8 +87,8 @@ contract EnhancedSecurityTest is Test {
         // Deploy contracts
         vm.startPrank(owner);
         
-        governanceToken = new EnhancedDIDGovernanceToken();
-        didRegistry = new EnhancedDIDRegistry();
+        governanceToken = new EnhancedLABSGovernanceToken();
+        LABSRegistry = new EnhancedLABSRegistry();
         
         // Setup timelock
         address[] memory proposers = new address[](1);
@@ -104,16 +104,16 @@ contract EnhancedSecurityTest is Test {
         );
         
         // Deploy governor
-        governor = new EnhancedDIDGovernor(
+        governor = new EnhancedLABSGovernor(
             governanceToken,
             timelock
         );
         
         // Setup roles
-        didRegistry.grantRole(didRegistry.ADMIN_ROLE(), admin);
-        didRegistry.addPauser(pauser1);
-        didRegistry.addPauser(pauser2);
-        didRegistry.addPauser(pauser3);
+        LABSRegistry.grantRole(LABSRegistry.ADMIN_ROLE(), admin);
+        LABSRegistry.addPauser(pauser1);
+        LABSRegistry.addPauser(pauser2);
+        LABSRegistry.addPauser(pauser3);
         
         governanceToken.addMinter(admin);
         governanceToken.addPauser(pauser1);
@@ -139,42 +139,42 @@ contract EnhancedSecurityTest is Test {
     function test_CustomErrorHandling() public {
         vm.startPrank(admin);
         
-        // Test DIDAlreadyExists error with detailed info
-        didRegistry.bridgeDID(DID, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        // Test LABSAlreadyExists error with detailed info
+        LABSRegistry.bridgeLABS(LABS, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.DIDAlreadyExists.selector,
-                DID,
+                EnhancedLABSRegistry.LABSAlreadyExists.selector,
+                LABS,
                 user1
             )
         );
-        didRegistry.bridgeDID(DID, user2, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS(LABS, user2, PUBLIC_KEY, SERVICE_ENDPOINT);
         
-        // Test UnauthorizedDIDOperation error
+        // Test UnauthorizedLABSOperation error
         vm.stopPrank();
         vm.startPrank(user2);
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.UnauthorizedDIDOperation.selector,
+                EnhancedLABSRegistry.UnauthorizedLABSOperation.selector,
                 user2,
-                DID,
+                LABS,
                 user1
             )
         );
-        didRegistry.updateDID(DID, "new_key", SERVICE_ENDPOINT);
+        LABSRegistry.updateLABS(LABS, "new_key", SERVICE_ENDPOINT);
         
         // Test InvalidAddress error
         vm.startPrank(admin);
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.ZeroAddress.selector,
+                EnhancedLABSRegistry.ZeroAddress.selector,
                 "address"
             )
         );
-        didRegistry.bridgeDID(DID, address(0), PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS(LABS, address(0), PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // Test StringTooLong error
         string memory longString = new string(300);
@@ -184,13 +184,13 @@ contract EnhancedSecurityTest is Test {
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.StringTooLong.selector,
-                "did",
+                EnhancedLABSRegistry.StringTooLong.selector,
+                "LABS",
                 300,
                 256
             )
         );
-        didRegistry.bridgeDID(longString, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS(longString, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         vm.stopPrank();
     }
@@ -206,7 +206,7 @@ contract EnhancedSecurityTest is Test {
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDGovernanceToken.ExceedsMintLimit.selector,
+                EnhancedLABSGovernanceToken.ExceedsMintLimit.selector,
                 largeAmount,
                 1000000 * 10**18
             )
@@ -219,7 +219,7 @@ contract EnhancedSecurityTest is Test {
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDGovernanceToken.InsufficientBalance.selector,
+                EnhancedLABSGovernanceToken.InsufficientBalance.selector,
                 user1,
                 2000000 * 10**18,
                 1000000 * 10**18
@@ -239,11 +239,11 @@ contract EnhancedSecurityTest is Test {
         // Deploy malicious contract that attempts reentrancy
         vm.startPrank(admin);
         
-        // First create a DID for user1
-        didRegistry.bridgeDID(DID, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        // First create a LABS for user1
+        LABSRegistry.bridgeLABS(LABS, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // Deploy malicious contract
-        MaliciousContract malicious = new MaliciousContract(address(didRegistry));
+        MaliciousContract malicious = new MaliciousContract(address(LABSRegistry));
         
         // Give malicious contract some ETH to attempt reentrancy
         vm.deal(address(malicious), 1 ether);
@@ -251,7 +251,7 @@ contract EnhancedSecurityTest is Test {
         // Attempt reentrancy attack - should fail
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.ReentrantCall.selector
+                EnhancedLABSRegistry.ReentrantCall.selector
             )
         );
         malicious.attemptReentrancy{value: 0.1 ether}();
@@ -271,7 +271,7 @@ contract EnhancedSecurityTest is Test {
         // Attempt reentrancy during mint
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDGovernanceToken.ReentrantCall.selector
+                EnhancedLABSGovernanceToken.ReentrantCall.selector
             )
         );
         maliciousToken.attemptReentrancyMint();
@@ -287,15 +287,15 @@ contract EnhancedSecurityTest is Test {
     function test_MultiSigPause() public {
         // Initiate pause
         vm.startPrank(pauser1);
-        didRegistry.initiatePause("Security concern detected");
+        LABSRegistry.initiatePause("Security concern detected");
         
         // Verify pause is not yet active (needs more signatures)
-        assertTrue(!didRegistry.paused());
+        assertTrue(!LABSRegistry.paused());
         
         // Add second signature
         vm.stopPrank();
         vm.startPrank(pauser2);
-        didRegistry.signPause();
+        LABSRegistry.signPause();
         
         // Add third signature - should activate pause
         vm.stopPrank();
@@ -307,10 +307,10 @@ contract EnhancedSecurityTest is Test {
         vm.expectEmit(true, true, true, true);
         emit ContractPaused(pauser3, block.timestamp, "Multi-sig pause activated");
         
-        didRegistry.signPause();
+        LABSRegistry.signPause();
         
         // Verify contract is paused
-        assertTrue(didRegistry.paused());
+        assertTrue(LABSRegistry.paused());
         
         // Test operations are blocked when paused
         vm.stopPrank();
@@ -318,10 +318,10 @@ contract EnhancedSecurityTest is Test {
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.ContractPaused.selector
+                EnhancedLABSRegistry.ContractPaused.selector
             )
         );
-        didRegistry.bridgeDID("did:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS("LABS:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         vm.stopPrank();
     }
@@ -335,9 +335,9 @@ contract EnhancedSecurityTest is Test {
         vm.expectEmit(true, true, true, true);
         emit ContractPaused(admin, block.timestamp, "Critical vulnerability detected");
         
-        didRegistry.emergencyPause("Critical vulnerability detected");
+        LABSRegistry.emergencyPause("Critical vulnerability detected");
         
-        assertTrue(didRegistry.paused());
+        assertTrue(LABSRegistry.paused());
         
         vm.stopPrank();
     }
@@ -348,17 +348,17 @@ contract EnhancedSecurityTest is Test {
     function test_Unpause() public {
         // First pause the contract
         vm.startPrank(admin);
-        didRegistry.emergencyPause("Test pause");
-        assertTrue(didRegistry.paused());
+        LABSRegistry.emergencyPause("Test pause");
+        assertTrue(LABSRegistry.paused());
         
         // Then unpause
         vm.expectEmit(true, true, true, true);
         emit ContractUnpaused(admin, block.timestamp, "Issue resolved");
         
-        didRegistry.unpause("Issue resolved");
+        LABSRegistry.unpause("Issue resolved");
         
         // Verify operations work again
-        didRegistry.bridgeDID("did:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS("LABS:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         vm.stopPrank();
     }
@@ -390,7 +390,7 @@ contract EnhancedSecurityTest is Test {
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDGovernor.ContractPaused.selector
+                EnhancedLABSGovernor.ContractPaused.selector
             )
         );
         governor.castVote(1, 1); // Should fail when paused
@@ -401,15 +401,15 @@ contract EnhancedSecurityTest is Test {
     // ===== TEST #141: COMPREHENSIVE EVENT LOGGING =====
     
     /**
-     * @dev Test comprehensive DID events with indexed parameters
+     * @dev Test comprehensive LABS events with indexed parameters
      */
-    function test_DIDEventLogging() public {
+    function test_LABSEventLogging() public {
         vm.startPrank(admin);
         
-        // Test DIDBridged event with all parameters
+        // Test LABSBridged event with all parameters
         vm.expectEmit(true, true, false, true, false, true);
-        emit DIDBridged(
-            DID,
+        emit LABSBridged(
+            LABS,
             user1,
             PUBLIC_KEY,
             SERVICE_ENDPOINT,
@@ -417,12 +417,12 @@ contract EnhancedSecurityTest is Test {
             admin
         );
         
-        didRegistry.bridgeDID(DID, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS(LABS, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
-        // Test DIDUpdated event
+        // Test LABSUpdated event
         vm.expectEmit(true, true, true, true, false, true);
-        emit EnhancedDIDRegistry.DIDUpdated(
-            DID,
+        emit EnhancedLABSRegistry.LABSUpdated(
+            LABS,
             user1,
             block.timestamp,
             block.timestamp + 1,
@@ -433,18 +433,18 @@ contract EnhancedSecurityTest is Test {
         vm.stopPrank();
         vm.startPrank(user1);
         
-        didRegistry.updateDID(DID, "updated_public_key", SERVICE_ENDPOINT);
+        LABSRegistry.updateLABS(LABS, "updated_public_key", SERVICE_ENDPOINT);
         
-        // Test DIDOwnershipTransferred event
+        // Test LABSOwnershipTransferred event
         vm.expectEmit(true, true, true, true);
-        emit EnhancedDIDRegistry.DIDOwnershipTransferred(
-            DID,
+        emit EnhancedLABSRegistry.LABSOwnershipTransferred(
+            LABS,
             user1,
             user2,
             block.timestamp
         );
         
-        didRegistry.transferDIDOwnership(DID, user2);
+        LABSRegistry.transferLABSOwnership(LABS, user2);
         
         vm.stopPrank();
     }
@@ -457,7 +457,7 @@ contract EnhancedSecurityTest is Test {
         
         // Test CredentialBridged event
         vm.expectEmit(true, true, true, false, false, false, true);
-        emit EnhancedDIDRegistry.CredentialBridged(
+        emit EnhancedLABSRegistry.CredentialBridged(
             CREDENTIAL_ID,
             ISSUER,
             SUBJECT,
@@ -467,7 +467,7 @@ contract EnhancedSecurityTest is Test {
             block.timestamp
         );
         
-        didRegistry.bridgeCredential(
+        LABSRegistry.bridgeCredential(
             CREDENTIAL_ID,
             ISSUER,
             SUBJECT,
@@ -478,14 +478,14 @@ contract EnhancedSecurityTest is Test {
         
         // Test CredentialRevoked event
         vm.expectEmit(true, true, true, true);
-        emit EnhancedDIDRegistry.CredentialRevoked(
+        emit EnhancedLABSRegistry.CredentialRevoked(
             CREDENTIAL_ID,
             ISSUER,
             block.timestamp,
             admin
         );
         
-        didRegistry.revokeCredential(CREDENTIAL_ID);
+        LABSRegistry.revokeCredential(CREDENTIAL_ID);
         
         vm.stopPrank();
     }
@@ -512,7 +512,7 @@ contract EnhancedSecurityTest is Test {
         
         // Test TransferEnhanced event
         vm.expectEmit(true, true, true, true, false, true);
-        emit EnhancedDIDGovernanceToken.TransferEnhanced(
+        emit EnhancedLABSGovernanceToken.TransferEnhanced(
             user1,
             user2,
             user1,
@@ -535,8 +535,8 @@ contract EnhancedSecurityTest is Test {
     function test_ExecutionEventLogging() public {
         vm.startPrank(admin);
         
-        // Create DID first
-        didRegistry.bridgeDID(DID, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        // Create LABS first
+        LABSRegistry.bridgeLABS(LABS, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // Test ExecutionFailed event
         vm.stopPrank();
@@ -544,7 +544,7 @@ contract EnhancedSecurityTest is Test {
         
         vm.expectEmit(true, true, true, true, true, true, true);
         emit ExecutionFailed(
-            DID,
+            LABS,
             user1,
             address(0xdead),
             0,
@@ -554,7 +554,7 @@ contract EnhancedSecurityTest is Test {
         );
         
         // This should fail and emit ExecutionFailed
-        didRegistry.execute(
+        LABSRegistry.execute(
             1,
             address(0xdead), // Non-existent contract
             0,
@@ -572,12 +572,12 @@ contract EnhancedSecurityTest is Test {
     function test_CompleteSecurityWorkflow() public {
         // 1. Normal operations work
         vm.startPrank(admin);
-        didRegistry.bridgeDID(DID, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS(LABS, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // 2. Events are properly emitted
         vm.expectEmit(true, true, true, true);
-        emit EnhancedDIDRegistry.DIDOwnershipTransferred(
-            DID,
+        emit EnhancedLABSRegistry.LABSOwnershipTransferred(
+            LABS,
             user1,
             user2,
             block.timestamp
@@ -585,35 +585,35 @@ contract EnhancedSecurityTest is Test {
         
         vm.stopPrank();
         vm.startPrank(user1);
-        didRegistry.transferDIDOwnership(DID, user2);
+        LABSRegistry.transferLABSOwnership(LABS, user2);
         
         // 3. Multi-sig pause works
         vm.startPrank(pauser1);
-        didRegistry.initiatePause("Security audit");
+        LABSRegistry.initiatePause("Security audit");
         
         vm.stopPrank();
         vm.startPrank(pauser2);
-        didRegistry.signPause();
+        LABSRegistry.signPause();
         
         vm.stopPrank();
         vm.startPrank(pauser3);
         vm.warp(block.timestamp + 25 hours);
-        didRegistry.signPause();
+        LABSRegistry.signPause();
         
         // 4. Operations are blocked when paused
-        assertTrue(didRegistry.paused());
+        assertTrue(LABSRegistry.paused());
         
         vm.stopPrank();
         vm.startPrank(admin);
-        vm.expectRevert(EnhancedDIDRegistry.ContractPaused.selector);
-        didRegistry.bridgeDID("did:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        vm.expectRevert(EnhancedLABSRegistry.ContractPaused.selector);
+        LABSRegistry.bridgeLABS("LABS:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         // 5. Unpause restores functionality
-        didRegistry.unpause("Audit complete");
-        assertFalse(didRegistry.paused());
+        LABSRegistry.unpause("Audit complete");
+        assertFalse(LABSRegistry.paused());
         
         // 6. Operations work again
-        didRegistry.bridgeDID("did:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS("LABS:stellar:new", user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
         vm.stopPrank();
     }
@@ -624,32 +624,32 @@ contract EnhancedSecurityTest is Test {
     function test_DebuggingInformation() public {
         vm.startPrank(admin);
         
-        // Create initial DID
-        didRegistry.bridgeDID(DID, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
+        // Create initial LABS
+        LABSRegistry.bridgeLABS(LABS, user1, PUBLIC_KEY, SERVICE_ENDPOINT);
         
-        // Try to create duplicate - error includes DID and current owner
+        // Try to create duplicate - error includes LABS and current owner
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.DIDAlreadyExists.selector,
-                DID,
+                EnhancedLABSRegistry.LABSAlreadyExists.selector,
+                LABS,
                 user1
             )
         );
-        didRegistry.bridgeDID(DID, user2, PUBLIC_KEY, SERVICE_ENDPOINT);
+        LABSRegistry.bridgeLABS(LABS, user2, PUBLIC_KEY, SERVICE_ENDPOINT);
         
-        // Try unauthorized operation - error includes caller, DID, and owner
+        // Try unauthorized operation - error includes caller, LABS, and owner
         vm.stopPrank();
         vm.startPrank(user2);
         
         vm.expectRevert(
             abi.encodeWithSelector(
-                EnhancedDIDRegistry.UnauthorizedDIDOperation.selector,
+                EnhancedLABSRegistry.UnauthorizedLABSOperation.selector,
                 user2,
-                DID,
+                LABS,
                 user1
             )
         );
-        didRegistry.updateDID(DID, "new_key", SERVICE_ENDPOINT);
+        LABSRegistry.updateLABS(LABS, "new_key", SERVICE_ENDPOINT);
         
         vm.stopPrank();
     }
@@ -660,11 +660,11 @@ contract EnhancedSecurityTest is Test {
  * @dev Contract to test reentrancy protection
  */
 contract MaliciousContract {
-    EnhancedDIDRegistry public target;
+    EnhancedLABSRegistry public target;
     uint256 public attackCount;
     
     constructor(address _target) {
-        target = EnhancedDIDRegistry(_target);
+        target = EnhancedLABSRegistry(_target);
     }
     
     function attemptReentrancy() external payable {
@@ -698,11 +698,11 @@ contract MaliciousContract {
  * @dev Contract to test token reentrancy protection
  */
 contract MaliciousTokenContract {
-    EnhancedDIDGovernanceToken public target;
+    EnhancedLABSGovernanceToken public target;
     uint256 public attackCount;
     
     constructor(address _target) {
-        target = EnhancedDIDGovernanceToken(_target);
+        target = EnhancedLABSGovernanceToken(_target);
     }
     
     function attemptReentrancyMint() external {

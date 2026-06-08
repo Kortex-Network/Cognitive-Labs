@@ -106,36 +106,36 @@ router.post('/:batchId/rollback', async (req, res) => {
 });
 
 /**
- * POST /api/batch/did/create-batch
- * Create multiple DIDs in a batch
+ * POST /api/batch/LABS/create-batch
+ * Create multiple LABSs in a batch
  */
-router.post('/did/create-batch', async (req, res) => {
+router.post('/LABS/create-batch', async (req, res) => {
   try {
-    const { didConfigs } = req.body;
+    const { LABSConfigs } = req.body;
 
-    if (!didConfigs || !Array.isArray(didConfigs)) {
+    if (!LABSConfigs || !Array.isArray(LABSConfigs)) {
       return res.status(400).json({
         success: false,
-        error: 'didConfigs array is required'
+        error: 'LABSConfigs array is required'
       });
     }
 
-    const operations = didConfigs.map(config => 
-      BatchService.createDIDOperation(config)
+    const operations = LABSConfigs.map(config => 
+      BatchService.createLABSOperation(config)
     );
 
-    const batchId = `did_create_batch_${Date.now()}`;
+    const batchId = `LABS_create_batch_${Date.now()}`;
     
     const result = await batchService.executeBatch(batchId, operations);
 
     res.status(201).json({
       success: true,
       data: result,
-      message: `${result.summary.successfulOperations} DIDs created successfully`
+      message: `${result.summary.successfulOperations} LABSs created successfully`
     });
 
   } catch (error) {
-    console.error('Batch DID creation error:', error);
+    console.error('Batch LABS creation error:', error);
     res.status(400).json({
       success: false,
       error: error.message
@@ -144,10 +144,10 @@ router.post('/did/create-batch', async (req, res) => {
 });
 
 /**
- * POST /api/batch/did/update-batch
- * Update multiple DIDs in a batch
+ * POST /api/batch/LABS/update-batch
+ * Update multiple LABSs in a batch
  */
-router.post('/did/update-batch', async (req, res) => {
+router.post('/LABS/update-batch', async (req, res) => {
   try {
     const { updates } = req.body;
 
@@ -159,21 +159,21 @@ router.post('/did/update-batch', async (req, res) => {
     }
 
     const operations = updates.map(update => 
-      BatchService.updateDIDOperation(update.did, update.updates, update.secretKey)
+      BatchService.updateLABSOperation(update.LABS, update.updates, update.secretKey)
     );
 
-    const batchId = `did_update_batch_${Date.now()}`;
+    const batchId = `LABS_update_batch_${Date.now()}`;
     
     const result = await batchService.executeBatch(batchId, operations);
 
     res.json({
       success: true,
       data: result,
-      message: `${result.summary.successfulOperations} DIDs updated successfully`
+      message: `${result.summary.successfulOperations} LABSs updated successfully`
     });
 
   } catch (error) {
-    console.error('Batch DID update error:', error);
+    console.error('Batch LABS update error:', error);
     res.status(400).json({
       success: false,
       error: error.message
@@ -237,7 +237,7 @@ router.post('/credentials/revoke-batch', async (req, res) => {
     const operations = revocations.map(revocation => 
       BatchService.revokeCredentialOperation(
         revocation.credentialId, 
-        revocation.issuerDid, 
+        revocation.issuerLABS, 
         revocation.reason
       )
     );
@@ -262,41 +262,41 @@ router.post('/credentials/revoke-batch', async (req, res) => {
 });
 
 /**
- * POST /api/batch/bridge/did-batch
- * Bridge multiple DIDs to Ethereum in a batch
+ * POST /api/batch/bridge/LABS-batch
+ * Bridge multiple LABSs to Ethereum in a batch
  */
-router.post('/bridge/did-batch', async (req, res) => {
+router.post('/bridge/LABS-batch', async (req, res) => {
   try {
-    const { dids } = req.body;
+    const { LABSs } = req.body;
 
-    if (!dids || !Array.isArray(dids)) {
+    if (!LABSs || !Array.isArray(LABSs)) {
       return res.status(400).json({
         success: false,
-        error: 'dids array is required'
+        error: 'LABSs array is required'
       });
     }
 
-    const operations = dids.map(did => 
-      BatchService.bridgeDIDOperation(
-        did.did,
-        did.ownerAddress,
-        did.publicKey,
-        did.serviceEndpoint
+    const operations = LABSs.map(LABS => 
+      BatchService.bridgeLABSOperation(
+        LABS.LABS,
+        LABS.ownerAddress,
+        LABS.publicKey,
+        LABS.serviceEndpoint
       )
     );
 
-    const batchId = `did_bridge_batch_${Date.now()}`;
+    const batchId = `LABS_bridge_batch_${Date.now()}`;
     
     const result = await batchService.executeBatch(batchId, operations);
 
     res.status(201).json({
       success: true,
       data: result,
-      message: `${result.summary.successfulOperations} DIDs bridged successfully`
+      message: `${result.summary.successfulOperations} LABSs bridged successfully`
     });
 
   } catch (error) {
-    console.error('Batch DID bridging error:', error);
+    console.error('Batch LABS bridging error:', error);
     res.status(400).json({
       success: false,
       error: error.message
@@ -367,16 +367,16 @@ router.post('/mixed', async (req, res) => {
     // Convert operation objects to proper format
     const formattedOperations = operations.map(op => {
       switch (op.type) {
-        case 'CREATE_DID':
-          return BatchService.createDIDOperation(op.data);
-        case 'UPDATE_DID':
-          return BatchService.updateDIDOperation(op.data.did, op.data.updates, op.data.secretKey);
+        case 'CREATE_LABS':
+          return BatchService.createLABSOperation(op.data);
+        case 'UPDATE_LABS':
+          return BatchService.updateLABSOperation(op.data.LABS, op.data.updates, op.data.secretKey);
         case 'ISSUE_CREDENTIAL':
           return BatchService.issueCredentialOperation(op.data);
         case 'REVOKE_CREDENTIAL':
-          return BatchService.revokeCredentialOperation(op.data.credentialId, op.data.issuerDid, op.data.reason);
-        case 'BRIDGE_DID':
-          return BatchService.bridgeDIDOperation(op.data.did, op.data.ownerAddress, op.data.publicKey, op.data.serviceEndpoint);
+          return BatchService.revokeCredentialOperation(op.data.credentialId, op.data.issuerLABS, op.data.reason);
+        case 'BRIDGE_LABS':
+          return BatchService.bridgeLABSOperation(op.data.LABS, op.data.ownerAddress, op.data.publicKey, op.data.serviceEndpoint);
         case 'BRIDGE_CREDENTIAL':
           return BatchService.bridgeCredentialOperation(op.data.credentialId, op.data.issuer, op.data.subject, op.data.credentialType, op.data.expires, op.data.dataHash);
         default:

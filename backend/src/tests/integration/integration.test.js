@@ -10,7 +10,7 @@ describe('Integration Test Suite', function() {
   let server;
   let testUsers = [];
   let authTokens = [];
-  let createdDIDs = [];
+  let createdLABSs = [];
   let createdCredentials = [];
 
   before(async function() {
@@ -50,57 +50,57 @@ describe('Integration Test Suite', function() {
     await TestUtils.testRedis.flushdb();
     
     // Reset arrays
-    createdDIDs = [];
+    createdLABSs = [];
     createdCredentials = [];
   });
 
   describe('Complete User Journey', function() {
     
-    it('should handle complete DID lifecycle for a user', async function() {
+    it('should handle complete LABS lifecycle for a user', async function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
-      // Step 1: Create DID
-      const didData = TestData.validDID({
+      // Step 1: Create LABS
+      const LABSData = TestData.validLABS({
         owner: user.walletAddress
       });
       
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
       expect(createResponse.body.success).to.be.true;
-      expect(createResponse.body.data.did).to.equal(didData.did);
+      expect(createResponse.body.data.LABS).to.equal(LABSData.LABS);
       
-      const createdDID = createResponse.body.data;
-      createdDIDs.push(createdDID);
+      const createdLABS = createResponse.body.data;
+      createdLABSs.push(createdLABS);
       
-      // Step 2: Retrieve and verify DID
+      // Step 2: Retrieve and verify LABS
       const getResponse = await request(app)
-        .get(`/api/v1/did/${createdDID.did}`)
+        .get(`/api/v1/LABS/${createdLABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      expect(getResponse.body.data.did).to.equal(createdDID.did);
+      expect(getResponse.body.data.LABS).to.equal(createdLABS.LABS);
       expect(getResponse.body.data.owner).to.equal(user.walletAddress);
       
-      // Step 3: Update DID
+      // Step 3: Update LABS
       const updateData = {
         serviceEndpoint: 'https://updated.example.com',
         verificationMethods: [
           {
             id: 'key-updated',
             type: 'Ed25519VerificationKey2018',
-            controller: createdDID.did,
+            controller: createdLABS.LABS,
             publicKeyBase58: TestUtils.generateRandomStellarAddress()
           }
         ]
       };
       
       const updateResponse = await request(app)
-        .put(`/api/v1/did/${createdDID.did}`)
+        .put(`/api/v1/LABS/${createdLABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updateData)
         .expect(200);
@@ -108,10 +108,10 @@ describe('Integration Test Suite', function() {
       expect(updateResponse.body.data.serviceEndpoint).to.equal(updateData.serviceEndpoint);
       expect(updateResponse.body.data.verificationMethods).to.have.length(1);
       
-      // Step 4: Issue credential for DID
+      // Step 4: Issue credential for LABS
       const credentialData = TestData.degreeCredential({
-        issuer: createdDID.did,
-        subject: createdDID.did
+        issuer: createdLABS.LABS,
+        subject: createdLABS.LABS
       });
       
       const credentialResponse = await request(app)
@@ -121,8 +121,8 @@ describe('Integration Test Suite', function() {
         .expect(201);
       
       expect(credentialResponse.body.success).to.be.true;
-      expect(credentialResponse.body.data.issuer).to.equal(createdDID.did);
-      expect(credentialResponse.body.data.subject).to.equal(createdDID.did);
+      expect(credentialResponse.body.data.issuer).to.equal(createdLABS.LABS);
+      expect(credentialResponse.body.data.subject).to.equal(createdLABS.LABS);
       
       const createdCredential = credentialResponse.body.data;
       createdCredentials.push(createdCredential);
@@ -136,17 +136,17 @@ describe('Integration Test Suite', function() {
       
       expect(verifyResponse.body.data.valid).to.be.true;
       
-      // Step 6: List user's DIDs and credentials
-      const didsResponse = await request(app)
-        .get(`/api/v1/did?owner=${user.walletAddress}`)
+      // Step 6: List user's LABSs and credentials
+      const LABSsResponse = await request(app)
+        .get(`/api/v1/LABS?owner=${user.walletAddress}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      expect(didsResponse.body.data).to.have.length(1);
-      expect(didsResponse.body.data[0].did).to.equal(createdDID.did);
+      expect(LABSsResponse.body.data).to.have.length(1);
+      expect(LABSsResponse.body.data[0].LABS).to.equal(createdLABS.LABS);
       
       const credentialsResponse = await request(app)
-        .get(`/api/v1/credentials?subject=${createdDID.did}`)
+        .get(`/api/v1/credentials?subject=${createdLABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
@@ -159,19 +159,19 @@ describe('Integration Test Suite', function() {
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      // Step 8: Deactivate DID
+      // Step 8: Deactivate LABS
       await request(app)
-        .delete(`/api/v1/did/${createdDID.did}`)
+        .delete(`/api/v1/LABS/${createdLABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
       // Step 9: Verify final state
-      const finalDIDResponse = await request(app)
-        .get(`/api/v1/did/${createdDID.did}`)
+      const finalLABSResponse = await request(app)
+        .get(`/api/v1/LABS/${createdLABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      expect(finalDIDResponse.body.data.active).to.be.false;
+      expect(finalLABSResponse.body.data.active).to.be.false;
       
       const finalCredentialResponse = await request(app)
         .get(`/api/v1/credentials/${createdCredential.id}`)
@@ -186,26 +186,26 @@ describe('Integration Test Suite', function() {
       const subject = testUsers[1];
       const verifier = testUsers[2];
       
-      // Create DIDs for issuer and subject
-      const issuerDID = TestData.validDID({ owner: issuer.walletAddress });
-      const subjectDID = TestData.validDID({ owner: subject.walletAddress });
+      // Create LABSs for issuer and subject
+      const issuerLABS = TestData.validLABS({ owner: issuer.walletAddress });
+      const subjectLABS = TestData.validLABS({ owner: subject.walletAddress });
       
       const issuerResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authTokens[0]}`)
-        .send(issuerDID)
+        .send(issuerLABS)
         .expect(201);
       
       const subjectResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authTokens[1]}`)
-        .send(subjectDID)
+        .send(subjectLABS)
         .expect(201);
       
       // Issue credential from issuer to subject
       const credentialData = TestData.employmentCredential({
-        issuer: issuerResponse.body.data.did,
-        subject: subjectResponse.body.data.did
+        issuer: issuerResponse.body.data.LABS,
+        subject: subjectResponse.body.data.LABS
       });
       
       const issueResponse = await request(app)
@@ -236,7 +236,7 @@ describe('Integration Test Suite', function() {
       
       // Check that credential appears in issuer's issued credentials
       const issuerCredentialsResponse = await request(app)
-        .get(`/api/v1/credentials?issuer=${issuerResponse.body.data.did}`)
+        .get(`/api/v1/credentials?issuer=${issuerResponse.body.data.LABS}`)
         .set('Authorization', `Bearer ${authTokens[0]}`)
         .expect(200);
       
@@ -245,7 +245,7 @@ describe('Integration Test Suite', function() {
       
       // Check that credential appears in subject's received credentials
       const subjectCredentialsResponse = await request(app)
-        .get(`/api/v1/credentials?subject=${subjectResponse.body.data.did}`)
+        .get(`/api/v1/credentials?subject=${subjectResponse.body.data.LABS}`)
         .set('Authorization', `Bearer ${authTokens[1]}`)
         .expect(200);
       
@@ -274,19 +274,19 @@ describe('Integration Test Suite', function() {
       expect(accountResponse.body.data).to.have.property('balance');
       expect(accountResponse.body.data).to.have.property('signers');
       
-      // Create DID linked to Stellar account
-      const didData = TestData.validDID({
+      // Create LABS linked to Stellar account
+      const LABSData = TestData.validLABS({
         owner: stellarAddress,
         publicKey: stellarAddress
       });
       
-      const didResponse = await request(app)
-        .post('/api/v1/did')
+      const LABSResponse = await request(app)
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      expect(didResponse.body.data.owner).to.equal(stellarAddress);
+      expect(LABSResponse.body.data.owner).to.equal(stellarAddress);
       
       // Create transaction
       const transactionData = TestData.validStellarTransaction({
@@ -318,7 +318,7 @@ describe('Integration Test Suite', function() {
 
   describe('Contract Integration', function() {
     
-    it('should integrate with smart contract for DID operations', async function() {
+    it('should integrate with smart contract for LABS operations', async function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
@@ -346,37 +346,37 @@ describe('Integration Test Suite', function() {
       expect(deployResponse.body.data).to.have.property('address');
       expect(deployResponse.body.data).to.have.property('transactionHash');
       
-      // Create DID that will be registered on contract
-      const didData = TestData.validDID({
+      // Create LABS that will be registered on contract
+      const LABSData = TestData.validLABS({
         owner: user.walletAddress
       });
       
-      const didResponse = await request(app)
-        .post('/api/v1/did')
+      const LABSResponse = await request(app)
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      // Register DID on contract
+      // Register LABS on contract
       const registerData = {
-        did: didResponse.body.data.did,
+        LABS: LABSResponse.body.data.LABS,
         owner: user.walletAddress,
-        publicKey: didData.publicKey
+        publicKey: LABSData.publicKey
       };
       
-      TestUtils.mockContractData(`did-${didResponse.body.data.did}`);
+      TestUtils.mockContractData(`LABS-${LABSResponse.body.data.LABS}`);
       
       const registerResponse = await request(app)
-        .post('/api/v1/contracts/register-did')
+        .post('/api/v1/contracts/register-LABS')
         .set('Authorization', `Bearer ${token}`)
         .send(registerData)
         .expect(200);
       
       expect(registerResponse.body.success).to.be.true;
       
-      // Get contract data for DID
+      // Get contract data for LABS
       const contractDataResponse = await request(app)
-        .get(`/api/v1/contracts/data/did-${didResponse.body.data.did}`)
+        .get(`/api/v1/contracts/data/LABS-${LABSResponse.body.data.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
@@ -387,25 +387,25 @@ describe('Integration Test Suite', function() {
 
   describe('Cross-Service Integration', function() {
     
-    it('should handle DID creation with automatic credential issuance', async function() {
+    it('should handle LABS creation with automatic credential issuance', async function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
-      // Create DID
-      const didData = TestData.validDID({ owner: user.walletAddress });
+      // Create LABS
+      const LABSData = TestData.validLABS({ owner: user.walletAddress });
       
-      const didResponse = await request(app)
-        .post('/api/v1/did')
+      const LABSResponse = await request(app)
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      const did = didResponse.body.data;
+      const LABS = LABSResponse.body.data;
       
-      // Automatically issue identity credential for new DID
+      // Automatically issue identity credential for new LABS
       const identityCredential = TestData.identityCredential({
-        issuer: did.did,
-        subject: did.did
+        issuer: LABS.LABS,
+        subject: LABS.LABS
       });
       
       const credentialResponse = await request(app)
@@ -425,50 +425,50 @@ describe('Integration Test Suite', function() {
       
       expect(verifyResponse.body.data.valid).to.be.true;
       
-      // Check that DID and credential are linked
-      const didWithCredentialsResponse = await request(app)
-        .get(`/api/v1/did/${did.did}`)
+      // Check that LABS and credential are linked
+      const LABSWithCredentialsResponse = await request(app)
+        .get(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      expect(didWithCredentialsResponse.body.data.did).to.equal(did.did);
+      expect(LABSWithCredentialsResponse.body.data.LABS).to.equal(LABS.LABS);
       
-      const credentialsForDIDResponse = await request(app)
-        .get(`/api/v1/credentials?subject=${did.did}`)
+      const credentialsForLABSResponse = await request(app)
+        .get(`/api/v1/credentials?subject=${LABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      expect(credentialsForDIDResponse.body.data).to.have.length(1);
-      expect(credentialsForDIDResponse.body.data[0].id).to.equal(credential.id);
+      expect(credentialsForLABSResponse.body.data).to.have.length(1);
+      expect(credentialsForLABSResponse.body.data[0].id).to.equal(credential.id);
     });
 
     it('should handle batch operations across multiple services', async function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
-      // Create multiple DIDs
-      const dids = [];
+      // Create multiple LABSs
+      const LABSs = [];
       for (let i = 0; i < 3; i++) {
-        const didData = TestData.validDID({
+        const LABSData = TestData.validLABS({
           owner: user.walletAddress,
-          did: `did:stellar:GABC${i.toString().padStart(54, '0')}`
+          LABS: `LABS:stellar:GABC${i.toString().padStart(54, '0')}`
         });
         
         const response = await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${token}`)
-          .send(didData)
+          .send(LABSData)
           .expect(201);
         
-        dids.push(response.body.data);
+        LABSs.push(response.body.data);
       }
       
-      // Issue credentials for all DIDs
+      // Issue credentials for all LABSs
       const credentials = [];
-      for (let i = 0; i < dids.length; i++) {
+      for (let i = 0; i < LABSs.length; i++) {
         const credentialData = TestData.validCredential({
-          issuer: dids[0].did, // First DID issues credentials
-          subject: dids[i].did,
+          issuer: LABSs[0].LABS, // First LABS issues credentials
+          subject: LABSs[i].LABS,
           credentialType: `TestCredential${i}`
         });
         
@@ -519,18 +519,18 @@ describe('Integration Test Suite', function() {
         expect(response.body.data.revoked).to.be.true;
       }
       
-      // Deactivate all DIDs
-      for (const did of dids) {
+      // Deactivate all LABSs
+      for (const LABS of LABSs) {
         await request(app)
-          .delete(`/api/v1/did/${did.did}`)
+          .delete(`/api/v1/LABS/${LABS.LABS}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(200);
       }
       
-      // Verify all DIDs are deactivated
-      for (const did of dids) {
+      // Verify all LABSs are deactivated
+      for (const LABS of LABSs) {
         const response = await request(app)
-          .get(`/api/v1/did/${did.did}`)
+          .get(`/api/v1/LABS/${LABS.LABS}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(200);
         
@@ -545,24 +545,24 @@ describe('Integration Test Suite', function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
-      // Try to create DID with invalid data
-      const invalidDIDData = {
-        did: 'invalid-did',
+      // Try to create LABS with invalid data
+      const invalidLABSData = {
+        LABS: 'invalid-LABS',
         publicKey: 'invalid-key'
       };
       
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(invalidDIDData)
+        .send(invalidLABSData)
         .expect(400);
       
       expect(createResponse.body.error.code).to.equal('VALIDATION_ERROR');
       
-      // Try to issue credential with non-existent DID
+      // Try to issue credential with non-existent LABS
       const credentialData = TestData.validCredential({
-        issuer: 'did:stellar:NONEXISTENT',
-        subject: 'did:stellar:NONEXISTENT'
+        issuer: 'LABS:stellar:NONEXISTENT',
+        subject: 'LABS:stellar:NONEXISTENT'
       });
       
       const issueResponse = await request(app)
@@ -582,12 +582,12 @@ describe('Integration Test Suite', function() {
       expect(revokeResponse.body.error.code).to.equal('NOT_FOUND');
       
       // System should still be functional for valid operations
-      const validDIDData = TestData.validDID();
+      const validLABSData = TestData.validLABS();
       
       const validCreateResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(validDIDData)
+        .send(validLABSData)
         .expect(201);
       
       expect(validCreateResponse.body.success).to.be.true;
@@ -608,16 +608,16 @@ describe('Integration Test Suite', function() {
       
       expect(stellarResponse.body.error.code).to.equal('STELLAR_ERROR');
       
-      // DID operations should still work
-      const didData = TestData.validDID();
+      // LABS operations should still work
+      const LABSData = TestData.validLABS();
       
-      const didResponse = await request(app)
-        .post('/api/v1/did')
+      const LABSResponse = await request(app)
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      expect(didResponse.body.success).to.be.true;
+      expect(LABSResponse.body.success).to.be.true;
     });
   });
 
@@ -627,23 +627,23 @@ describe('Integration Test Suite', function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
-      // Create DID
-      const didData = TestData.validDID();
+      // Create LABS
+      const LABSData = TestData.validLABS();
       
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      const did = createResponse.body.data;
+      const LABS = createResponse.body.data;
       
       // Issue multiple credentials
       const credentials = [];
       for (let i = 0; i < 5; i++) {
         const credentialData = TestData.validCredential({
-          issuer: did.did,
-          subject: did.did,
+          issuer: LABS.LABS,
+          subject: LABS.LABS,
           credentialType: `ConsistencyTest${i}`
         });
         
@@ -657,16 +657,16 @@ describe('Integration Test Suite', function() {
       }
       
       // Verify consistent state
-      const didResponse = await request(app)
-        .get(`/api/v1/did/${did.did}`)
+      const LABSResponse = await request(app)
+        .get(`/api/v1/LABS/${LABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
-      expect(didResponse.body.data.did).to.equal(did.did);
-      expect(didResponse.body.data.active).to.be.true;
+      expect(LABSResponse.body.data.LABS).to.equal(LABS.LABS);
+      expect(LABSResponse.body.data.active).to.be.true;
       
       const credentialsResponse = await request(app)
-        .get(`/api/v1/credentials?subject=${did.did}`)
+        .get(`/api/v1/credentials?subject=${LABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
@@ -684,7 +684,7 @@ describe('Integration Test Suite', function() {
       
       // Verify consistent state after partial revocation
       const updatedCredentialsResponse = await request(app)
-        .get(`/api/v1/credentials?subject=${did.did}`)
+        .get(`/api/v1/credentials?subject=${LABS.LABS}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
@@ -713,39 +713,39 @@ describe('Integration Test Suite', function() {
       const user = testUsers[0];
       const token = authTokens[0];
       
-      // Create multiple DIDs concurrently
-      const didCreationPromises = [];
+      // Create multiple LABSs concurrently
+      const LABSCreationPromises = [];
       for (let i = 0; i < 10; i++) {
-        const didData = TestData.validDID({
-          did: `did:stellar:GABC${i.toString().padStart(54, '0')}`
+        const LABSData = TestData.validLABS({
+          LABS: `LABS:stellar:GABC${i.toString().padStart(54, '0')}`
         });
         
-        didCreationPromises.push(
+        LABSCreationPromises.push(
           request(app)
-            .post('/api/v1/did')
+            .post('/api/v1/LABS')
             .set('Authorization', `Bearer ${token}`)
-            .send(didData)
+            .send(LABSData)
         );
       }
       
       const startTime = Date.now();
-      const didResponses = await Promise.all(didCreationPromises);
-      const didCreationTime = Date.now() - startTime;
+      const LABSResponses = await Promise.all(LABSCreationPromises);
+      const LABSCreationTime = Date.now() - startTime;
       
-      // All DID creations should succeed
-      didResponses.forEach(response => {
+      // All LABS creations should succeed
+      LABSResponses.forEach(response => {
         expect(response.status).to.equal(201);
         expect(response.body.success).to.be.true;
       });
       
       // Should complete within reasonable time
-      expect(didCreationTime).to.be.lessThan(5000);
+      expect(LABSCreationTime).to.be.lessThan(5000);
       
-      // Issue credentials for all DIDs concurrently
-      const credentialPromises = didResponses.map(response => {
+      // Issue credentials for all LABSs concurrently
+      const credentialPromises = LABSResponses.map(response => {
         const credentialData = TestData.validCredential({
-          issuer: response.body.data.did,
-          subject: response.body.data.did
+          issuer: response.body.data.LABS,
+          subject: response.body.data.LABS
         });
         
         return request(app)
@@ -768,15 +768,15 @@ describe('Integration Test Suite', function() {
       expect(credentialCreationTime).to.be.lessThan(5000);
       
       // Verify all data is consistent
-      const dids = didResponses.map(r => r.body.data);
+      const LABSs = LABSResponses.map(r => r.body.data);
       const credentials = credentialResponses.map(r => r.body.data);
       
-      expect(dids).to.have.length(10);
+      expect(LABSs).to.have.length(10);
       expect(credentials).to.have.length(10);
       
-      // List all DIDs and verify count
+      // List all LABSs and verify count
       const listResponse = await request(app)
-        .get('/api/v1/did')
+        .get('/api/v1/LABS')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       
@@ -800,49 +800,49 @@ describe('Integration Test Suite', function() {
       const token1 = authTokens[0];
       const token2 = authTokens[1];
       
-      // User 1 creates DID
-      const didData1 = TestData.validDID({ owner: user1.walletAddress });
+      // User 1 creates LABS
+      const LABSData1 = TestData.validLABS({ owner: user1.walletAddress });
       
-      const didResponse1 = await request(app)
-        .post('/api/v1/did')
+      const LABSResponse1 = await request(app)
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token1}`)
-        .send(didData1)
+        .send(LABSData1)
         .expect(201);
       
-      const did1 = didResponse1.body.data;
+      const LABS1 = LABSResponse1.body.data;
       
-      // User 2 creates DID
-      const didData2 = TestData.validDID({ owner: user2.walletAddress });
+      // User 2 creates LABS
+      const LABSData2 = TestData.validLABS({ owner: user2.walletAddress });
       
-      const didResponse2 = await request(app)
-        .post('/api/v1/did')
+      const LABSResponse2 = await request(app)
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${token2}`)
-        .send(didData2)
+        .send(LABSData2)
         .expect(201);
       
-      const did2 = didResponse2.body.data;
+      const LABS2 = LABSResponse2.body.data;
       
-      // User 1 should not be able to update User 2's DID
+      // User 1 should not be able to update User 2's LABS
       const updateResponse = await request(app)
-        .put(`/api/v1/did/${did2.did}`)
+        .put(`/api/v1/LABS/${LABS2.LABS}`)
         .set('Authorization', `Bearer ${token1}`)
         .send({ serviceEndpoint: 'https://malicious.example.com' })
         .expect(403);
       
       expect(updateResponse.body.error.code).to.equal('FORBIDDEN');
       
-      // User 1 should not be able to deactivate User 2's DID
+      // User 1 should not be able to deactivate User 2's LABS
       const deactivateResponse = await request(app)
-        .delete(`/api/v1/did/${did2.did}`)
+        .delete(`/api/v1/LABS/${LABS2.LABS}`)
         .set('Authorization', `Bearer ${token1}`)
         .expect(403);
       
       expect(deactivateResponse.body.error.code).to.equal('FORBIDDEN');
       
-      // User 1 issues credential for their own DID
+      // User 1 issues credential for their own LABS
       const credentialData = TestData.validCredential({
-        issuer: did1.did,
-        subject: did1.did
+        issuer: LABS1.LABS,
+        subject: LABS1.LABS
       });
       
       const credentialResponse = await request(app)
@@ -862,13 +862,13 @@ describe('Integration Test Suite', function() {
       expect(revokeResponse.body.error.code).to.equal('FORBIDDEN');
       
       // Verify original states are maintained
-      const did2CheckResponse = await request(app)
-        .get(`/api/v1/did/${did2.did}`)
+      const LABS2CheckResponse = await request(app)
+        .get(`/api/v1/LABS/${LABS2.LABS}`)
         .set('Authorization', `Bearer ${token2}`)
         .expect(200);
       
-      expect(did2CheckResponse.body.data.active).to.be.true;
-      expect(did2CheckResponse.body.data.serviceEndpoint).to.not.equal('https://malicious.example.com');
+      expect(LABS2CheckResponse.body.data.active).to.be.true;
+      expect(LABS2CheckResponse.body.data.serviceEndpoint).to.not.equal('https://malicious.example.com');
       
       const credentialCheckResponse = await request(app)
         .get(`/api/v1/credentials/${credential.id}`)

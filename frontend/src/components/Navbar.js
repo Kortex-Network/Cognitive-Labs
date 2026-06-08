@@ -48,8 +48,8 @@ const Navbar = () => {
     { label: t("navigation.dashboard"), to: "/" },
     { label: t("navigation.credentials"), to: "/credentials" },
     { label: "Analytics", to: "/analytics" },
-    { label: t("navigation.createDid"), to: "/create-did" },
-    { label: t("navigation.resolveDid"), to: "/resolve-did" },
+    { label: t("navigation.createLABS"), to: "/create-LABS" },
+    { label: t("navigation.resolveLABS"), to: "/resolve-LABS" },
     { label: "Verify", to: "/verify-credential" },
     { label: t("navigation.scanner"), to: "/scanner" },
     { label: t("navigation.account"), to: "/account" },
@@ -70,7 +70,7 @@ const Navbar = () => {
   const drawerContent = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        Stellar DID Platform
+        Stellar LABS Platform
       </Typography>
       <Divider />
       <List>
@@ -222,10 +222,10 @@ const Navbar = () => {
             </Box>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               <Typography variant="h6" noWrap>
-                Stellar DID Platform
+                Stellar LABS Platform
               </Typography>
               <Typography variant="caption" color="text.secondary" noWrap>
-                Decentralized Identity
+                Cognitive Lab
               </Typography>
             </Box>
           </Stack>

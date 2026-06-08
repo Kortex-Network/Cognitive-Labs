@@ -1,16 +1,16 @@
 const crypto = require('crypto');
-const DIDService = require('./didService');
+const LABSService = require('./LABSService');
 const StellarService = require('./stellarService');
 
 /**
  * Batch operation types
  */
 const BatchOperationType = {
-  CREATE_DID: 'CREATE_DID',
-  UPDATE_DID: 'UPDATE_DID',
+  CREATE_LABS: 'CREATE_LABS',
+  UPDATE_LABS: 'UPDATE_LABS',
   ISSUE_CREDENTIAL: 'ISSUE_CREDENTIAL',
   REVOKE_CREDENTIAL: 'REVOKE_CREDENTIAL',
-  BRIDGE_DID: 'BRIDGE_DID',
+  BRIDGE_LABS: 'BRIDGE_LABS',
   BRIDGE_CREDENTIAL: 'BRIDGE_CREDENTIAL'
 };
 
@@ -27,7 +27,7 @@ const BatchStatus = {
 
 class BatchService {
   constructor() {
-    this.didService = new DIDService();
+    this.LABSService = new LABSService();
     this.stellarService = new StellarService();
     this.activeBatches = new Map();
   }
@@ -95,14 +95,14 @@ class BatchService {
       let rollbackData = null;
 
       switch (operation.type) {
-        case BatchOperationType.CREATE_DID:
-          result = await this.executeCreateDID(operation);
+        case BatchOperationType.CREATE_LABS:
+          result = await this.executeCreateLABS(operation);
           rollbackData = { type: operation.type, data: result };
           break;
 
-        case BatchOperationType.UPDATE_DID:
-          result = await this.executeUpdateDID(operation);
-          rollbackData = { type: operation.type, did: operation.did, previousState: result.previousState };
+        case BatchOperationType.UPDATE_LABS:
+          result = await this.executeUpdateLABS(operation);
+          rollbackData = { type: operation.type, LABS: operation.LABS, previousState: result.previousState };
           break;
 
         case BatchOperationType.ISSUE_CREDENTIAL:
@@ -115,9 +115,9 @@ class BatchService {
           rollbackData = { type: operation.type, credentialId: operation.credentialId, previousState: result.previousState };
           break;
 
-        case BatchOperationType.BRIDGE_DID:
-          result = await this.executeBridgeDID(operation);
-          rollbackData = { type: operation.type, did: operation.did };
+        case BatchOperationType.BRIDGE_LABS:
+          result = await this.executeBridgeLABS(operation);
+          rollbackData = { type: operation.type, LABS: operation.LABS };
           break;
 
         case BatchOperationType.BRIDGE_CREDENTIAL:
@@ -156,12 +156,12 @@ class BatchService {
   }
 
   /**
-   * Execute DID creation operation
+   * Execute LABS creation operation
    */
-  async executeCreateDID(operation) {
+  async executeCreateLABS(operation) {
     const { serviceEndpoint, additionalServices, additionalKeys } = operation.data || {};
     
-    const result = await this.didService.createDID({
+    const result = await this.LABSService.createLABS({
       serviceEndpoint,
       additionalServices,
       additionalKeys
@@ -171,15 +171,15 @@ class BatchService {
   }
 
   /**
-   * Execute DID update operation
+   * Execute LABS update operation
    */
-  async executeUpdateDID(operation) {
-    const { did, updates, secretKey } = operation.data;
+  async executeUpdateLABS(operation) {
+    const { LABS, updates, secretKey } = operation.data;
     
     // Get current state for rollback
-    const currentState = await this.didService.resolveDID(did);
+    const currentState = await this.LABSService.resolveLABS(LABS);
     
-    const result = await this.didService.updateDID(did, updates, secretKey);
+    const result = await this.LABSService.updateLABS(LABS, updates, secretKey);
     
     return {
       ...result,
@@ -191,11 +191,11 @@ class BatchService {
    * Execute credential issuance operation
    */
   async executeIssueCredential(operation) {
-    const { issuerDid, subjectDid, claims, type, expirationDate } = operation.data;
+    const { issuerLABS, subjectLABS, claims, type, expirationDate } = operation.data;
     
-    const credential = await this.didService.createVerifiableCredential(
-      issuerDid,
-      subjectDid,
+    const credential = await this.LABSService.createVerifiableCredential(
+      issuerLABS,
+      subjectLABS,
       claims,
       { type, expirationDate }
     );
@@ -207,14 +207,14 @@ class BatchService {
    * Execute credential revocation operation
    */
   async executeRevokeCredential(operation) {
-    const { credentialId, issuerDid, reason } = operation.data;
+    const { credentialId, issuerLABS, reason } = operation.data;
     
     // In a real implementation, you'd get the current state
     const previousState = { status: 'active', revokedAt: null };
     
     const revocation = {
       credentialId,
-      issuerDid,
+      issuerLABS,
       revokedAt: new Date().toISOString(),
       reason: reason || 'Revoked by issuer',
       status: 'revoked'
@@ -227,14 +227,14 @@ class BatchService {
   }
 
   /**
-   * Execute DID bridging operation
+   * Execute LABS bridging operation
    */
-  async executeBridgeDID(operation) {
-    const { did, ownerAddress, publicKey, serviceEndpoint } = operation.data;
+  async executeBridgeLABS(operation) {
+    const { LABS, ownerAddress, publicKey, serviceEndpoint } = operation.data;
     
     // This would interact with the Ethereum contract
     const result = {
-      did,
+      LABS,
       ownerAddress,
       bridged: true,
       timestamp: new Date().toISOString()
@@ -304,14 +304,14 @@ class BatchService {
    */
   async rollbackOperation(rollbackData) {
     switch (rollbackData.type) {
-      case BatchOperationType.CREATE_DID:
-        // Delete created DID (implementation depends on storage)
-        console.log(`Rolling back DID creation for: ${rollbackData.data.did}`);
+      case BatchOperationType.CREATE_LABS:
+        // Delete created LABS (implementation depends on storage)
+        console.log(`Rolling back LABS creation for: ${rollbackData.data.LABS}`);
         break;
 
-      case BatchOperationType.UPDATE_DID:
+      case BatchOperationType.UPDATE_LABS:
         // Restore previous state
-        console.log(`Rolling back DID update for: ${rollbackData.did}`);
+        console.log(`Rolling back LABS update for: ${rollbackData.LABS}`);
         break;
 
       case BatchOperationType.ISSUE_CREDENTIAL:
@@ -324,9 +324,9 @@ class BatchService {
         console.log(`Rolling back credential revocation: ${rollbackData.credentialId}`);
         break;
 
-      case BatchOperationType.BRIDGE_DID:
-        // Remove bridged DID from Ethereum
-        console.log(`Rolling back DID bridging: ${rollbackData.did}`);
+      case BatchOperationType.BRIDGE_LABS:
+        // Remove bridged LABS from Ethereum
+        console.log(`Rolling back LABS bridging: ${rollbackData.LABS}`);
         break;
 
       case BatchOperationType.BRIDGE_CREDENTIAL:
@@ -382,17 +382,17 @@ class BatchService {
   /**
    * Create batch operation payload helpers
    */
-  static createDIDOperation(data) {
+  static createLABSOperation(data) {
     return {
-      type: BatchOperationType.CREATE_DID,
+      type: BatchOperationType.CREATE_LABS,
       data
     };
   }
 
-  static updateDIDOperation(did, data, secretKey) {
+  static updateLABSOperation(LABS, data, secretKey) {
     return {
-      type: BatchOperationType.UPDATE_DID,
-      data: { did, updates: data, secretKey }
+      type: BatchOperationType.UPDATE_LABS,
+      data: { LABS, updates: data, secretKey }
     };
   }
 
@@ -403,17 +403,17 @@ class BatchService {
     };
   }
 
-  static revokeCredentialOperation(credentialId, issuerDid, reason) {
+  static revokeCredentialOperation(credentialId, issuerLABS, reason) {
     return {
       type: BatchOperationType.REVOKE_CREDENTIAL,
-      data: { credentialId, issuerDid, reason }
+      data: { credentialId, issuerLABS, reason }
     };
   }
 
-  static bridgeDIDOperation(did, ownerAddress, publicKey, serviceEndpoint) {
+  static bridgeLABSOperation(LABS, ownerAddress, publicKey, serviceEndpoint) {
     return {
-      type: BatchOperationType.BRIDGE_DID,
-      data: { did, ownerAddress, publicKey, serviceEndpoint }
+      type: BatchOperationType.BRIDGE_LABS,
+      data: { LABS, ownerAddress, publicKey, serviceEndpoint }
     };
   }
 

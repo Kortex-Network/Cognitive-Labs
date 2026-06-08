@@ -1,17 +1,17 @@
 const { BatchService, BatchOperationType, BatchStatus } = require('../services/batchService');
-const DIDService = require('../services/didService');
+const LABSService = require('../services/LABSService');
 
-// Mock DIDService
-jest.mock('../services/didService');
+// Mock LABSService
+jest.mock('../services/LABSService');
 jest.mock('../services/stellarService');
 
 describe('BatchService', () => {
   let batchService;
-  let mockDidService;
+  let mockLABSService;
 
   beforeEach(() => {
     batchService = new BatchService();
-    mockDidService = new DIDService();
+    mockLABSService = new LABSService();
     
     // Clear all batches before each test
     batchService.activeBatches.clear();
@@ -20,27 +20,27 @@ describe('BatchService', () => {
   describe('executeBatch', () => {
     test('should execute a successful batch of operations', async () => {
       const operations = [
-        BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' }),
+        BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' }),
         BatchService.issueCredentialOperation({
-          issuerDid: 'did:stellar:test1',
-          subjectDid: 'did:stellar:test2',
+          issuerLABS: 'LABS:stellar:test1',
+          subjectLABS: 'LABS:stellar:test2',
           claims: { name: 'John Doe' }
         })
       ];
 
       // Mock successful operations
-      mockDidService.createDID.mockResolvedValue({
-        did: 'did:stellar:test1',
+      mockLABSService.createLABS.mockResolvedValue({
+        LABS: 'LABS:stellar:test1',
         account: { publicKey: 'test1' }
       });
       
-      mockDidService.createVerifiableCredential.mockResolvedValue({
+      mockLABSService.createVerifiableCredential.mockResolvedValue({
         id: 'cred-123',
-        issuer: 'did:stellar:test1',
-        subject: 'did:stellar:test2'
+        issuer: 'LABS:stellar:test1',
+        subject: 'LABS:stellar:test2'
       });
 
-      batchService.didService = mockDidService;
+      batchService.LABSService = mockLABSService;
 
       const result = await batchService.executeBatch('test-batch', operations);
 
@@ -54,25 +54,25 @@ describe('BatchService', () => {
 
     test('should handle batch failure and rollback', async () => {
       const operations = [
-        BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' }),
+        BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' }),
         BatchService.issueCredentialOperation({
-          issuerDid: 'did:stellar:test1',
-          subjectDid: 'did:stellar:test2',
+          issuerLABS: 'LABS:stellar:test1',
+          subjectLABS: 'LABS:stellar:test2',
           claims: { name: 'John Doe' }
         })
       ];
 
       // Mock first operation success, second failure
-      mockDidService.createDID.mockResolvedValue({
-        did: 'did:stellar:test1',
+      mockLABSService.createLABS.mockResolvedValue({
+        LABS: 'LABS:stellar:test1',
         account: { publicKey: 'test1' }
       });
       
-      mockDidService.createVerifiableCredential.mockRejectedValue(
+      mockLABSService.createVerifiableCredential.mockRejectedValue(
         new Error('Credential creation failed')
       );
 
-      batchService.didService = mockDidService;
+      batchService.LABSService = mockLABSService;
 
       await expect(batchService.executeBatch('test-batch', operations))
         .rejects.toThrow('Credential creation failed');
@@ -83,17 +83,17 @@ describe('BatchService', () => {
 
     test('should skip rollback when disabled', async () => {
       const operations = [
-        BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' })
+        BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' })
       ];
 
-      mockDidService.createDID.mockRejectedValue(
-        new Error('DID creation failed')
+      mockLABSService.createLABS.mockRejectedValue(
+        new Error('LABS creation failed')
       );
 
-      batchService.didService = mockDidService;
+      batchService.LABSService = mockLABSService;
 
       await expect(batchService.executeBatch('test-batch', operations, { rollbackOnError: false }))
-        .rejects.toThrow('DID creation failed');
+        .rejects.toThrow('LABS creation failed');
 
       const batchStatus = batchService.getBatchStatus('test-batch');
       expect(batchStatus.status).toBe(BatchStatus.FAILED);
@@ -101,8 +101,8 @@ describe('BatchService', () => {
   });
 
   describe('executeOperation', () => {
-    test('should execute CREATE_DID operation', async () => {
-      const operation = BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' });
+    test('should execute CREATE_LABS operation', async () => {
+      const operation = BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' });
       const batch = {
         id: 'test-batch',
         operations: [operation],
@@ -111,24 +111,24 @@ describe('BatchService', () => {
         rollbackData: []
       };
 
-      mockDidService.createDID.mockResolvedValue({
-        did: 'did:stellar:test1',
+      mockLABSService.createLABS.mockResolvedValue({
+        LABS: 'LABS:stellar:test1',
         account: { publicKey: 'test1' }
       });
 
-      batchService.didService = mockDidService;
+      batchService.LABSService = mockLABSService;
 
       const result = await batchService.executeOperation(operation, batch);
 
       expect(result.status).toBe('SUCCESS');
-      expect(result.type).toBe(BatchOperationType.CREATE_DID);
-      expect(result.result.did).toBe('did:stellar:test1');
+      expect(result.type).toBe(BatchOperationType.CREATE_LABS);
+      expect(result.result.LABS).toBe('LABS:stellar:test1');
       expect(batch.rollbackData).toHaveLength(1);
     });
 
-    test('should execute UPDATE_DID operation', async () => {
-      const operation = BatchService.updateDIDOperation(
-        'did:stellar:test1',
+    test('should execute UPDATE_LABS operation', async () => {
+      const operation = BatchService.updateLABSOperation(
+        'LABS:stellar:test1',
         { serviceEndpoint: 'https://updated.com' },
         'secret-key'
       );
@@ -141,26 +141,26 @@ describe('BatchService', () => {
       };
 
       const currentState = {
-        didDocument: { id: 'did:stellar:test1', serviceEndpoint: 'https://old.com' }
+        LABSDocument: { id: 'LABS:stellar:test1', serviceEndpoint: 'https://old.com' }
       };
 
-      mockDidService.resolveDID.mockResolvedValue(currentState);
-      mockDidService.updateDID.mockResolvedValue({
-        didDocument: { id: 'did:stellar:test1', serviceEndpoint: 'https://updated.com' }
+      mockLABSService.resolveLABS.mockResolvedValue(currentState);
+      mockLABSService.updateLABS.mockResolvedValue({
+        LABSDocument: { id: 'LABS:stellar:test1', serviceEndpoint: 'https://updated.com' }
       });
 
-      batchService.didService = mockDidService;
+      batchService.LABSService = mockLABSService;
 
       const result = await batchService.executeOperation(operation, batch);
 
       expect(result.status).toBe('SUCCESS');
-      expect(result.type).toBe(BatchOperationType.UPDATE_DID);
+      expect(result.type).toBe(BatchOperationType.UPDATE_LABS);
       expect(result.result.previousState).toBe(currentState);
       expect(batch.rollbackData).toHaveLength(1);
     });
 
     test('should handle operation failure', async () => {
-      const operation = BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' });
+      const operation = BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' });
       const batch = {
         id: 'test-batch',
         operations: [operation],
@@ -169,9 +169,9 @@ describe('BatchService', () => {
         rollbackData: []
       };
 
-      mockDidService.createDID.mockRejectedValue(new Error('Creation failed'));
+      mockLABSService.createLABS.mockRejectedValue(new Error('Creation failed'));
 
-      batchService.didService = mockDidService;
+      batchService.LABSService = mockLABSService;
 
       const result = await batchService.executeOperation(operation, batch);
 
@@ -189,7 +189,7 @@ describe('BatchService', () => {
         status: BatchStatus.FAILED,
         results: [],
         rollbackData: [
-          { type: BatchOperationType.CREATE_DID, data: { did: 'did:stellar:test1' } },
+          { type: BatchOperationType.CREATE_LABS, data: { LABS: 'LABS:stellar:test1' } },
           { type: BatchOperationType.ISSUE_CREDENTIAL, credentialId: 'cred-123' }
         ],
         error: 'Test error'
@@ -281,32 +281,32 @@ describe('BatchService', () => {
 
   describe('operation helpers', () => {
     test('should create correct operation objects', () => {
-      const didOp = BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' });
-      expect(didOp.type).toBe(BatchOperationType.CREATE_DID);
-      expect(didOp.data.serviceEndpoint).toBe('https://example.com');
+      const LABSOp = BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' });
+      expect(LABSOp.type).toBe(BatchOperationType.CREATE_LABS);
+      expect(LABSOp.data.serviceEndpoint).toBe('https://example.com');
 
-      const updateOp = BatchService.updateDIDOperation('did:test', { name: 'test' }, 'secret');
-      expect(updateOp.type).toBe(BatchOperationType.UPDATE_DID);
-      expect(updateOp.data.did).toBe('did:test');
+      const updateOp = BatchService.updateLABSOperation('LABS:test', { name: 'test' }, 'secret');
+      expect(updateOp.type).toBe(BatchOperationType.UPDATE_LABS);
+      expect(updateOp.data.LABS).toBe('LABS:test');
       expect(updateOp.data.updates.name).toBe('test');
       expect(updateOp.data.secretKey).toBe('secret');
 
       const issueOp = BatchService.issueCredentialOperation({
-        issuerDid: 'did:issuer',
-        subjectDid: 'did:subject',
+        issuerLABS: 'LABS:issuer',
+        subjectLABS: 'LABS:subject',
         claims: { name: 'John' }
       });
       expect(issueOp.type).toBe(BatchOperationType.ISSUE_CREDENTIAL);
-      expect(issueOp.data.issuerDid).toBe('did:issuer');
+      expect(issueOp.data.issuerLABS).toBe('LABS:issuer');
 
-      const revokeOp = BatchService.revokeCredentialOperation('cred-123', 'did:issuer', 'test');
+      const revokeOp = BatchService.revokeCredentialOperation('cred-123', 'LABS:issuer', 'test');
       expect(revokeOp.type).toBe(BatchOperationType.REVOKE_CREDENTIAL);
       expect(revokeOp.data.credentialId).toBe('cred-123');
       expect(revokeOp.data.reason).toBe('test');
 
-      const bridgeDidOp = BatchService.bridgeDIDOperation('did:test', '0x123', 'pubkey', 'endpoint');
-      expect(bridgeDidOp.type).toBe(BatchOperationType.BRIDGE_DID);
-      expect(bridgeDidOp.data.did).toBe('did:test');
+      const bridgeLABSOp = BatchService.bridgeLABSOperation('LABS:test', '0x123', 'pubkey', 'endpoint');
+      expect(bridgeLABSOp.type).toBe(BatchOperationType.BRIDGE_LABS);
+      expect(bridgeLABSOp.data.LABS).toBe('LABS:test');
 
       const bridgeCredOp = BatchService.bridgeCredentialOperation('cred-123', 'issuer', 'subject', 'type', 12345, 'hash');
       expect(bridgeCredOp.type).toBe(BatchOperationType.BRIDGE_CREDENTIAL);

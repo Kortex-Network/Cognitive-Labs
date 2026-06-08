@@ -2,18 +2,18 @@
   "navigation": {
     "dashboard": "Panel",
     "credentials": "Credenciales",
-    "createDid": "Crear DID",
-    "resolveDid": "Resolver DID",
+    "createLABS": "Crear LABS",
+    "resolveLABS": "Resolver LABS",
     "connectWallet": "Conectar Billetera",
     "account": "Cuenta",
     "scanner": "Escáner",
     "contracts": "Contratos"
   },
   "dashboard": {
-    "title": "Panel de Plataforma DID Stellar",
+    "title": "Panel de Plataforma LABS Stellar",
     "subtitle": "Descripción general de tu ecosistema de identidad descentralizada",
     "stats": {
-      "totalDids": "Total de DIDs",
+      "totalLABSs": "Total de LABSs",
       "totalCredentials": "Total de Credenciales",
       "activeUsers": "Usuarios Activos",
       "network": "Red",
@@ -68,8 +68,8 @@
     "verifyCredential": "Verificar Credencial",
     "credentialTemplates": "Plantillas de Credencial",
     "templateClickToUse": "Haz clic para usar una plantilla:",
-    "issuerDid": "DID del Emisor",
-    "subjectDid": "DID del Sujeto",
+    "issuerLABS": "LABS del Emisor",
+    "subjectLABS": "LABS del Sujeto",
     "credentialType": "Tipo de Credencial",
     "claims": "Reclamaciones",
     "claimsPlaceholder": "{\"degree\": \"Licenciatura\", \"university\": \"Universidad Ejemplo\"}",
@@ -85,7 +85,7 @@
   },
   "forms": {
     "required": "Este campo es requerido",
-    "invalidDidFormat": "Formato DID inválido",
+    "invalidLABSFormat": "Formato LABS inválido",
     "invalidJson": "Formato JSON inválido"
   },
   "types": {

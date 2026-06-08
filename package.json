@@ -1,7 +1,7 @@
 {
-  "name": "decentralized-identity-did-test-suite",
+  "name": "cognitive-labs",
   "version": "1.0.0",
-  "description": "Comprehensive test suite for Decentralized Identity DID contracts",
+  "description": "Comprehensive test suite for Cognitive Labs contracts",
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
@@ -22,8 +22,8 @@
     "blockchain",
     "ethereum",
     "solidity",
-    "did",
-    "decentralized-identity",
+    "cognitive-lab",
+    "cognitive-labs",
     "smart-contracts",
     "hardhat",
     "testing"

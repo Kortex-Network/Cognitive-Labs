@@ -34,15 +34,15 @@ This guide helps developers migrate from the REST API to the new GraphQL API, pr
 
 ## Endpoint Mapping
 
-### DID Operations
+### Cognitive Lab Operations
 
 | REST Endpoint | GraphQL Query/Mutation | Status |
 |---------------|------------------------|--------|
-| `GET /api/v1/did/:did` | `query { did(did: "...") }` | ✅ Direct replacement |
-| `GET /api/v1/did` | `query { dids(...) }` | ✅ Enhanced filtering |
-| `POST /api/v1/did` | `mutation { createDID(...) }` | ✅ Direct replacement |
-| `PUT /api/v1/did/:did` | `mutation { updateDID(...) }` | ✅ Direct replacement |
-| `DELETE /api/v1/did/:did` | `mutation { deactivateDID(...) }` | ✅ Direct replacement |
+| `GET /api/v1/Cognitive Lab/:Cognitive Lab` | `query { Cognitive Lab(Cognitive Lab: "...") }` | ✅ Direct replacement |
+| `GET /api/v1/Cognitive Lab` | `query { Cognitive Labs(...) }` | ✅ Enhanced filtering |
+| `POST /api/v1/Cognitive Lab` | `mutation { createLABS(...) }` | ✅ Direct replacement |
+| `PUT /api/v1/Cognitive Lab/:Cognitive Lab` | `mutation { updateLABS(...) }` | ✅ Direct replacement |
+| `DELETE /api/v1/Cognitive Lab/:Cognitive Lab` | `mutation { deactivateLABS(...) }` | ✅ Direct replacement |
 
 ### Credential Operations
 
@@ -66,10 +66,10 @@ This guide helps developers migrate from the REST API to the new GraphQL API, pr
 ### Before: REST API
 
 ```javascript
-// Fetch DID with REST
-async function getDID(did) {
+// Fetch Cognitive Lab with REST
+async function getLABS(Cognitive Lab) {
   try {
-    const response = await fetch(`/api/v1/did/${did}`);
+    const response = await fetch(`/api/v1/Cognitive Lab/${Cognitive Lab}`);
     const data = await response.json();
     
     if (!response.ok) {
@@ -78,38 +78,38 @@ async function getDID(did) {
     
     return data;
   } catch (error) {
-    console.error('Error fetching DID:', error);
+    console.error('Error fetching Cognitive Lab:', error);
     throw error;
   }
 }
 
-// Fetch multiple DIDs
-async function listDIDs(owner, active) {
+// Fetch multiple Cognitive Labs
+async function listLABSs(owner, active) {
   try {
     const params = new URLSearchParams();
     if (owner) params.append('owner', owner);
     if (active !== undefined) params.append('active', active);
     
-    const response = await fetch(`/api/v1/did?${params}`);
+    const response = await fetch(`/api/v1/Cognitive Lab?${params}`);
     const data = await response.json();
     
-    return data.dids || [];
+    return data.Cognitive Labs || [];
   } catch (error) {
-    console.error('Error listing DIDs:', error);
+    console.error('Error listing Cognitive Labs:', error);
     throw error;
   }
 }
 
-// Create DID
-async function createDID(didData) {
+// Create Cognitive Lab
+async function createLABS(LABSData) {
   try {
-    const response = await fetch('/api/v1/did', {
+    const response = await fetch('/api/v1/Cognitive Lab', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(didData)
+      body: JSON.stringify(LABSData)
     });
     
     const data = await response.json();
@@ -120,7 +120,7 @@ async function createDID(didData) {
     
     return data;
   } catch (error) {
-    console.error('Error creating DID:', error);
+    console.error('Error creating Cognitive Lab:', error);
     throw error;
   }
 }
@@ -140,12 +140,12 @@ const client = new ApolloClient({
   }
 });
 
-// Fetch DID with GraphQL
-const GET_DID = gql`
-  query GetDID($did: String!) {
-    did(did: $did) {
+// Fetch Cognitive Lab with GraphQL
+const GET_LABS = gql`
+  query GetLABS($Cognitive Lab: String!) {
+    Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
       id
-      did
+      Cognitive Lab
       owner
       publicKey
       created
@@ -166,11 +166,11 @@ const GET_DID = gql`
   }
 `;
 
-async function getDID(did) {
+async function getLABS(Cognitive Lab) {
   try {
     const { data, errors } = await client.query({
-      query: GET_DID,
-      variables: { did },
+      query: GET_LABS,
+      variables: { Cognitive Lab },
       errorPolicy: 'all'
     });
     
@@ -178,32 +178,32 @@ async function getDID(did) {
       throw new Error(errors[0].message);
     }
     
-    return data.did;
+    return data.Cognitive Lab;
   } catch (error) {
-    console.error('Error fetching DID:', error);
+    console.error('Error fetching Cognitive Lab:', error);
     throw error;
   }
 }
 
-// Fetch multiple DIDs with enhanced filtering
-const LIST_DIDS = gql`
-  query ListDIDs($owner: String, $active: Boolean, $limit: Int, $offset: Int) {
-    dids(owner: $owner, active: $active, limit: $limit, offset: $offset) {
+// Fetch multiple Cognitive Labs with enhanced filtering
+const LIST_LABSS = gql`
+  query ListLABSs($owner: String, $active: Boolean, $limit: Int, $offset: Int) {
+    Cognitive Labs(owner: $owner, active: $active, limit: $limit, offset: $offset) {
       id
-      did
+      Cognitive Lab
       owner
       created
       active
       serviceEndpoint
     }
-    didCount(active: $active)
+    LABSCount(active: $active)
   }
 `;
 
-async function listDIDs(owner, active, limit = 10, offset = 0) {
+async function listLABSs(owner, active, limit = 10, offset = 0) {
   try {
     const { data, errors } = await client.query({
-      query: LIST_DIDS,
+      query: LIST_LABSS,
       variables: { owner, active, limit, offset },
       errorPolicy: 'all'
     });
@@ -213,27 +213,27 @@ async function listDIDs(owner, active, limit = 10, offset = 0) {
     }
     
     return {
-      dids: data.dids,
-      total: data.didCount
+      Cognitive Labs: data.Cognitive Labs,
+      total: data.LABSCount
     };
   } catch (error) {
-    console.error('Error listing DIDs:', error);
+    console.error('Error listing Cognitive Labs:', error);
     throw error;
   }
 }
 
-// Create DID with GraphQL
-const CREATE_DID = gql`
-  mutation CreateDID($input: CreateDIDInput!) {
-    createDID(
-      did: $input.did
+// Create Cognitive Lab with GraphQL
+const CREATE_LABS = gql`
+  mutation CreateLABS($input: CreateLABSInput!) {
+    createLABS(
+      Cognitive Lab: $input.Cognitive Lab
       publicKey: $input.publicKey
       serviceEndpoint: $input.serviceEndpoint
       verificationMethods: $input.verificationMethods
       services: $input.services
     ) {
       id
-      did
+      Cognitive Lab
       owner
       publicKey
       created
@@ -242,11 +242,11 @@ const CREATE_DID = gql`
   }
 `;
 
-async function createDID(didData) {
+async function createLABS(LABSData) {
   try {
     const { data, errors } = await client.mutate({
-      mutation: CREATE_DID,
-      variables: { input: didData },
+      mutation: CREATE_LABS,
+      variables: { input: LABSData },
       errorPolicy: 'all'
     });
     
@@ -254,9 +254,9 @@ async function createDID(didData) {
       throw new Error(errors[0].message);
     }
     
-    return data.createDID;
+    return data.createLABS;
   } catch (error) {
-    console.error('Error creating DID:', error);
+    console.error('Error creating Cognitive Lab:', error);
     throw error;
   }
 }
@@ -267,12 +267,12 @@ async function createDID(didData) {
 ### Real-time Subscriptions
 
 ```javascript
-// Subscribe to DID creation events
-const DID_CREATED_SUBSCRIPTION = gql`
-  subscription DIDCreated($owner: String) {
-    didCreated(owner: $owner) {
+// Subscribe to Cognitive Lab creation events
+const LABS_CREATED_SUBSCRIPTION = gql`
+  subscription LABSCreated($owner: String) {
+    LABSCreated(owner: $owner) {
       id
-      did
+      Cognitive Lab
       owner
       created
       active
@@ -280,12 +280,12 @@ const DID_CREATED_SUBSCRIPTION = gql`
   }
 `;
 
-function subscribeToDIDCreated(owner, callback) {
+function subscribeToLABSCreated(owner, callback) {
   const subscription = client.subscribe({
-    query: DID_CREATED_SUBSCRIPTION,
+    query: LABS_CREATED_SUBSCRIPTION,
     variables: { owner }
   }).subscribe({
-    next: ({ data }) => callback(data.didCreated),
+    next: ({ data }) => callback(data.LABSCreated),
     error: (error) => console.error('Subscription error:', error)
   });
   
@@ -293,8 +293,8 @@ function subscribeToDIDCreated(owner, callback) {
 }
 
 // Usage
-const subscription = subscribeToDIDCreated('owner-address', (did) => {
-  console.log('New DID created:', did);
+const subscription = subscribeToLABSCreated('owner-address', (Cognitive Lab) => {
+  console.log('New Cognitive Lab created:', Cognitive Lab);
 });
 
 // Unsubscribe when done
@@ -339,22 +339,22 @@ async function batchRevokeCredentials(ids) {
 
 ```javascript
 // Request only needed fields
-const MINIMAL_DID = gql`
-  query GetMinimalDID($did: String!) {
-    did(did: $did) {
+const MINIMAL_LABS = gql`
+  query GetMinimalLABS($Cognitive Lab: String!) {
+    Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
       id
-      did
+      Cognitive Lab
       active
     }
   }
 `;
 
 // Complex query with relationships
-const DID_WITH_CREDENTIALS = gql`
-  query GetDIDWithCredentials($did: String!) {
-    did(did: $did) {
+const LABS_WITH_CREDENTIALS = gql`
+  query GetLABSWithCredentials($Cognitive Lab: String!) {
+    Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
       id
-      did
+      Cognitive Lab
       owner
       active
       verificationMethods {
@@ -363,7 +363,7 @@ const DID_WITH_CREDENTIALS = gql`
         publicKeyBase58
       }
     }
-    credentials(subject: $did, revoked: false) {
+    credentials(subject: $Cognitive Lab, revoked: false) {
       id
       issuer
       credentialType
@@ -379,7 +379,7 @@ const DID_WITH_CREDENTIALS = gql`
 ### REST Error Handling
 ```javascript
 try {
-  const response = await fetch('/api/v1/did/invalid-did');
+  const response = await fetch('/api/v1/Cognitive Lab/invalid-Cognitive Lab');
   const data = await response.json();
   
   if (!response.ok) {
@@ -397,8 +397,8 @@ try {
 ```javascript
 try {
   const { data, errors } = await client.query({
-    query: GET_DID,
-    variables: { did: 'invalid-did' },
+    query: GET_LABS,
+    variables: { Cognitive Lab: 'invalid-Cognitive Lab' },
     errorPolicy: 'all'
   });
   
@@ -407,11 +407,11 @@ try {
     throw new Error(error.message);
   }
   
-  if (!data.did) {
-    throw new Error('DID not found');
+  if (!data.Cognitive Lab) {
+    throw new Error('Cognitive Lab not found');
   }
   
-  return data.did;
+  return data.Cognitive Lab;
 } catch (error) {
   console.error('GraphQL Error:', error);
   throw error;
@@ -429,17 +429,17 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          did: {
+          Cognitive Lab: {
             merge: true,
             cache: true
           },
-          dids: {
+          Cognitive Labs: {
             merge: false,
             cache: true
           }
         }
       },
-      DIDDocument: {
+      LABSDocument: {
         keyFields: ["id"],
         fields: {
           verificationMethods: {
@@ -459,10 +459,10 @@ const client = new ApolloClient({
 ```javascript
 // Use field selection to reduce payload
 const OPTIMIZED_QUERY = gql`
-  query GetDIDList($limit: Int) {
-    dids(limit: $limit) {
+  query GetLABSList($limit: Int) {
+    Cognitive Labs(limit: $limit) {
       id  # Only request ID field
-      did
+      Cognitive Lab
       active
     }
   }
@@ -470,14 +470,14 @@ const OPTIMIZED_QUERY = gql`
 
 // Use pagination for large datasets
 const PAGINATED_QUERY = gql`
-  query GetDIDList($limit: Int, $offset: Int) {
-    dids(limit: $limit, offset: $offset) {
+  query GetLABSList($limit: Int, $offset: Int) {
+    Cognitive Labs(limit: $limit, offset: $offset) {
       id
-      did
+      Cognitive Lab
       owner
       created
     }
-    didCount
+    LABSCount
   }
 `;
 ```
@@ -489,7 +489,7 @@ const PAGINATED_QUERY = gql`
 // Test GraphQL queries
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
-describe('DID GraphQL Operations', () => {
+describe('Cognitive Lab GraphQL Operations', () => {
   let client;
   
   beforeEach(() => {
@@ -499,14 +499,14 @@ describe('DID GraphQL Operations', () => {
     });
   });
   
-  it('should fetch DID', async () => {
+  it('should fetch Cognitive Lab', async () => {
     const { data } = await client.query({
-      query: GET_DID,
-      variables: { did: 'test-did' }
+      query: GET_LABS,
+      variables: { Cognitive Lab: 'test-Cognitive Lab' }
     });
     
-    expect(data.did).toBeDefined();
-    expect(data.did.id).toBe('test-did');
+    expect(data.Cognitive Lab).toBeDefined();
+    expect(data.Cognitive Lab.id).toBe('test-Cognitive Lab');
   });
 });
 ```
@@ -515,20 +515,20 @@ describe('DID GraphQL Operations', () => {
 ```javascript
 // Test migration compatibility
 describe('REST to GraphQL Migration', () => {
-  it('should return same data for DID operations', async () => {
+  it('should return same data for Cognitive Lab operations', async () => {
     // Fetch with REST
-    const restResponse = await fetch('/api/v1/did/test-did');
+    const restResponse = await fetch('/api/v1/Cognitive Lab/test-Cognitive Lab');
     const restData = await restResponse.json();
     
     // Fetch with GraphQL
     const { data: graphqlData } = await client.query({
-      query: GET_DID,
-      variables: { did: 'test-did' }
+      query: GET_LABS,
+      variables: { Cognitive Lab: 'test-Cognitive Lab' }
     });
     
     // Compare results
-    expect(restData.id).toBe(graphqlData.did.id);
-    expect(restData.did).toBe(graphqlData.did.did);
+    expect(restData.id).toBe(graphqlData.Cognitive Lab.id);
+    expect(restData.Cognitive Lab).toBe(graphqlData.Cognitive Lab.Cognitive Lab);
   });
 });
 ```

@@ -2,18 +2,18 @@
   "navigation": {
     "dashboard": "Tableau de Bord",
     "credentials": "Certificats",
-    "createDid": "Créer DID",
-    "resolveDid": "Résoudre DID",
+    "createLABS": "Créer LABS",
+    "resolveLABS": "Résoudre LABS",
     "connectWallet": "Connecter Portefeuille",
     "account": "Compte",
     "scanner": "Scanneur",
     "contracts": "Contrats"
   },
   "dashboard": {
-    "title": "Tableau de Bord de la Plateforme DID Stellar",
+    "title": "Tableau de Bord de la Plateforme LABS Stellar",
     "subtitle": "Aperçu de votre écosystème d'identité décentralisée",
     "stats": {
-      "totalDids": "Total des DIDs",
+      "totalLABSs": "Total des LABSs",
       "totalCredentials": "Total des Certificats",
       "activeUsers": "Utilisateurs Actifs",
       "network": "Réseau",
@@ -68,8 +68,8 @@
     "verifyCredential": "Vérifier Certificat",
     "credentialTemplates": "Modèles de Certificat",
     "templateClickToUse": "Cliquez pour utiliser un modèle :",
-    "issuerDid": "DID de l'Émetteur",
-    "subjectDid": "DID du Sujet",
+    "issuerLABS": "LABS de l'Émetteur",
+    "subjectLABS": "LABS du Sujet",
     "credentialType": "Type de Certificat",
     "claims": "Déclarations",
     "claimsPlaceholder": "{\"degree\": \"Licence\", \"university\": \"Université Exemple\"}",
@@ -85,7 +85,7 @@
   },
   "forms": {
     "required": "Ce champ est requis",
-    "invalidDidFormat": "Format DID invalide",
+    "invalidLABSFormat": "Format LABS invalide",
     "invalidJson": "Format JSON invalide"
   },
   "types": {

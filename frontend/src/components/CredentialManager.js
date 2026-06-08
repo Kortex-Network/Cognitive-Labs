@@ -49,14 +49,14 @@ import QRScanner from "./QRScanner";
 import { FormSkeleton } from "./SkeletonLoader";
 
 const issueSchema = yup.object().shape({
-  issuerDID: yup
+  issuerLABS: yup
     .string()
-    .required("Issuer DID is required")
-    .matches(/^did:stellar:G[A-Z0-9]{55}$/, "Invalid DID format"),
-  subjectDID: yup
+    .required("Issuer LABS is required")
+    .matches(/^LABS:stellar:G[A-Z0-9]{55}$/, "Invalid LABS format"),
+  subjectLABS: yup
     .string()
-    .required("Subject DID is required")
-    .matches(/^did:stellar:G[A-Z0-9]{55}$/, "Invalid DID format"),
+    .required("Subject LABS is required")
+    .matches(/^LABS:stellar:G[A-Z0-9]{55}$/, "Invalid LABS format"),
   credentialType: yup.string().required("Credential type is required"),
   claims: yup.string().required("Claims are required"),
 });
@@ -78,8 +78,8 @@ const CredentialManager = () => {
   const issueForm = useForm({
     resolver: yupResolver(issueSchema),
     defaultValues: {
-      issuerDID: "",
-      subjectDID: "",
+      issuerLABS: "",
+      subjectLABS: "",
       credentialType: "university-degree",
       claims: "",
     },
@@ -122,8 +122,8 @@ const CredentialManager = () => {
       }
 
       const response = await stellarAPI.contracts.issueCredential(
-        data.issuerDID,
-        data.subjectDID,
+        data.issuerLABS,
+        data.subjectLABS,
         data.credentialType,
         claims,
       );
@@ -231,36 +231,36 @@ const CredentialManager = () => {
                     onSubmit={issueForm.handleSubmit(handleIssueCredential)}
                   >
                     <Controller
-                      name="issuerDID"
+                      name="issuerLABS"
                       control={issueForm.control}
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="Issuer DID"
-                          placeholder="did:stellar:G..."
+                          label="Issuer LABS"
+                          placeholder="LABS:stellar:G..."
                           fullWidth
                           margin="normal"
-                          error={!!issueForm.formState.errors.issuerDID}
+                          error={!!issueForm.formState.errors.issuerLABS}
                           helperText={
-                            issueForm.formState.errors.issuerDID?.message
+                            issueForm.formState.errors.issuerLABS?.message
                           }
                         />
                       )}
                     />
 
                     <Controller
-                      name="subjectDID"
+                      name="subjectLABS"
                       control={issueForm.control}
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="Subject DID"
-                          placeholder="did:stellar:G..."
+                          label="Subject LABS"
+                          placeholder="LABS:stellar:G..."
                           fullWidth
                           margin="normal"
-                          error={!!issueForm.formState.errors.subjectDID}
+                          error={!!issueForm.formState.errors.subjectLABS}
                           helperText={
-                            issueForm.formState.errors.subjectDID?.message
+                            issueForm.formState.errors.subjectLABS?.message
                           }
                         />
                       )}

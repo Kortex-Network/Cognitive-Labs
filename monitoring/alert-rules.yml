@@ -1,5 +1,5 @@
 groups:
-  - name: stellar-did-backend-alerts
+  - name: stellar-LABS-backend-alerts
     rules:
       # High error rate alert
       - alert: HighErrorRate
@@ -7,9 +7,9 @@ groups:
         for: 2m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
-          summary: "High error rate detected in Stellar DID Backend"
+          summary: "High error rate detected in Stellar LABS Backend"
           description: "Error rate is {{ $value }} errors per second for the last 5 minutes"
 
       # High memory usage alert
@@ -18,7 +18,7 @@ groups:
         for: 5m
         labels:
           severity: critical
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "Memory usage above 90%"
           description: "Memory usage is {{ $value | humanizePercentage }} of total heap"
@@ -29,21 +29,21 @@ groups:
         for: 3m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "95th percentile response time is high"
           description: "95th percentile response time is {{ $value }}s"
 
       # Service down alert
       - alert: ServiceDown
-        expr: up{job="stellar-did-backend"} == 0
+        expr: up{job="stellar-LABS-backend"} == 0
         for: 1m
         labels:
           severity: critical
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
-          summary: "Stellar DID Backend service is down"
-          description: "The Stellar DID Backend service has been down for more than 1 minute"
+          summary: "Stellar LABS Backend service is down"
+          description: "The Stellar LABS Backend service has been down for more than 1 minute"
 
       # Low cache hit rate alert
       - alert: LowCacheHitRate
@@ -51,7 +51,7 @@ groups:
         for: 5m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "Cache hit rate is below 80%"
           description: "Cache hit rate is {{ $value }}%"
@@ -62,7 +62,7 @@ groups:
         for: 2m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "High database connection usage"
           description: "Active database connections: {{ $value }}"
@@ -73,7 +73,7 @@ groups:
         for: 5m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "High queue size detected"
           description: "Queue {{ $labels.queue_name }} size is {{ $value }}"
@@ -84,7 +84,7 @@ groups:
         for: 2m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "High authentication failure rate"
           description: "Authentication failure rate is {{ $value | humanizePercentage }}"
@@ -95,7 +95,7 @@ groups:
         for: 5m
         labels:
           severity: critical
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "Blockchain sync issues"
           description: "Stellar blockchain sync status is {{ $value }}"
@@ -106,7 +106,7 @@ groups:
         for: 5m
         labels:
           severity: warning
-          service: stellar-did-backend
+          service: stellar-LABS-backend
         annotations:
           summary: "High gas usage detected"
           description: "95th percentile gas usage is {{ $value }}"

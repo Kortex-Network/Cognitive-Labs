@@ -1,6 +1,6 @@
-# DID Registry Proxy Implementation
+# Cognitive Lab Registry Proxy Implementation
 
-This directory contains the upgradeable proxy implementation for the Stellar DID Registry system using the UUPS (Universal Upgradeable Proxy Standard) pattern.
+This directory contains the upgradeable proxy implementation for the Cognitive Lab Registry system using the UUPS (Universal Upgradeable Proxy Standard) pattern.
 
 ## Architecture Overview
 
@@ -12,20 +12,20 @@ The implementation uses the UUPS proxy pattern, which provides several advantage
 
 ### Contract Structure
 
-#### 1. DIDProxy.sol
+#### 1. LABSProxy.sol
 - **Purpose**: UUPS proxy contract that delegates calls to the implementation
 - **Features**: 
   - Initializable pattern for safe initialization
   - Owner-controlled upgrade authorization
   - Fallback delegation to implementation
 
-#### 2. UpgradeableStellarDIDRegistry.sol
-- **Purpose**: Upgradeable implementation of the DID registry
+#### 2. UpgradeableStellarLABSRegistry.sol
+- **Purpose**: Upgradeable implementation of the Cognitive Lab registry
 - **Features**:
-  - All original DID registry functionality
+  - All original Cognitive Lab registry functionality
   - UUPS upgrade capability
   - Enhanced security with reentrancy protection
-  - Ownership transfer for DIDs
+  - Ownership transfer for Cognitive Labs
   - Version tracking for upgrades
 
 #### 3. ProxyAdmin.sol
@@ -69,10 +69,10 @@ npx hardhat run scripts/deploy-upgradeable-contracts.js upgrade --network sepoli
 ```javascript
 // Connect to the proxy contract (not the implementation)
 const registryAddress = "PROXY_ADDRESS"; // Use proxy address from deployment
-const registry = await ethers.getContractAt("UpgradeableStellarDIDRegistry", registryAddress);
+const registry = await ethers.getContractAt("UpgradeableStellarLABSRegistry", registryAddress);
 
 // Use the contract normally
-await registry.createDID("did:stellar:user123", publicKey, serviceEndpoint);
+await registry.createLABS("Cognitive Lab:stellar:user123", publicKey, serviceEndpoint);
 ```
 
 ### Testing
@@ -81,7 +81,7 @@ await registry.createDID("did:stellar:user123", publicKey, serviceEndpoint);
 npx hardhat test
 
 # Run specific test file
-npx hardhat test test/UpgradeableDIDRegistry.test.js
+npx hardhat test test/UpgradeableLABSRegistry.test.js
 
 # Run tests with gas reporting
 REPORT_GAS=true npx hardhat test
@@ -128,7 +128,7 @@ console.log("Current implementation:", currentImpl);
 
 After deployment, the addresses will be saved to:
 ```
-./deployments/{network-name}-upgradeable-did-registry.json
+./deployments/{network-name}-upgradeable-LABS-registry.json
 ```
 
 This file contains:
@@ -141,9 +141,9 @@ This file contains:
 
 ### Events to Monitor
 - `ImplementationUpgraded`: When the implementation is upgraded
-- `DIDCreated`: New DID creation
-- `DIDUpdated`: DID modifications
-- `DIDDeactivated`: DID deactivation
+- `LABSCreated`: New Cognitive Lab creation
+- `LABSUpdated`: Cognitive Lab modifications
+- `LABSDeactivated`: Cognitive Lab deactivation
 
 ### Health Checks
 ```javascript
@@ -177,11 +177,11 @@ const owner = await registry.owner();
 ```bash
 # Check current implementation
 npx hardhat console --network sepolia
-> const proxy = await ethers.getContractAt("DIDProxy", "PROXY_ADDRESS");
+> const proxy = await ethers.getContractAt("LABSProxy", "PROXY_ADDRESS");
 > await proxy.getImplementation();
 
 # Check contract version
-> const registry = await ethers.getContractAt("UpgradeableStellarDIDRegistry", "PROXY_ADDRESS");
+> const registry = await ethers.getContractAt("UpgradeableStellarLABSRegistry", "PROXY_ADDRESS");
 > await registry.getVersion();
 ```
 

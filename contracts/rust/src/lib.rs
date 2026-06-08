@@ -10,7 +10,7 @@ use soroban_sdk::{
 #[repr(u32)]
 pub enum Error {
     Unauthorized = 1,
-    DIDNotFound = 2,
+    LABSNotFound = 2,
     CredentialNotFound = 3,
     AlreadyRevoked = 4,
     InvalidInput = 5,
@@ -22,10 +22,10 @@ pub enum Error {
 // Data keys for storage
 #[contracttype]
 pub enum DataKey {
-    DID(Bytes),
-    DIDOwner(Bytes),
-    DIDCreated(Bytes),
-    DIDUpdated(Bytes),
+    LABS(Bytes),
+    LABSOwner(Bytes),
+    LABSCreated(Bytes),
+    LABSUpdated(Bytes),
     Credential(Bytes),
     CredentialIssuer(Bytes),
     CredentialSubject(Bytes),
@@ -34,11 +34,11 @@ pub enum DataKey {
     ContractInfo,
 }
 
-// DID Document structure
+// LABS Document structure
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct DIDDocument {
-    pub did: Bytes,
+pub struct LABSDocument {
+    pub LABS: Bytes,
     pub owner: Address,
     pub public_key: Bytes,
     pub service_endpoint: Option<String>,
@@ -73,10 +73,10 @@ pub struct ContractInfo {
 
 // Main contract implementation
 #[contract]
-pub struct DIDContract;
+pub struct LABSContract;
 
 #[contractimpl]
-impl DIDContract {
+impl LABSContract {
     /// Initialize the contract with version and network
      pub fn __constructor(env: Env, version: String, network: String, owner: Address) {
         let info = ContractInfo {
@@ -89,10 +89,10 @@ impl DIDContract {
         env.storage().instance().set(&DataKey::ContractInfo, &info);
     }
 
-    /// Register a new DID
-    pub fn register_did(
+    /// Register a new LABS
+    pub fn register_LABS(
         env: Env,
-        did: Bytes,
+        LABS: Bytes,
         public_key: Bytes,
         service_endpoint: Option<String>,
         owner: Address,
@@ -101,24 +101,24 @@ impl DIDContract {
         owner.require_auth();
 
         // Validate inputs
-        if did.len() == 0 || public_key.len() == 0 {
+        if LABS.len() == 0 || public_key.len() == 0 {
             return Err(Error::InvalidInput);
         }
 
-        // Check if DID already exists
+        // Check if LABS already exists
         if env
             .storage()
             .instance()
-            .has(&DataKey::DID(did.clone()))
+            .has(&DataKey::LABS(LABS.clone()))
         {
             return Err(Error::InvalidInput);
         }
 
         let timestamp = env.ledger().timestamp();
         
-        // Create DID document
-        let did_doc = DIDDocument {
-            did: did.clone(),
+        // Create LABS document
+        let LABS_doc = LABSDocument {
+            LABS: LABS.clone(),
             owner: owner.clone(),
             public_key: public_key.clone(),
             service_endpoint,
@@ -127,31 +127,31 @@ impl DIDContract {
             active: true,
         };
 
-        // Store DID document
+        // Store LABS document
         env.storage()
             .instance()
-            .set(&DataKey::DID(did.clone()), &did_doc);
+            .set(&DataKey::LABS(LABS.clone()), &LABS_doc);
         
         // Store owner mapping
         env.storage()
             .instance()
-            .set(&DataKey::DIDOwner(did.clone()), &owner);
+            .set(&DataKey::LABSOwner(LABS.clone()), &owner);
         
         // Store timestamps
         env.storage()
             .instance()
-            .set(&DataKey::DIDCreated(did.clone()), &timestamp);
+            .set(&DataKey::LABSCreated(LABS.clone()), &timestamp);
         env.storage()
             .instance()
-            .set(&DataKey::DIDUpdated(did.clone()), &timestamp);
+            .set(&DataKey::LABSUpdated(LABS.clone()), &timestamp);
 
         Ok(())
     }
 
-    /// Update DID document
-    pub fn update_did(
+    /// Update LABS document
+    pub fn update_LABS(
         env: Env,
-        did: Bytes,
+        LABS: Bytes,
         public_key: Option<Bytes>,
         service_endpoint: Option<String>,
         updater: Address,
@@ -159,81 +159,81 @@ impl DIDContract {
         // Require the updater to sign this transaction
         updater.require_auth();
 
-        // Get existing DID document
-        let mut did_doc: DIDDocument = env
+        // Get existing LABS document
+        let mut LABS_doc: LABSDocument = env
             .storage()
             .instance()
-            .get(&DataKey::DID(did.clone()))
-            .ok_or(Error::DIDNotFound)?;
+            .get(&DataKey::LABS(LABS.clone()))
+            .ok_or(Error::LABSNotFound)?;
 
         // Check authorization
-        if did_doc.owner != updater {
+        if LABS_doc.owner != updater {
             return Err(Error::Unauthorized);
         }
 
-        if !did_doc.active {
+        if !LABS_doc.active {
             return Err(Error::InvalidInput);
         }
 
         // Update fields if provided
         if let Some(new_key) = public_key {
-            did_doc.public_key = new_key;
+            LABS_doc.public_key = new_key;
         }
         
         if let Some(new_endpoint) = service_endpoint {
-            did_doc.service_endpoint = Some(new_endpoint);
+            LABS_doc.service_endpoint = Some(new_endpoint);
         }
 
         let timestamp = env.ledger().timestamp();
-        did_doc.updated = timestamp;
+        LABS_doc.updated = timestamp;
 
         // Store updated document
         env.storage()
             .instance()
-            .set(&DataKey::DID(did.clone()), &did_doc);
+            .set(&DataKey::LABS(LABS.clone()), &LABS_doc);
         env.storage()
             .instance()
-            .set(&DataKey::DIDUpdated(did.clone()), &timestamp);
+            .set(&DataKey::LABSUpdated(LABS.clone()), &timestamp);
 
         Ok(())
     }
 
-    /// Deactivate DID
-    pub fn deactivate_did(env: Env, did: Bytes, deactivator: Address) -> Result<(), Error> {
+    /// Deactivate LABS
+    pub fn deactivate_LABS(env: Env, LABS: Bytes, deactivator: Address) -> Result<(), Error> {
         // Require the deactivator to sign this transaction
         deactivator.require_auth();
 
-        let mut did_doc: DIDDocument = env
+        let mut LABS_doc: LABSDocument = env
             .storage()
             .instance()
-            .get(&DataKey::DID(did.clone()))
-            .ok_or(Error::DIDNotFound)?;
+            .get(&DataKey::LABS(LABS.clone()))
+            .ok_or(Error::LABSNotFound)?;
 
         // Check authorization
-        if did_doc.owner != deactivator {
+        if LABS_doc.owner != deactivator {
             return Err(Error::Unauthorized);
         }
 
-        if !did_doc.active {
+        if !LABS_doc.active {
             return Err(Error::InvalidInput);
         }
 
-        did_doc.active = false;
-        did_doc.updated = env.ledger().timestamp();
+        LABS_doc.active = false;
+        LABS_doc.updated = env.ledger().timestamp();
 
         env.storage()
             .instance()
-            .set(&DataKey::DID(did.clone()), &did_doc);
+            .set(&DataKey::LABS(LABS.clone()), &LABS_doc);
 
         Ok(())
     }
 
-    /// Resolve DID document
-    pub fn resolve_did(env: Env, did: Bytes) -> Result<DIDDocument, Error> {
+    /// Resolve LABS document
+    pub fn resolve_LABS(env: Env, LABS: Bytes) -> Result<LABSDocument, Error> {
         env.storage()
             .instance()
-            .get(&DataKey::DID(did))
-            .ok_or(Error::DIDNotFound)
+            .get(&DataKey::LABS(LABS))
+            .ok_or(Error::LABSNotFound)
     }
 
     /// Issue verifiable credential
@@ -262,13 +262,13 @@ impl DIDContract {
         }
 
         // Verify issuer exists and is authorized
-        let issuer_did: DIDDocument = env
+        let issuer_LABS: LABSDocument = env
             .storage()
             .instance()
-            .get(&DataKey::DID(issuer.clone()))
-            .ok_or(Error::DIDNotFound)?;
+            .get(&DataKey::LABS(issuer.clone()))
+            .ok_or(Error::LABSNotFound)?;
 
-        if issuer_did.owner != issuer_address {
+        if issuer_LABS.owner != issuer_address {
             return Err(Error::Unauthorized);
         }
 
@@ -337,13 +337,13 @@ impl DIDContract {
         }
 
         // Get issuer to verify authorization
-        let issuer_did: DIDDocument = env
+        let issuer_LABS: LABSDocument = env
             .storage()
             .instance()
-            .get(&DataKey::DID(credential.issuer.clone()))
-            .ok_or(Error::DIDNotFound)?;
+            .get(&DataKey::LABS(credential.issuer.clone()))
+            .ok_or(Error::LABSNotFound)?;
 
-        if issuer_did.owner != revoker_address {
+        if issuer_LABS.owner != revoker_address {
             return Err(Error::Unauthorized);
         }
 
@@ -396,15 +396,15 @@ impl DIDContract {
             .ok_or(Error::CredentialNotFound)
     }
 
-    /// Get all DIDs for an owner
-    pub fn get_owner_dids(env: Env, owner: Address) -> Result<Vec<Bytes>, Error> {
+    /// Get all LABSs for an owner
+    pub fn get_owner_LABSs(env: Env, owner: Address) -> Result<Vec<Bytes>, Error> {
         // This is a simplified implementation
         // In production, you'd maintain an index or use more efficient querying
-        let mut dids = Vec::new(&env);
+        let mut LABSs = Vec::new(&env);
         
         // For now, return empty vector as implementing efficient owner querying
         // would require more complex indexing
-        Ok(dids)
+        Ok(LABSs)
     }
 
     /// Get contract information
@@ -412,14 +412,14 @@ impl DIDContract {
         env.storage()
             .instance()
             .get(&DataKey::ContractInfo)
-            .ok_or(Error::DIDNotFound)
+            .ok_or(Error::LABSNotFound)
     }
 
-    /// Check if DID exists
-    pub fn did_exists(env: Env, did: Bytes) -> bool {
+    /// Check if LABS exists
+    pub fn LABS_exists(env: Env, LABS: Bytes) -> bool {
         env.storage()
             .instance()
-            .has(&DataKey::DID(did))
+            .has(&DataKey::LABS(LABS))
     }
 
     /// Check if credential exists

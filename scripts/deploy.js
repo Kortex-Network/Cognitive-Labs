@@ -3,9 +3,9 @@ const fs = require("fs");
 const path = require("path");
 
 /**
- * Deployment script for IntegratedDIDRegistry
+ * Deployment script for IntegratedLABSRegistry
  * 
- * This script deploys the complete DID registry solution addressing:
+ * This script deploys the complete LABS registry solution addressing:
  * - Issue #140: Enhanced RBAC with fine-grained permissions
  * - Issue #139: Upgradeable contract pattern with proxy
  * - Issue #138: Gas optimization for 30%+ reduction
@@ -14,7 +14,7 @@ const path = require("path");
  */
 
 async function main() {
-    console.log("🚀 Starting IntegratedDIDRegistry deployment...");
+    console.log("🚀 Starting IntegratedLABSRegistry deployment...");
     
     const [deployer] = await ethers.getSigners();
     console.log("📦 Deploying with account:", deployer.address);
@@ -49,21 +49,21 @@ async function main() {
         console.log("✅ EnhancedProxy deployed to:", proxy.address);
 
         // 3. Deploy Gas Optimized Registry
-        console.log("⛽ Deploying GasOptimizedDIDRegistry...");
-        const GasOptimizedRegistry = await ethers.getContractFactory("GasOptimizedDIDRegistry");
+        console.log("⛽ Deploying GasOptimizedLABSRegistry...");
+        const GasOptimizedRegistry = await ethers.getContractFactory("GasOptimizedLABSRegistry");
         const gasOptimizedRegistry = await GasOptimizedRegistry.deploy(accessControl.address);
         await gasOptimizedRegistry.deployed();
-        console.log("✅ GasOptimizedDIDRegistry deployed to:", gasOptimizedRegistry.address);
+        console.log("✅ GasOptimizedLABSRegistry deployed to:", gasOptimizedRegistry.address);
 
         // 4. Deploy Integrated Registry
-        console.log("🔗 Deploying IntegratedDIDRegistry...");
-        const IntegratedRegistry = await ethers.getContractFactory("IntegratedDIDRegistry");
+        console.log("🔗 Deploying IntegratedLABSRegistry...");
+        const IntegratedRegistry = await ethers.getContractFactory("IntegratedLABSRegistry");
         const integratedRegistry = await IntegratedRegistry.deploy();
         await integratedRegistry.deployed();
-        console.log("✅ IntegratedDIDRegistry deployed to:", integratedRegistry.address);
+        console.log("✅ IntegratedLABSRegistry deployed to:", integratedRegistry.address);
 
         // 5. Initialize Integrated Registry
-        console.log("🎯 Initializing IntegratedDIDRegistry...");
+        console.log("🎯 Initializing IntegratedLABSRegistry...");
         const initTx = await integratedRegistry.initialize(
             accessControl.address,
             proxy.address,
@@ -72,7 +72,7 @@ async function main() {
             config.gasOptimizationEnabled
         );
         await initTx.wait();
-        console.log("✅ IntegratedDIDRegistry initialized");
+        console.log("✅ IntegratedLABSRegistry initialized");
 
         // 6. Setup initial roles and permissions
         console.log("👥 Setting up initial roles...");
@@ -218,12 +218,12 @@ async function generateABIs(accessControl, proxy, gasOptimizedRegistry, integrat
     );
 
     fs.writeFileSync(
-        path.join(artifactsDir, "GasOptimizedDIDRegistry.json"),
+        path.join(artifactsDir, "GasOptimizedLABSRegistry.json"),
         JSON.stringify(gasOptimizedRegistry.interface.format(ethers.utils.FormatTypes.json), null, 2)
     );
 
     fs.writeFileSync(
-        path.join(artifactsDir, "IntegratedDIDRegistry.json"),
+        path.join(artifactsDir, "IntegratedLABSRegistry.json"),
         JSON.stringify(integratedRegistry.interface.format(ethers.utils.FormatTypes.json), null, 2)
     );
 

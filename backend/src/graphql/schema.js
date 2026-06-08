@@ -4,9 +4,9 @@ const typeDefs = gql`
   scalar DateTime
   scalar JSON
 
-  type DIDDocument {
+  type LABSDocument {
     id: ID!
-    did: String!
+    LABS: String!
     owner: String!
     publicKey: String!
     created: DateTime!
@@ -128,8 +128,8 @@ const typeDefs = gql`
   }
 
   type NetworkStats {
-    totalDIDs: Int!
-    activeDIDs: Int!
+    totalLABSs: Int!
+    activeLABSs: Int!
     totalCredentials: Int!
     activeCredentials: Int!
     totalTransactions: Int!
@@ -138,17 +138,17 @@ const typeDefs = gql`
   }
 
   type Query {
-    # DID Queries
-    did(did: String!): DIDDocument
-    dids(
+    # LABS Queries
+    LABS(LABS: String!): LABSDocument
+    LABSs(
       owner: String
       active: Boolean
       limit: Int = 10
       offset: Int = 0
       sortBy: String = "created"
       sortOrder: String = "desc"
-    ): [DIDDocument!]!
-    didCount(active: Boolean): Int!
+    ): [LABSDocument!]!
+    LABSCount(active: Boolean): Int!
 
     # Credential Queries
     credential(id: ID!): VerifiableCredential
@@ -203,29 +203,29 @@ const typeDefs = gql`
     networkStats: NetworkStats
 
     # Search Queries
-    searchDIDs(query: String!, limit: Int = 10): [DIDDocument!]!
+    searchLABSs(query: String!, limit: Int = 10): [LABSDocument!]!
     searchCredentials(query: String!, limit: Int = 10): [VerifiableCredential!]!
   }
 
   type Mutation {
-    # DID Mutations
-    createDID(
-      did: String!
+    # LABS Mutations
+    createLABS(
+      LABS: String!
       publicKey: String!
       serviceEndpoint: String
       verificationMethods: [VerificationMethodInput!]
       services: [ServiceInput!]
-    ): DIDDocument!
+    ): LABSDocument!
 
-    updateDID(
-      did: String!
+    updateLABS(
+      LABS: String!
       publicKey: String
       serviceEndpoint: String
       verificationMethods: [VerificationMethodInput!]
       services: [ServiceInput!]
-    ): DIDDocument!
+    ): LABSDocument!
 
-    deactivateDID(did: String!): DIDDocument!
+    deactivateLABS(LABS: String!): LABSDocument!
 
     # Credential Mutations
     issueCredential(
@@ -264,10 +264,10 @@ const typeDefs = gql`
   }
 
   type Subscription {
-    # DID Subscriptions
-    didCreated(owner: String): DIDDocument!
-    didUpdated(did: String): DIDDocument!
-    didDeactivated(did: String): DIDDocument!
+    # LABS Subscriptions
+    LABSCreated(owner: String): LABSDocument!
+    LABSUpdated(LABS: String): LABSDocument!
+    LABSDeactivated(LABS: String): LABSDocument!
 
     # Credential Subscriptions
     credentialIssued(issuer: String, subject: String): VerifiableCredential!
@@ -320,7 +320,7 @@ const typeDefs = gql`
     details: JSON
   }
 
-  union SearchResult = DIDDocument | VerifiableCredential | StellarAccount | Transaction
+  union SearchResult = LABSDocument | VerifiableCredential | StellarAccount | Transaction
 `;
 
 module.exports = typeDefs;

@@ -3,7 +3,7 @@
 ## Issue #140: Improve Contract Access Control
 
 ### Summary
-This pull request implements a comprehensive Role-Based Access Control (RBAC) system with fine-grained permissions for the Decentralized Identity DID Registry, addressing issue #140. The implementation provides enterprise-grade access control with hierarchical roles, resource-specific permissions, and advanced security features.
+This pull request implements a comprehensive Role-Based Access Control (RBAC) system with fine-grained permissions for the Cognitive Lab Registry, addressing issue #140. The implementation provides enterprise-grade access control with hierarchical roles, resource-specific permissions, and advanced security features.
 
 ### 🎯 Acceptance Criteria Met
 ✅ **RBAC Implementation**: Complete role-based access control system  
@@ -12,13 +12,13 @@ This pull request implements a comprehensive Role-Based Access Control (RBAC) sy
 ✅ **Time-Based Access**: Permissions with expiration support  
 ✅ **Emergency Controls**: Emergency access mechanisms  
 ✅ **Audit Trail**: Comprehensive logging and monitoring  
-✅ **Integration**: Seamless integration with existing DID registry  
+✅ **Integration**: Seamless integration with existing Cognitive Lab registry  
 
 ### 🔧 Key Components Implemented
 
 #### 1. Enhanced Access Control Contract (`contracts/access/EnhancedAccessControl.sol`)
 - **Hierarchical Role System**: 6-tier role hierarchy (Admin, Governor, Issuer, Validator, User, Auditor)
-- **Resource Types**: DID, Credential, Governance, System, Bridge operations
+- **Resource Types**: Cognitive Lab, Credential, Governance, System, Bridge operations
 - **Operation Types**: Create, Read, Update, Delete, Admin, Validate, Execute, Migrate
 - **Advanced Features**:
   - Time-based permissions with expiration
@@ -28,9 +28,9 @@ This pull request implements a comprehensive Role-Based Access Control (RBAC) sy
   - Comprehensive audit trail
   - Role inheritance and hierarchy
 
-#### 2. Integrated DID Registry (`contracts/IntegratedDIDRegistry.sol`)
+#### 2. Integrated Cognitive Lab Registry (`contracts/IntegratedLABSRegistry.sol`)
 - **RBAC Integration**: Seamless integration with access control system
-- **Permission-Based Operations**: All DID operations protected by RBAC
+- **Permission-Based Operations**: All Cognitive Lab operations protected by RBAC
 - **Performance Metrics**: RBAC check tracking and optimization
 - **Feature Management**: Dynamic RBAC enable/disable capabilities
 
@@ -41,7 +41,7 @@ This pull request implements a comprehensive Role-Based Access Control (RBAC) sy
   - Emergency access testing
   - Permission checking validation
   - Gas optimization verification
-- **Integration Tests** (`contracts/test/IntegratedDIDRegistry.RBAC.test.js`)
+- **Integration Tests** (`contracts/test/IntegratedLABSRegistry.RBAC.test.js`)
   - RBAC integration testing
   - Permission-based operation testing
   - Batch operations with RBAC
@@ -61,7 +61,7 @@ ROLE_ADMIN (Level 0)
 ```
 
 #### Permission Matrix
-| Role | DID | Credential | Governance | System | Bridge |
+| Role | Cognitive Lab | Credential | Governance | System | Bridge |
 |------|-----|------------|------------|--------|--------|
 | Admin | ✅ All | ✅ All | ✅ All | ✅ All | ✅ All |
 | Governor | Validate | Validate | All | - | - |
@@ -73,7 +73,7 @@ ROLE_ADMIN (Level 0)
 ### 🚀 Key Features
 
 #### 1. Fine-Grained Permissions
-- **Resource-Level Control**: Separate permissions for DID, Credential, Governance, System, and Bridge operations
+- **Resource-Level Control**: Separate permissions for Cognitive Lab, Credential, Governance, System, and Bridge operations
 - **Operation-Level Control**: Granular permissions for Create, Read, Update, Delete, Admin, Validate, Execute, Migrate operations
 - **Context-Aware**: Permissions can include conditional rules and context validation
 
@@ -176,7 +176,7 @@ ROLE_ADMIN (Level 0)
 - [x] Time-based access controls
 - [x] Emergency access mechanisms
 - [x] Comprehensive audit trail
-- [x] Integration with DID Registry
+- [x] Integration with Cognitive Lab Registry
 - [x] Performance optimization
 - [x] Comprehensive test suite
 - [x] Documentation and examples
@@ -188,12 +188,12 @@ ROLE_ADMIN (Level 0)
 # Deploy Enhanced Access Control
 npx hardhat run scripts/deploy-access-control.js
 
-# Deploy Integrated DID Registry
+# Deploy Integrated Cognitive Lab Registry
 npx hardhat run scripts/deploy-integrated-registry.js
 
 # Run tests
 npx hardhat test contracts/test/EnhancedAccessControl.test.js
-npx hardhat test contracts/test/IntegratedDIDRegistry.RBAC.test.js
+npx hardhat test contracts/test/IntegratedLABSRegistry.RBAC.test.js
 ```
 
 #### 2. Initial Setup
@@ -236,6 +236,6 @@ npx hardhat test --grep "Integration"
 
 This implementation successfully addresses issue #140 by providing a comprehensive RBAC system with fine-grained permissions. The solution offers enterprise-grade security, flexibility, and performance while maintaining backward compatibility and providing a clear migration path.
 
-The RBAC system enhances the DID registry's security posture and prepares it for enterprise adoption with proper access controls, audit trails, and compliance features.
+The RBAC system enhances the Cognitive Lab registry's security posture and prepares it for enterprise adoption with proper access controls, audit trails, and compliance features.
 
 **Status**: ✅ Ready for Review and Merge

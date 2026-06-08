@@ -9,10 +9,10 @@ const {
 
 // ─── Arbitraries ────────────────────────────────────────────────────────────
 
-const arbitraryDIDPayload = () =>
+const arbitraryLABSPayload = () =>
   fc.record({
-    type: fc.constant("did"),
-    did: fc
+    type: fc.constant("LABS"),
+    LABS: fc
       .string({ minLength: 1, maxLength: 64 })
       .filter((s) => s.trim().length > 0),
   });
@@ -35,7 +35,7 @@ const arbitraryConnectionPayload = () =>
 
 const arbitraryQRPayload = () =>
   fc.oneof(
-    arbitraryDIDPayload(),
+    arbitraryLABSPayload(),
     arbitraryCredentialPayload(),
     arbitraryConnectionPayload(),
   );
@@ -43,15 +43,15 @@ const arbitraryQRPayload = () =>
 const arbitraryInvalidPayload = () =>
   fc.oneof(
     // missing type
-    fc.record({ did: fc.string({ minLength: 1 }) }),
+    fc.record({ LABS: fc.string({ minLength: 1 }) }),
     // wrong type
     fc.record({
       type: fc
         .string({ minLength: 1 })
-        .filter((s) => !["did", "credential", "connection"].includes(s)),
+        .filter((s) => !["LABS", "credential", "connection"].includes(s)),
     }),
-    // did type missing did field
-    fc.record({ type: fc.constant("did") }),
+    // LABS type missing LABS field
+    fc.record({ type: fc.constant("LABS") }),
     // credential type missing credentialId
     fc.record({ type: fc.constant("credential") }),
     // connection type missing publicKey
@@ -61,8 +61,8 @@ const arbitraryInvalidPayload = () =>
 // ─── Unit Tests ──────────────────────────────────────────────────────────────
 
 describe("validateSchema", () => {
-  test("accepts valid DID payload", () => {
-    expect(validateSchema({ type: "did", did: "did:stellar:abc" })).toEqual({
+  test("accepts valid LABS payload", () => {
+    expect(validateSchema({ type: "LABS", LABS: "LABS:stellar:abc" })).toEqual({
       valid: true,
       errors: [],
     });
@@ -81,7 +81,7 @@ describe("validateSchema", () => {
   });
 
   test("rejects missing type", () => {
-    const result = validateSchema({ did: "did:stellar:abc" });
+    const result = validateSchema({ LABS: "LABS:stellar:abc" });
     expect(result.valid).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
   });
@@ -99,28 +99,28 @@ describe("validateSchema", () => {
 });
 
 describe("encodeDeepLink / decodeDeepLink", () => {
-  test("round-trips a DID payload", () => {
-    const payload = { type: "did", did: "did:stellar:abc" };
+  test("round-trips a LABS payload", () => {
+    const payload = { type: "LABS", LABS: "LABS:stellar:abc" };
     expect(decodeDeepLink(encodeDeepLink(payload))).toEqual(payload);
   });
 
-  test("URI starts with did-marketplace://qr?payload=", () => {
-    const uri = encodeDeepLink({ type: "did", did: "x" });
-    expect(uri.startsWith("did-marketplace://qr?payload=")).toBe(true);
+  test("URI starts with LABS-marketplace://qr?payload=", () => {
+    const uri = encodeDeepLink({ type: "LABS", LABS: "x" });
+    expect(uri.startsWith("LABS-marketplace://qr?payload=")).toBe(true);
   });
 
   test("decodeDeepLink throws on missing payload param", () => {
-    expect(() => decodeDeepLink("did-marketplace://qr")).toThrow();
+    expect(() => decodeDeepLink("LABS-marketplace://qr")).toThrow();
   });
 });
 
 describe("generateToken / validateToken", () => {
   test("generates and validates a token round-trip", () => {
-    const payload = { type: "did", did: "did:stellar:abc" };
+    const payload = { type: "LABS", LABS: "LABS:stellar:abc" };
     const { token } = generateToken(payload);
     const decoded = validateToken(token);
-    expect(decoded.type).toBe("did");
-    expect(decoded.did).toBe("did:stellar:abc");
+    expect(decoded.type).toBe("LABS");
+    expect(decoded.LABS).toBe("LABS:stellar:abc");
   });
 
   test("generateToken throws on invalid payload", () => {
@@ -128,7 +128,7 @@ describe("generateToken / validateToken", () => {
   });
 
   test("validateToken throws on tampered token", () => {
-    const { token } = generateToken({ type: "did", did: "x" });
+    const { token } = generateToken({ type: "LABS", LABS: "x" });
     expect(() => validateToken(token + "tampered")).toThrow();
   });
 });
@@ -167,7 +167,7 @@ describe("Property 5: Deep Link URI Format", () => {
     fc.assert(
       fc.property(arbitraryQRPayload(), (payload) => {
         const uri = encodeDeepLink(payload);
-        expect(uri.startsWith("did-marketplace://qr?payload=")).toBe(true);
+        expect(uri.startsWith("LABS-marketplace://qr?payload=")).toBe(true);
         const decoded = decodeDeepLink(uri);
         expect(decoded).toEqual(payload);
       }),

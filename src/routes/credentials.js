@@ -1,8 +1,8 @@
 const express = require('express');
-const DIDService = require('../services/didService');
+const LABSService = require('../services/LABSService');
 
 const router = express.Router();
-const didService = new DIDService();
+const LABSService = new LABSService();
 
 /**
  * POST /api/credentials/issue
@@ -11,8 +11,8 @@ const didService = new DIDService();
 router.post('/issue', async (req, res) => {
   try {
     const { 
-      issuerDid, 
-      subjectDid, 
+      issuerLABS, 
+      subjectLABS, 
       claims, 
       type = [],
       expirationDate,
@@ -20,22 +20,22 @@ router.post('/issue', async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!issuerDid || !subjectDid || !claims) {
+    if (!issuerLABS || !subjectLABS || !claims) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: issuerDid, subjectDid, claims'
+        error: 'Missing required fields: issuerLABS, subjectLABS, claims'
       });
     }
 
-    // Verify issuer DID exists
-    await didService.resolveDID(issuerDid);
+    // Verify issuer LABS exists
+    await LABSService.resolveLABS(issuerLABS);
     
-    // Verify subject DID exists
-    await didService.resolveDID(subjectDid);
+    // Verify subject LABS exists
+    await LABSService.resolveLABS(subjectLABS);
 
-    const credential = await didService.createVerifiableCredential(
-      issuerDid,
-      subjectDid,
+    const credential = await LABSService.createVerifiableCredential(
+      issuerLABS,
+      subjectLABS,
       claims,
       {
         type,
@@ -72,7 +72,7 @@ router.post('/verify', async (req, res) => {
       });
     }
 
-    const verification = await didService.verifyCredential(credential);
+    const verification = await LABSService.verifyCredential(credential);
 
     res.json({
       success: true,
@@ -96,29 +96,29 @@ router.post('/verify', async (req, res) => {
  */
 router.post('/batch-issue', async (req, res) => {
   try {
-    const { issuerDid, credentials } = req.body;
+    const { issuerLABS, credentials } = req.body;
 
-    if (!issuerDid || !credentials || !Array.isArray(credentials)) {
+    if (!issuerLABS || !credentials || !Array.isArray(credentials)) {
       return res.status(400).json({
         success: false,
-        error: 'issuerDid and credentials array are required'
+        error: 'issuerLABS and credentials array are required'
       });
     }
 
-    // Verify issuer DID exists
-    await didService.resolveDID(issuerDid);
+    // Verify issuer LABS exists
+    await LABSService.resolveLABS(issuerLABS);
 
     const issuedCredentials = [];
 
     for (const cred of credentials) {
-      const { subjectDid, claims, type = [], expirationDate } = cred;
+      const { subjectLABS, claims, type = [], expirationDate } = cred;
       
-      // Verify subject DID exists
-      await didService.resolveDID(subjectDid);
+      // Verify subject LABS exists
+      await LABSService.resolveLABS(subjectLABS);
       
-      const credential = await didService.createVerifiableCredential(
-        issuerDid,
-        subjectDid,
+      const credential = await LABSService.createVerifiableCredential(
+        issuerLABS,
+        subjectLABS,
         claims,
         {
           type,
@@ -161,7 +161,7 @@ router.post('/batch-verify', async (req, res) => {
     const verifications = [];
 
     for (const credential of credentials) {
-      const verification = await didService.verifyCredential(credential);
+      const verification = await LABSService.verifyCredential(credential);
       verifications.push({
         credentialId: credential.id,
         ...verification
@@ -264,16 +264,16 @@ router.post('/from-template', async (req, res) => {
   try {
     const { 
       templateId, 
-      issuerDid, 
-      subjectDid, 
+      issuerLABS, 
+      subjectLABS, 
       customClaims = {},
       expirationDate 
     } = req.body;
 
-    if (!templateId || !issuerDid || !subjectDid) {
+    if (!templateId || !issuerLABS || !subjectLABS) {
       return res.status(400).json({
         success: false,
-        error: 'templateId, issuerDid, and subjectDid are required'
+        error: 'templateId, issuerLABS, and subjectLABS are required'
       });
     }
 
@@ -294,9 +294,9 @@ router.post('/from-template', async (req, res) => {
     // Merge template claims with custom claims
     const claims = { ...template.claims, ...customClaims };
 
-    const credential = await didService.createVerifiableCredential(
-      issuerDid,
-      subjectDid,
+    const credential = await LABSService.createVerifiableCredential(
+      issuerLABS,
+      subjectLABS,
       claims,
       {
         type: template.type,
@@ -324,12 +324,12 @@ router.post('/from-template', async (req, res) => {
  */
 router.post('/revoke', async (req, res) => {
   try {
-    const { credentialId, issuerDid, reason } = req.body;
+    const { credentialId, issuerLABS, reason } = req.body;
 
-    if (!credentialId || !issuerDid) {
+    if (!credentialId || !issuerLABS) {
       return res.status(400).json({
         success: false,
-        error: 'credentialId and issuerDid are required'
+        error: 'credentialId and issuerLABS are required'
       });
     }
 
@@ -340,7 +340,7 @@ router.post('/revoke', async (req, res) => {
 
     const revocation = {
       credentialId,
-      issuerDid,
+      issuerLABS,
       revokedAt: new Date().toISOString(),
       reason: reason || 'Revoked by issuer',
       status: 'revoked'

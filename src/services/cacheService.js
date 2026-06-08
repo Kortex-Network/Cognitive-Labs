@@ -7,7 +7,7 @@ class CacheService {
   constructor() {
     this.client = null;
     this.enabled = false;
-    this.defaultTTL = Number(process.env.CACHE_TTL_SECONDS || process.env.DID_CACHE_TTL || 300);
+    this.defaultTTL = Number(process.env.CACHE_TTL_SECONDS || process.env.LABS_CACHE_TTL || 300);
     this.connecting = this.connect();
   }
 

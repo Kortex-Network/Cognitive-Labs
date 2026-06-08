@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Stellar DID Platform includes a comprehensive testing suite designed to prevent regression issues, ensure API reliability, and maintain high code quality. This documentation covers the testing architecture, implementation, and usage.
+The Cognitive Lab Platform includes a comprehensive testing suite designed to prevent regression issues, ensure API reliability, and maintain high code quality. This documentation covers the testing architecture, implementation, and usage.
 
 ## Table of Contents
 
@@ -59,7 +59,7 @@ backend/src/tests/
 ├── config/                 # Test configuration
 │   └── test-config.js     # Test settings
 ├── fixtures/               # Test fixtures
-│   ├── dids.json          # Sample DID data
+│   ├── Cognitive Labs.json          # Sample Cognitive Lab data
 │   ├── credentials.json   # Sample credential data
 │   └── users.json         # Sample user data
 ├── runner.js               # Test runner script
@@ -83,13 +83,13 @@ backend/src/tests/
 
 **Example**:
 ```javascript
-describe('DID Service - createDID', function() {
-  it('should create DID with valid data', async function() {
-    const didData = TestData.validDID();
-    const result = await DIDService.createDID(didData);
+describe('Cognitive Lab Service - createLABS', function() {
+  it('should create Cognitive Lab with valid data', async function() {
+    const LABSData = TestData.validLABS();
+    const result = await LABSService.createLABS(LABSData);
     
     expect(result).to.have.property('id');
-    expect(result.did).to.equal(didData.did);
+    expect(result.Cognitive Lab).to.equal(LABSData.Cognitive Lab);
   });
 });
 ```
@@ -107,43 +107,43 @@ describe('DID Service - createDID', function() {
 
 **REST API Example**:
 ```javascript
-describe('POST /api/v1/did', function() {
-  it('should create DID with valid data', async function() {
-    const didData = TestData.validDID();
+describe('POST /api/v1/Cognitive Lab', function() {
+  it('should create Cognitive Lab with valid data', async function() {
+    const LABSData = TestData.validLABS();
     
     const response = await request(app)
-      .post('/api/v1/did')
+      .post('/api/v1/Cognitive Lab')
       .set('Authorization', `Bearer ${authToken}`)
-      .send(didData)
+      .send(LABSData)
       .expect(201);
     
     expect(response.body.success).to.be.true;
-    expect(response.body.data.did).to.equal(didData.did);
+    expect(response.body.data.Cognitive Lab).to.equal(LABSData.Cognitive Lab);
   });
 });
 ```
 
 **GraphQL Example**:
 ```javascript
-describe('DID GraphQL Query', function() {
-  it('should fetch DID by ID', async function() {
-    const GET_DID = gql`
-      query GetDID($did: String!) {
-        did(did: $did) {
+describe('Cognitive Lab GraphQL Query', function() {
+  it('should fetch Cognitive Lab by ID', async function() {
+    const GET_LABS = gql`
+      query GetLABS($Cognitive Lab: String!) {
+        Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
           id
-          did
+          Cognitive Lab
           active
         }
       }
     `;
     
     const response = await testServer.query({
-      query: GET_DID,
-      variables: { did: 'test-did' }
+      query: GET_LABS,
+      variables: { Cognitive Lab: 'test-Cognitive Lab' }
     });
     
     expect(response.errors).to.be.undefined;
-    expect(response.data.did).to.have.property('id');
+    expect(response.data.Cognitive Lab).to.have.property('id');
   });
 });
 ```
@@ -161,10 +161,10 @@ describe('DID GraphQL Query', function() {
 
 **Example**:
 ```javascript
-describe('Complete DID Lifecycle', function() {
-  it('should handle full DID creation to deactivation', async function() {
-    // Create DID
-    const createResponse = await createDID(didData);
+describe('Complete Cognitive Lab Lifecycle', function() {
+  it('should handle full Cognitive Lab creation to deactivation', async function() {
+    // Create Cognitive Lab
+    const createResponse = await createLABS(LABSData);
     
     // Issue credential
     const credentialResponse = await issueCredential(credentialData);
@@ -175,8 +175,8 @@ describe('Complete DID Lifecycle', function() {
     // Revoke credential
     await revokeCredential(credentialResponse.body.data.id);
     
-    // Deactivate DID
-    await deactivateDID(createResponse.body.data.did);
+    // Deactivate Cognitive Lab
+    await deactivateLABS(createResponse.body.data.Cognitive Lab);
   });
 });
 ```
@@ -194,10 +194,10 @@ describe('Complete DID Lifecycle', function() {
 
 **Example**:
 ```javascript
-describe('DID Creation Performance', function() {
-  it('should handle 100 concurrent DID creations', async function() {
+describe('Cognitive Lab Creation Performance', function() {
+  it('should handle 100 concurrent Cognitive Lab creations', async function() {
     const loadTest = await TestUtils.runLoadTest(
-      () => createDID(TestData.validDID()),
+      () => createLABS(TestData.validLABS()),
       50,  // concurrency
       10000 // duration (ms)
     );
@@ -226,7 +226,7 @@ describe('Security - Input Validation', function() {
     const maliciousInput = "'; DROP TABLE users; --";
     
     const response = await request(app)
-      .get(`/api/v1/did?owner=${maliciousInput}`)
+      .get(`/api/v1/Cognitive Lab?owner=${maliciousInput}`)
       .set('Authorization', `Bearer ${authToken}`)
       .expect(400);
     
@@ -252,8 +252,8 @@ const config = {
   },
   thresholds: {
     api: {
-      did_create: { average: 500, max: 1000 },
-      did_read: { average: 200, max: 400 },
+      LABS_create: { average: 500, max: 1000 },
+      LABS_read: { average: 200, max: 400 },
       // ... other thresholds
     }
   },
@@ -270,9 +270,9 @@ const config = {
 
 | Operation | Average (ms) | Max (ms) | Description |
 |-----------|---------------|----------|-------------|
-| DID Create | 500 | 1000 | Create new DID document |
-| DID Read | 200 | 400 | Retrieve DID document |
-| DID Update | 300 | 600 | Update DID document |
+| Cognitive Lab Create | 500 | 1000 | Create new Cognitive Lab document |
+| Cognitive Lab Read | 200 | 400 | Retrieve Cognitive Lab document |
+| Cognitive Lab Update | 300 | 600 | Update Cognitive Lab document |
 | Credential Issue | 400 | 800 | Issue verifiable credential |
 | Credential Verify | 300 | 600 | Verify credential |
 | Stellar Account | 300 | 600 | Get Stellar account info |
@@ -322,7 +322,7 @@ npm run test:watch
 
 ```bash
 # Run tests matching specific pattern
-node src/tests/runner.js --grep "DID"
+node src/tests/runner.js --grep "Cognitive Lab"
 
 # Run specific suite with pattern
 node src/tests/runner.js --suite api --grep "create"
@@ -342,22 +342,22 @@ node src/tests/runner.js --continue
 Provides methods to generate realistic test data:
 
 ```javascript
-// Generate valid DID data
-const didData = TestData.validDID({
-  did: 'did:stellar:GABC...',
+// Generate valid Cognitive Lab data
+const LABSData = TestData.validLABS({
+  Cognitive Lab: 'Cognitive Lab:stellar:GABC...',
   publicKey: 'GABC...',
   serviceEndpoint: 'https://example.com'
 });
 
 // Generate valid credential data
 const credentialData = TestData.validCredential({
-  issuer: 'did:stellar:GABC...',
-  subject: 'did:stellar:GDEF...',
+  issuer: 'Cognitive Lab:stellar:GABC...',
+  subject: 'Cognitive Lab:stellar:GDEF...',
   credentialType: 'DegreeCredential'
 });
 
 // Generate test scenarios
-const scenario = TestData.testScenario('full-did-lifecycle');
+const scenario = TestData.testScenario('full-LABS-lifecycle');
 ```
 
 ### Test Utilities
@@ -414,7 +414,7 @@ Tests API performance under various load conditions:
 describe('Load Testing', function() {
   it('should handle 50 concurrent requests', async function() {
     const loadTest = await TestUtils.runLoadTest(
-      () => request(app).get('/api/v1/did'),
+      () => request(app).get('/api/v1/Cognitive Lab'),
       50,  // concurrency
       10000 // duration (ms)
     );
@@ -448,11 +448,11 @@ Automatically detects performance regressions:
 
 ```javascript
 describe('Performance Regression', function() {
-  it('should not regress DID creation performance', function() {
-    const current = await measureDIDCreationPerformance();
-    const baseline = getPerformanceBaseline('did_create');
+  it('should not regress Cognitive Lab creation performance', function() {
+    const current = await measureLABSCreationPerformance();
+    const baseline = getPerformanceBaseline('LABS_create');
     
-    testConfig.checkPerformanceRegression(current.average, baseline.average, 'did_create');
+    testConfig.checkPerformanceRegression(current.average, baseline.average, 'LABS_create');
   });
 });
 ```
@@ -467,7 +467,7 @@ describe('Performance Regression', function() {
 describe('Authentication Security', function() {
   it('should reject requests without authentication', async function() {
     const response = await request(app)
-      .get('/api/v1/did')
+      .get('/api/v1/Cognitive Lab')
       .expect(401);
     
     expect(response.body.error.code).to.equal('UNAUTHORIZED');
@@ -477,7 +477,7 @@ describe('Authentication Security', function() {
     const expiredToken = generateExpiredToken();
     
     const response = await request(app)
-      .get('/api/v1/did')
+      .get('/api/v1/Cognitive Lab')
       .set('Authorization', `Bearer ${expiredToken}`)
       .expect(401);
   });
@@ -488,13 +488,13 @@ describe('Authentication Security', function() {
 
 ```javascript
 describe('Authorization Security', function() {
-  it('should prevent unauthorized DID access', async function() {
-    // User 1 creates DID
-    const did = await createDID(user1Token);
+  it('should prevent unauthorized Cognitive Lab access', async function() {
+    // User 1 creates Cognitive Lab
+    const Cognitive Lab = await createLABS(user1Token);
     
-    // User 2 tries to access User 1's DID
+    // User 2 tries to access User 1's Cognitive Lab
     const response = await request(app)
-      .put(`/api/v1/did/${did.id}`)
+      .put(`/api/v1/Cognitive Lab/${Cognitive Lab.id}`)
       .set('Authorization', `Bearer ${user2Token}`)
       .send({ serviceEndpoint: 'malicious.com' })
       .expect(403);
@@ -512,7 +512,7 @@ describe('Input Validation Security', function() {
     const maliciousInput = "'; DROP TABLE users; --";
     
     const response = await request(app)
-      .get(`/api/v1/did?owner=${maliciousInput}`)
+      .get(`/api/v1/Cognitive Lab?owner=${maliciousInput}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(400);
     
@@ -523,10 +523,10 @@ describe('Input Validation Security', function() {
     const xssPayload = '<script>alert("xss")</script>';
     
     const response = await request(app)
-      .post('/api/v1/did')
+      .post('/api/v1/Cognitive Lab')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        did: `did:stellar:${xssPayload}`,
+        Cognitive Lab: `Cognitive Lab:stellar:${xssPayload}`,
         publicKey: 'GABC...'
       })
       .expect(400);
@@ -543,20 +543,20 @@ describe('Input Validation Security', function() {
 ```javascript
 describe('Database Integration', function() {
   it('should maintain data consistency across operations', async function() {
-    // Create DID
-    const did = await createDID(didData);
+    // Create Cognitive Lab
+    const Cognitive Lab = await createLABS(LABSData);
     
     // Issue credential
     const credential = await issueCredential({
-      issuer: did.id,
-      subject: did.id
+      issuer: Cognitive Lab.id,
+      subject: Cognitive Lab.id
     });
     
     // Verify data consistency
-    const didCheck = await getDID(did.id);
+    const LABSCheck = await getLABS(Cognitive Lab.id);
     const credentialCheck = await getCredential(credential.id);
     
-    expect(didCheck.active).to.be.true;
+    expect(LABSCheck.active).to.be.true;
     expect(credentialCheck.revoked).to.be.false;
   });
 });
@@ -750,10 +750,10 @@ VERBOSE_TESTS=true npm run test:unit
 
 ```bash
 # Run specific test file
-npx mocha tests/unit/services/didService.test.js
+npx mocha tests/unit/services/LABSService.test.js
 
 # Run specific test case
-npx mocha tests/unit/services/didService.test.js --grep "createDID"
+npx mocha tests/unit/services/LABSService.test.js --grep "createLABS"
 ```
 
 #### 3. Generate Detailed Reports
@@ -869,6 +869,6 @@ node tests/runner.js --report json > test-results.json
 
 ## Conclusion
 
-This comprehensive testing suite provides multiple layers of protection against regression issues and ensures the Stellar DID Platform API remains reliable, secure, and performant. Regular execution of these tests, combined with continuous integration, helps maintain high code quality and confidence in deployments.
+This comprehensive testing suite provides multiple layers of protection against regression issues and ensures the Cognitive Lab Platform API remains reliable, secure, and performant. Regular execution of these tests, combined with continuous integration, helps maintain high code quality and confidence in deployments.
 
 For questions or contributions to the testing suite, please refer to the project's contribution guidelines or contact the development team.

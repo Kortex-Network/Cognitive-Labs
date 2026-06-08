@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="stellar-did-sdk",
+    name="stellar-LABS-sdk",
     version="1.0.0",
-    description="Official Python SDK for Stellar DID Platform",
+    description="Official Python SDK for Stellar LABS Platform",
     packages=find_packages(),
     install_requires=[
         "requests>=2.25.1"

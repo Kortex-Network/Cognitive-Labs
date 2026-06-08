@@ -1,16 +1,16 @@
 # Contract Storage Optimization Report
 
 ## Overview
-This document outlines the storage optimization improvements made to the DID registry contracts to reduce gas costs and improve efficiency.
+This document outlines the storage optimization improvements made to the Cognitive Lab registry contracts to reduce gas costs and improve efficiency.
 
 ## Issues Identified
 
 ### 1. Inefficient Struct Layout
 **Original Problems:**
-- `DIDDocument` struct used 7+ storage slots
+- `LABSDocument` struct used 7+ storage slots
 - `VerifiableCredential` struct used 8+ storage slots
 - Boolean fields placed after uint256 fields, wasting full storage slots
-- Redundant `did` field stored in struct when already used as mapping key
+- Redundant `Cognitive Lab` field stored in struct when already used as mapping key
 
 ### 2. Poor Variable Ordering
 - Large uint256 fields followed by small boolean fields
@@ -21,11 +21,11 @@ This document outlines the storage optimization improvements made to the DID reg
 
 ### 1. Packed Struct Layout
 
-#### DIDDocument Struct
+#### LABSDocument Struct
 **Before (7+ slots):**
 ```solidity
-struct DIDDocument {
-    string did;           // dynamic
+struct LABSDocument {
+    string Cognitive Lab;           // dynamic
     address owner;        // 20 bytes
     string publicKey;     // dynamic
     uint256 created;      // 32 bytes
@@ -37,7 +37,7 @@ struct DIDDocument {
 
 **After (4 slots minimum):**
 ```solidity
-struct DIDDocument {
+struct LABSDocument {
     address owner;        // 20 bytes
     bool active;          // 1 byte
     uint256 created;      // 32 bytes
@@ -47,7 +47,7 @@ struct DIDDocument {
 }
 ```
 
-**Gas Savings:** ~15-20% reduction in DID creation costs
+**Gas Savings:** ~15-20% reduction in Cognitive Lab creation costs
 
 #### VerifiableCredential Struct
 **Before (8+ slots):**
@@ -82,15 +82,15 @@ struct VerifiableCredential {
 
 ### 2. Redundant Storage Removal
 
-- Removed redundant `did` field from `DIDDocument` struct
-- DID is already the mapping key, storing it again wastes storage
+- Removed redundant `Cognitive Lab` field from `LABSDocument` struct
+- Cognitive Lab is already the mapping key, storing it again wastes storage
 - Updated existence checks to use `owner == address(0)` instead
 
 ### 3. Batch Operations
 
 Added batch functions to reduce transaction costs:
-- `batchBridgeDIDs()` - Create multiple DIDs in one transaction
-- `batchCreateDIDs()` - For upgradeable version
+- `batchBridgeLABSs()` - Create multiple Cognitive Labs in one transaction
+- `batchCreateLABSs()` - For upgradeable version
 - `batchIssueCredentials()` - Issue multiple credentials
 
 **Gas Savings:** ~25-30% for batch operations vs individual calls
@@ -98,8 +98,8 @@ Added batch functions to reduce transaction costs:
 ### 4. Optimized View Functions
 
 Added gas-efficient view functions:
-- `didExists()` - Check existence without loading full struct
-- `getDIDInfo()` - Get only essential fields (owner, active, updated)
+- `LABSExists()` - Check existence without loading full struct
+- `getLABSInfo()` - Get only essential fields (owner, active, updated)
 
 **Gas Savings:** ~40-50% for simple existence/info checks
 
@@ -107,20 +107,20 @@ Added gas-efficient view functions:
 
 | Operation | Original | Optimized | Savings |
 |-----------|----------|-----------|---------|
-| DID Creation | ~150,000 gas | ~120,000 gas | ~20% |
+| Cognitive Lab Creation | ~150,000 gas | ~120,000 gas | ~20% |
 | Credential Issuance | ~120,000 gas | ~100,000 gas | ~17% |
-| DID Existence Check | ~8,000 gas | ~4,000 gas | ~50% |
-| Batch DID Creation (3) | ~450,000 gas | ~320,000 gas | ~29% |
+| Cognitive Lab Existence Check | ~8,000 gas | ~4,000 gas | ~50% |
+| Batch Cognitive Lab Creation (3) | ~450,000 gas | ~320,000 gas | ~29% |
 
 ## Files Modified/Created
 
 ### Modified Files:
-1. `contracts/ethereum/EthereumDIDRegistry.sol`
-2. `contracts/proxy/UpgradeableStellarDIDRegistry.sol`
+1. `contracts/ethereum/EthereumLABSRegistry.sol`
+2. `contracts/proxy/UpgradeableStellarLABSRegistry.sol`
 
 ### New Files:
-1. `contracts/optimized/OptimizedDIDRegistry.sol`
-2. `contracts/optimized/OptimizedUpgradeableDIDRegistry.sol`
+1. `contracts/optimized/OptimizedLABSRegistry.sol`
+2. `contracts/optimized/OptimizedUpgradeableLABSRegistry.sol`
 3. `test/StorageOptimizationTest.sol`
 
 ## Testing
@@ -162,7 +162,7 @@ Potential further improvements:
 ## Conclusion
 
 The storage optimizations provide significant gas savings while maintaining all functionality. The improvements are particularly beneficial for:
-- High-frequency DID operations
+- High-frequency Cognitive Lab operations
 - Batch credential issuance
 - Large-scale deployments
 

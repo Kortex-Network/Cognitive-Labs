@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Stellar DID Platform now includes a comprehensive GraphQL API that provides flexible data querying capabilities alongside the existing REST API. This allows clients to request exactly the data they need in a single request, reducing over-fetching and under-fetching issues.
+The Cognitive Lab Platform now includes a comprehensive GraphQL API that provides flexible data querying capabilities alongside the existing REST API. This allows clients to request exactly the data they need in a single request, reducing over-fetching and under-fetching issues.
 
 ## Features
 
@@ -15,7 +15,7 @@ The Stellar DID Platform now includes a comprehensive GraphQL API that provides 
 - **Error Handling**: Comprehensive error reporting
 
 ### 📊 Available Data Types
-- DID Documents with verification methods and services
+- Cognitive Lab Documents with verification methods and services
 - Verifiable Credentials with schemas and proofs
 - Stellar Accounts and transactions
 - Contract information and network statistics
@@ -37,11 +37,11 @@ POST http://localhost:3001/graphql
 
 ### Types
 
-#### DIDDocument
+#### LABSDocument
 ```graphql
-type DIDDocument {
+type LABSDocument {
   id: ID!
-  did: String!
+  Cognitive Lab: String!
   owner: String!
   publicKey: String!
   created: DateTime!
@@ -84,12 +84,12 @@ type StellarAccount {
 
 ## Query Examples
 
-### Basic DID Query
+### Basic Cognitive Lab Query
 ```graphql
-query GetDID($did: String!) {
-  did(did: $did) {
+query GetLABS($Cognitive Lab: String!) {
+  Cognitive Lab(Cognitive Lab: $Cognitive Lab) {
     id
-    did
+    Cognitive Lab
     owner
     publicKey
     created
@@ -108,26 +108,26 @@ query GetDID($did: String!) {
 }
 ```
 
-### List DIDs with Filtering
+### List Cognitive Labs with Filtering
 ```graphql
-query ListDIDs($owner: String, $active: Boolean, $limit: Int) {
-  dids(owner: $owner, active: $active, limit: $limit) {
+query ListLABSs($owner: String, $active: Boolean, $limit: Int) {
+  Cognitive Labs(owner: $owner, active: $active, limit: $limit) {
     id
-    did
+    Cognitive Lab
     owner
     created
     active
   }
-  didCount(active: $active)
+  LABSCount(active: $active)
 }
 ```
 
-### Search DIDs
+### Search Cognitive Labs
 ```graphql
-query SearchDIDs($query: String!) {
-  searchDIDs(query: $query, limit: 10) {
+query SearchLABSs($query: String!) {
+  searchLABSs(query: $query, limit: 10) {
     id
-    did
+    Cognitive Lab
     owner
     serviceEndpoint
   }
@@ -174,8 +174,8 @@ query GetStellarAccount($address: String!) {
 ```graphql
 query GetNetworkStats {
   networkStats {
-    totalDIDs
-    activeDIDs
+    totalLABSs
+    activeLABSs
     totalCredentials
     activeCredentials
     totalTransactions
@@ -187,18 +187,18 @@ query GetNetworkStats {
 
 ## Mutation Examples
 
-### Create DID
+### Create Cognitive Lab
 ```graphql
-mutation CreateDID($input: CreateDIDInput!) {
-  createDID(
-    did: $input.did
+mutation CreateLABS($input: CreateLABSInput!) {
+  createLABS(
+    Cognitive Lab: $input.Cognitive Lab
     publicKey: $input.publicKey
     serviceEndpoint: $input.serviceEndpoint
     verificationMethods: $input.verificationMethods
     services: $input.services
   ) {
     id
-    did
+    Cognitive Lab
     owner
     created
     active
@@ -273,12 +273,12 @@ mutation CreateTransaction($input: CreateTransactionInput!) {
 
 ## Subscription Examples
 
-### Subscribe to DID Creation
+### Subscribe to Cognitive Lab Creation
 ```graphql
-subscription DIDCreated($owner: String) {
-  didCreated(owner: $owner) {
+subscription LABSCreated($owner: String) {
+  LABSCreated(owner: $owner) {
     id
-    did
+    Cognitive Lab
     owner
     created
     active
@@ -321,14 +321,14 @@ GraphQL provides structured error responses:
 {
   "errors": [
     {
-      "message": "DID not found",
+      "message": "Cognitive Lab not found",
       "code": "NOT_FOUND",
-      "path": ["did"],
+      "path": ["Cognitive Lab"],
       "locations": [{"line": 2, "column": 3}]
     }
   ],
   "data": {
-    "did": null
+    "Cognitive Lab": null
   }
 }
 ```
@@ -343,7 +343,7 @@ GraphQL provides structured error responses:
 ## Performance Optimization
 
 ### Caching
-- DID documents: 5 minutes
+- Cognitive Lab documents: 5 minutes
 - Credentials: 5 minutes
 - Stellar accounts: 30 seconds
 - Transactions: 5 minutes
@@ -352,9 +352,9 @@ GraphQL provides structured error responses:
 Use `limit` and `offset` parameters for large datasets:
 ```graphql
 query {
-  dids(limit: 20, offset: 40) {
+  Cognitive Labs(limit: 20, offset: 40) {
     id
-    did
+    Cognitive Lab
   }
 }
 ```
@@ -363,7 +363,7 @@ query {
 Request only the fields you need:
 ```graphql
 query {
-  dids {
+  Cognitive Labs {
     id  # Only request ID field
   }
 }
@@ -409,11 +409,11 @@ query {
 
 | REST Endpoint | GraphQL Equivalent |
 |---------------|-------------------|
-| `GET /api/v1/did/:did` | `query { did(did: "...") }` |
-| `GET /api/v1/did` | `query { dids(...) }` |
-| `POST /api/v1/did` | `mutation { createDID(...) }` |
-| `PUT /api/v1/did/:did` | `mutation { updateDID(...) }` |
-| `DELETE /api/v1/did/:did` | `mutation { deactivateDID(...) }` |
+| `GET /api/v1/Cognitive Lab/:Cognitive Lab` | `query { Cognitive Lab(Cognitive Lab: "...") }` |
+| `GET /api/v1/Cognitive Lab` | `query { Cognitive Labs(...) }` |
+| `POST /api/v1/Cognitive Lab` | `mutation { createLABS(...) }` |
+| `PUT /api/v1/Cognitive Lab/:Cognitive Lab` | `mutation { updateLABS(...) }` |
+| `DELETE /api/v1/Cognitive Lab/:Cognitive Lab` | `mutation { deactivateLABS(...) }` |
 
 ### Benefits
 - **Single Request**: Get related data in one query

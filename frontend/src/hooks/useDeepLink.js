@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { resolveRoute } from "../utils/qrPayload";
 
-const ALLOWED_TYPES = ["did", "credential", "connection"];
-const SCHEME = "did-marketplace://";
+const ALLOWED_TYPES = ["LABS", "credential", "connection"];
+const SCHEME = "LABS-marketplace://";
 
 /**
  * Parse a base64url-encoded string (URL-safe base64 without padding).
@@ -18,7 +18,7 @@ function base64urlDecode(str) {
 /**
  * useDeepLink hook
  *
- * Accepts a did-marketplace:// URI string and returns { route, fieldValue }
+ * Accepts a LABS-marketplace:// URI string and returns { route, fieldValue }
  * on success, or { error } on failure.
  *
  * @param {string} uri - The deep link URI to parse
@@ -35,7 +35,7 @@ function useDeepLink() {
     }
 
     // Extract the query string portion after the path
-    // Format: did-marketplace://qr?payload=<base64url>
+    // Format: LABS-marketplace://qr?payload=<base64url>
     const queryStart = uri.indexOf("?");
     if (queryStart === -1) {
       return { error: "Invalid deep link: missing payload parameter" };

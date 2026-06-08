@@ -68,7 +68,7 @@ describe('API Comprehensive Test Suite', function() {
     
     it('should reject requests without authentication', async function() {
       const response = await request(app)
-        .get('/api/v1/did')
+        .get('/api/v1/LABS')
         .expect(401);
       
       expect(response.body).to.have.property('error');
@@ -77,7 +77,7 @@ describe('API Comprehensive Test Suite', function() {
 
     it('should reject requests with invalid token', async function() {
       const response = await request(app)
-        .get('/api/v1/did')
+        .get('/api/v1/LABS')
         .set('Authorization', 'Bearer invalid-token')
         .expect(401);
       
@@ -87,7 +87,7 @@ describe('API Comprehensive Test Suite', function() {
 
     it('should accept requests with valid token', async function() {
       const response = await request(app)
-        .get('/api/v1/did')
+        .get('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
@@ -102,7 +102,7 @@ describe('API Comprehensive Test Suite', function() {
       );
       
       const response = await request(app)
-        .get('/api/v1/did')
+        .get('/api/v1/LABS')
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(401);
       
@@ -110,62 +110,62 @@ describe('API Comprehensive Test Suite', function() {
     });
   });
 
-  describe('DID API Endpoints', function() {
+  describe('LABS API Endpoints', function() {
     
-    describe('POST /api/v1/did', function() {
+    describe('POST /api/v1/LABS', function() {
       
-      it('should create a new DID with valid data', async function() {
-        const didData = TestData.validDID();
+      it('should create a new LABS with valid data', async function() {
+        const LABSData = TestData.validLABS();
         
         const response = await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData)
+          .send(LABSData)
           .expect(201);
         
         expect(response.body).to.have.property('success', true);
         expect(response.body.data).to.have.property('id');
-        expect(response.body.data.did).to.equal(didData.did);
+        expect(response.body.data.LABS).to.equal(LABSData.LABS);
         expect(response.body.data.owner).to.equal(testUser.walletAddress);
         
-        // Verify DID was created
+        // Verify LABS was created
         const verifyResponse = await request(app)
-          .get(`/api/v1/did/${didData.did}`)
+          .get(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
-        expect(verifyResponse.body.data.did).to.equal(didData.did);
+        expect(verifyResponse.body.data.LABS).to.equal(LABSData.LABS);
       });
 
-      it('should reject DID creation with duplicate DID', async function() {
-        const didData = TestData.validDID();
+      it('should reject LABS creation with duplicate LABS', async function() {
+        const LABSData = TestData.validLABS();
         
-        // Create first DID
+        // Create first LABS
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData)
+          .send(LABSData)
           .expect(201);
         
         // Try to create duplicate
         const response = await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData)
+          .send(LABSData)
           .expect(409);
         
         expect(response.body.error.code).to.equal('CONFLICT');
         expect(response.body.error.message).to.include('already exists');
       });
 
-      it('should reject DID creation with invalid data', async function() {
+      it('should reject LABS creation with invalid data', async function() {
         const invalidData = {
-          did: 'invalid-did-format',
+          LABS: 'invalid-LABS-format',
           publicKey: 'invalid-key'
         };
         
         const response = await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
           .send(invalidData)
           .expect(400);
@@ -173,13 +173,13 @@ describe('API Comprehensive Test Suite', function() {
         expect(response.body.error.code).to.equal('VALIDATION_ERROR');
       });
 
-      it('should handle DID creation with verification methods', async function() {
-        const didData = TestData.validDIDWithVerificationMethods();
+      it('should handle LABS creation with verification methods', async function() {
+        const LABSData = TestData.validLABSWithVerificationMethods();
         
         const response = await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData)
+          .send(LABSData)
           .expect(201);
         
         expect(response.body.data.verificationMethods).to.be.an('array');
@@ -187,64 +187,64 @@ describe('API Comprehensive Test Suite', function() {
       });
     });
 
-    describe('GET /api/v1/did/:did', function() {
+    describe('GET /api/v1/LABS/:LABS', function() {
       
-      it('should retrieve existing DID', async function() {
-        const didData = TestData.validDID();
+      it('should retrieve existing LABS', async function() {
+        const LABSData = TestData.validLABS();
         
-        // Create DID first
+        // Create LABS first
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData);
+          .send(LABSData);
         
-        // Retrieve DID
+        // Retrieve LABS
         const response = await request(app)
-          .get(`/api/v1/did/${didData.did}`)
+          .get(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
-        expect(response.body.data).to.have.property('did', didData.did);
-        expect(response.body.data).to.have.property('publicKey', didData.publicKey);
+        expect(response.body.data).to.have.property('LABS', LABSData.LABS);
+        expect(response.body.data).to.have.property('publicKey', LABSData.publicKey);
         expect(response.body.data).to.have.property('active', true);
       });
 
-      it('should return 404 for non-existent DID', async function() {
+      it('should return 404 for non-existent LABS', async function() {
         const response = await request(app)
-          .get('/api/v1/did/did:stellar:NONEXISTENT')
+          .get('/api/v1/LABS/LABS:stellar:NONEXISTENT')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(404);
         
         expect(response.body.error.code).to.equal('NOT_FOUND');
       });
 
-      it('should handle malformed DID parameter', async function() {
+      it('should handle malformed LABS parameter', async function() {
         const response = await request(app)
-          .get('/api/v1/did/')
+          .get('/api/v1/LABS/')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(404);
       });
     });
 
-    describe('PUT /api/v1/did/:did', function() {
+    describe('PUT /api/v1/LABS/:LABS', function() {
       
-      it('should update existing DID owned by user', async function() {
-        const didData = TestData.validDID();
+      it('should update existing LABS owned by user', async function() {
+        const LABSData = TestData.validLABS();
         
-        // Create DID first
+        // Create LABS first
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData);
+          .send(LABSData);
         
-        // Update DID
+        // Update LABS
         const updateData = {
           publicKey: 'GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
           serviceEndpoint: 'https://updated.example.com'
         };
         
         const response = await request(app)
-          .put(`/api/v1/did/${didData.did}`)
+          .put(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .send(updateData)
           .expect(200);
@@ -254,23 +254,23 @@ describe('API Comprehensive Test Suite', function() {
         expect(response.body.data.updated).to.not.equal(response.body.data.created);
       });
 
-      it('should reject update of DID not owned by user', async function() {
+      it('should reject update of LABS not owned by user', async function() {
         const otherUser = await TestUtils.createTestUser();
         const otherToken = TestUtils.generateAuthToken(otherUser);
         
-        const didData = TestData.validDID();
+        const LABSData = TestData.validLABS();
         
-        // Create DID with other user
+        // Create LABS with other user
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${otherToken}`)
-          .send(didData);
+          .send(LABSData);
         
         // Try to update with test user
         const updateData = { publicKey: 'GDEF1234567890ABCDEF1234567890ABCDEF1234567890' };
         
         const response = await request(app)
-          .put(`/api/v1/did/${didData.did}`)
+          .put(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .send(updateData)
           .expect(403);
@@ -279,19 +279,19 @@ describe('API Comprehensive Test Suite', function() {
       });
 
       it('should reject update with invalid data', async function() {
-        const didData = TestData.validDID();
+        const LABSData = TestData.validLABS();
         
-        // Create DID first
+        // Create LABS first
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData);
+          .send(LABSData);
         
         // Try invalid update
         const invalidUpdate = { publicKey: 'invalid-key' };
         
         const response = await request(app)
-          .put(`/api/v1/did/${didData.did}`)
+          .put(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .send(invalidUpdate)
           .expect(400);
@@ -300,20 +300,20 @@ describe('API Comprehensive Test Suite', function() {
       });
     });
 
-    describe('DELETE /api/v1/did/:did', function() {
+    describe('DELETE /api/v1/LABS/:LABS', function() {
       
-      it('should deactivate DID owned by user', async function() {
-        const didData = TestData.validDID();
+      it('should deactivate LABS owned by user', async function() {
+        const LABSData = TestData.validLABS();
         
-        // Create DID first
+        // Create LABS first
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData);
+          .send(LABSData);
         
-        // Deactivate DID
+        // Deactivate LABS
         const response = await request(app)
-          .delete(`/api/v1/did/${didData.did}`)
+          .delete(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -321,28 +321,28 @@ describe('API Comprehensive Test Suite', function() {
         
         // Verify deactivation
         const verifyResponse = await request(app)
-          .get(`/api/v1/did/${didData.did}`)
+          .get(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
         expect(verifyResponse.body.data.active).to.be.false;
       });
 
-      it('should reject deactivation of DID not owned by user', async function() {
+      it('should reject deactivation of LABS not owned by user', async function() {
         const otherUser = await TestUtils.createTestUser();
         const otherToken = TestUtils.generateAuthToken(otherUser);
         
-        const didData = TestData.validDID();
+        const LABSData = TestData.validLABS();
         
-        // Create DID with other user
+        // Create LABS with other user
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${otherToken}`)
-          .send(didData);
+          .send(LABSData);
         
         // Try to deactivate with test user
         const response = await request(app)
-          .delete(`/api/v1/did/${didData.did}`)
+          .delete(`/api/v1/LABS/${LABSData.LABS}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect(403);
         
@@ -350,23 +350,23 @@ describe('API Comprehensive Test Suite', function() {
       });
     });
 
-    describe('GET /api/v1/did', function() {
+    describe('GET /api/v1/LABS', function() {
       
-      it('should list DIDs with pagination', async function() {
-        // Create multiple DIDs
+      it('should list LABSs with pagination', async function() {
+        // Create multiple LABSs
         for (let i = 0; i < 5; i++) {
-          const didData = TestData.validDID();
-          didData.did = `did:stellar:GABC${i.toString().padStart(54, '0')}`;
+          const LABSData = TestData.validLABS();
+          LABSData.LABS = `LABS:stellar:GABC${i.toString().padStart(54, '0')}`;
           
           await request(app)
-            .post('/api/v1/did')
+            .post('/api/v1/LABS')
             .set('Authorization', `Bearer ${authToken}`)
-            .send(didData);
+            .send(LABSData);
         }
         
-        // List DIDs
+        // List LABSs
         const response = await request(app)
-          .get('/api/v1/did?limit=3&offset=0')
+          .get('/api/v1/LABS?limit=3&offset=0')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -377,27 +377,27 @@ describe('API Comprehensive Test Suite', function() {
         expect(response.body.meta).to.have.property('offset', 0);
       });
 
-      it('should filter DIDs by owner', async function() {
+      it('should filter LABSs by owner', async function() {
         const otherUser = await TestUtils.createTestUser();
         const otherToken = TestUtils.generateAuthToken(otherUser);
         
-        // Create DID with test user
-        const didData1 = TestData.validDID();
+        // Create LABS with test user
+        const LABSData1 = TestData.validLABS();
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData1);
+          .send(LABSData1);
         
-        // Create DID with other user
-        const didData2 = TestData.validDID();
+        // Create LABS with other user
+        const LABSData2 = TestData.validLABS();
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${otherToken}`)
-          .send(didData2);
+          .send(LABSData2);
         
         // Filter by test user
         const response = await request(app)
-          .get(`/api/v1/did?owner=${testUser.walletAddress}`)
+          .get(`/api/v1/LABS?owner=${testUser.walletAddress}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -405,28 +405,28 @@ describe('API Comprehensive Test Suite', function() {
         expect(response.body.data[0].owner).to.equal(testUser.walletAddress);
       });
 
-      it('should filter DIDs by active status', async function() {
-        // Create active DID
-        const activeDID = TestData.validDID();
+      it('should filter LABSs by active status', async function() {
+        // Create active LABS
+        const activeLABS = TestData.validLABS();
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(activeDID);
+          .send(activeLABS);
         
-        // Create and deactivate DID
-        const inactiveDID = TestData.validDID();
+        // Create and deactivate LABS
+        const inactiveLABS = TestData.validLABS();
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(inactiveDID);
+          .send(inactiveLABS);
         
         await request(app)
-          .delete(`/api/v1/did/${inactiveDID.did}`)
+          .delete(`/api/v1/LABS/${inactiveLABS.LABS}`)
           .set('Authorization', `Bearer ${authToken}`);
         
-        // Filter active DIDs
+        // Filter active LABSs
         const response = await request(app)
-          .get('/api/v1/did?active=true')
+          .get('/api/v1/LABS?active=true')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -435,21 +435,21 @@ describe('API Comprehensive Test Suite', function() {
       });
     });
 
-    describe('GET /api/v1/did/search', function() {
+    describe('GET /api/v1/LABS/search', function() {
       
-      it('should search DIDs by query', async function() {
-        // Create DID with searchable content
-        const didData = TestData.validDID();
-        didData.serviceEndpoint = 'https://university.example.com';
+      it('should search LABSs by query', async function() {
+        // Create LABS with searchable content
+        const LABSData = TestData.validLABS();
+        LABSData.serviceEndpoint = 'https://university.example.com';
         
         await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData);
+          .send(LABSData);
         
         // Search
         const response = await request(app)
-          .get('/api/v1/did/search?q=university')
+          .get('/api/v1/LABS/search?q=university')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -460,7 +460,7 @@ describe('API Comprehensive Test Suite', function() {
 
       it('should return empty results for non-matching query', async function() {
         const response = await request(app)
-          .get('/api/v1/did/search?q=nonexistent')
+          .get('/api/v1/LABS/search?q=nonexistent')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -615,7 +615,7 @@ describe('API Comprehensive Test Suite', function() {
         // Create multiple credentials
         for (let i = 0; i < 5; i++) {
           const credentialData = TestData.validCredential();
-          credentialData.issuer = `did:stellar:GABC${i.toString().padStart(54, '0')}`;
+          credentialData.issuer = `LABS:stellar:GABC${i.toString().padStart(54, '0')}`;
           
           await request(app)
             .post('/api/v1/credentials')
@@ -638,10 +638,10 @@ describe('API Comprehensive Test Suite', function() {
 
       it('should filter credentials by issuer', async function() {
         const credentialData1 = TestData.validCredential();
-        credentialData1.issuer = 'did:stellar:GABC111111111111111111111111111111111111111';
+        credentialData1.issuer = 'LABS:stellar:GABC111111111111111111111111111111111111111';
         
         const credentialData2 = TestData.validCredential();
-        credentialData2.issuer = 'did:stellar:GDEF222222222222222222222222222222222222222';
+        credentialData2.issuer = 'LABS:stellar:GDEF222222222222222222222222222222222222222';
         
         // Create credentials
         await request(app)
@@ -921,7 +921,7 @@ describe('API Comprehensive Test Suite', function() {
     
     it('should handle malformed JSON requests', async function() {
       const response = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
         .set('Content-Type', 'application/json')
         .send('invalid json')
@@ -932,7 +932,7 @@ describe('API Comprehensive Test Suite', function() {
 
     it('should handle missing required fields', async function() {
       const response = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
         .send({})
         .expect(400);
@@ -947,7 +947,7 @@ describe('API Comprehensive Test Suite', function() {
       for (let i = 0; i < 105; i++) { // Assuming rate limit is 100 per 15 minutes
         promises.push(
           request(app)
-            .get('/api/v1/did')
+            .get('/api/v1/LABS')
             .set('Authorization', `Bearer ${authToken}`)
         );
       }
@@ -961,10 +961,10 @@ describe('API Comprehensive Test Suite', function() {
 
     it('should handle server errors gracefully', async function() {
       // Mock a server error
-      TestUtils.mockServerError('/api/v1/did', 'GET');
+      TestUtils.mockServerError('/api/v1/LABS', 'GET');
       
       const response = await request(app)
-        .get('/api/v1/did')
+        .get('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(500);
       
@@ -981,7 +981,7 @@ describe('API Comprehensive Test Suite', function() {
       for (let i = 0; i < concurrentRequests; i++) {
         promises.push(
           request(app)
-            .get('/api/v1/did')
+            .get('/api/v1/LABS')
             .set('Authorization', `Bearer ${authToken}`)
         );
       }
@@ -1007,7 +1007,7 @@ describe('API Comprehensive Test Suite', function() {
         const startTime = Date.now();
         
         await request(app)
-          .get('/api/v1/did')
+          .get('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
         
@@ -1032,7 +1032,7 @@ describe('API Comprehensive Test Suite', function() {
       const maliciousInput = "'; DROP TABLE users; --";
       
       const response = await request(app)
-        .get(`/api/v1/did?owner=${maliciousInput}`)
+        .get(`/api/v1/LABS?owner=${maliciousInput}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(400);
       
@@ -1043,10 +1043,10 @@ describe('API Comprehensive Test Suite', function() {
       const xssPayload = '<script>alert("xss")</script>';
       
       const response = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          did: `did:stellar:${xssPayload}`,
+          LABS: `LABS:stellar:${xssPayload}`,
           publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890'
         })
         .expect(400);
@@ -1055,14 +1055,14 @@ describe('API Comprehensive Test Suite', function() {
     });
 
     it('should sanitize output data', async function() {
-      // Create DID with potentially malicious data
-      const didData = TestData.validDID();
-      didData.serviceEndpoint = 'https://example.com<script>alert("xss")</script>';
+      // Create LABS with potentially malicious data
+      const LABSData = TestData.validLABS();
+      LABSData.serviceEndpoint = 'https://example.com<script>alert("xss")</script>';
       
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
       // Verify data is sanitized in response
@@ -1071,7 +1071,7 @@ describe('API Comprehensive Test Suite', function() {
 
     it('should enforce CORS headers', async function() {
       const response = await request(app)
-        .options('/api/v1/did')
+        .options('/api/v1/LABS')
         .expect(200);
       
       expect(response.headers).to.have.property('access-control-allow-origin');
@@ -1081,38 +1081,38 @@ describe('API Comprehensive Test Suite', function() {
 
   describe('Integration Tests', function() {
     
-    it('should handle complete DID lifecycle', async function() {
-      // Create DID
-      const didData = TestData.validDID();
+    it('should handle complete LABS lifecycle', async function() {
+      // Create LABS
+      const LABSData = TestData.validLABS();
       const createResponse = await request(app)
-        .post('/api/v1/did')
+        .post('/api/v1/LABS')
         .set('Authorization', `Bearer ${authToken}`)
-        .send(didData)
+        .send(LABSData)
         .expect(201);
       
-      const did = createResponse.body.data.did;
+      const LABS = createResponse.body.data.LABS;
       
-      // Retrieve DID
+      // Retrieve LABS
       const getResponse = await request(app)
-        .get(`/api/v1/did/${did}`)
+        .get(`/api/v1/LABS/${LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
-      expect(getResponse.body.data.did).to.equal(did);
+      expect(getResponse.body.data.LABS).to.equal(LABS);
       
-      // Update DID
+      // Update LABS
       const updateData = { serviceEndpoint: 'https://updated.example.com' };
       const updateResponse = await request(app)
-        .put(`/api/v1/did/${did}`)
+        .put(`/api/v1/LABS/${LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send(updateData)
         .expect(200);
       
       expect(updateResponse.body.data.serviceEndpoint).to.equal(updateData.serviceEndpoint);
       
-      // Issue credential for DID
+      // Issue credential for LABS
       const credentialData = TestData.validCredential();
-      credentialData.subject = did;
+      credentialData.subject = LABS;
       
       const credentialResponse = await request(app)
         .post('/api/v1/credentials')
@@ -1135,19 +1135,19 @@ describe('API Comprehensive Test Suite', function() {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
-      // Deactivate DID
+      // Deactivate LABS
       await request(app)
-        .delete(`/api/v1/did/${did}`)
+        .delete(`/api/v1/LABS/${LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
       // Verify final state
-      const finalDIDResponse = await request(app)
-        .get(`/api/v1/did/${did}`)
+      const finalLABSResponse = await request(app)
+        .get(`/api/v1/LABS/${LABS}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
-      expect(finalDIDResponse.body.data.active).to.be.false;
+      expect(finalLABSResponse.body.data.active).to.be.false;
       
       const finalCredentialResponse = await request(app)
         .get(`/api/v1/credentials/${credentialResponse.body.data.id}`)
@@ -1158,34 +1158,34 @@ describe('API Comprehensive Test Suite', function() {
     });
 
     it('should handle batch operations', async function() {
-      // Create multiple DIDs
-      const dids = [];
+      // Create multiple LABSs
+      const LABSs = [];
       for (let i = 0; i < 3; i++) {
-        const didData = TestData.validDID();
-        didData.did = `did:stellar:GABC${i.toString().padStart(54, '0')}`;
+        const LABSData = TestData.validLABS();
+        LABSData.LABS = `LABS:stellar:GABC${i.toString().padStart(54, '0')}`;
         
         const response = await request(app)
-          .post('/api/v1/did')
+          .post('/api/v1/LABS')
           .set('Authorization', `Bearer ${authToken}`)
-          .send(didData)
+          .send(LABSData)
           .expect(201);
         
-        dids.push(response.body.data);
+        LABSs.push(response.body.data);
       }
       
-      // List all DIDs
+      // List all LABSs
       const listResponse = await request(app)
-        .get('/api/v1/did?limit=10')
+        .get('/api/v1/LABS?limit=10')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
       
       expect(listResponse.body.data).to.have.length.at.least(3);
       
-      // Create credentials for all DIDs
+      // Create credentials for all LABSs
       const credentials = [];
-      for (const did of dids) {
+      for (const LABS of LABSs) {
         const credentialData = TestData.validCredential();
-        credentialData.subject = did.did;
+        credentialData.subject = LABS.LABS;
         
         const response = await request(app)
           .post('/api/v1/credentials')

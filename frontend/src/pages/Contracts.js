@@ -123,7 +123,7 @@ const Contracts = () => {
         Smart Contracts
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Manage Stellar DID Registry smart contracts
+        Manage Stellar LABS Registry smart contracts
       </Typography>
 
       <Grid container spacing={3} role="region" aria-label="Contract management">
@@ -263,10 +263,10 @@ const Contracts = () => {
                     variant="outlined"
                     fullWidth
                     startIcon={<Security aria-hidden="true" />}
-                    href="/create-did"
-                    aria-label="Navigate to Register DID page"
+                    href="/create-LABS"
+                    aria-label="Navigate to Register LABS page"
                   >
-                    Register DID
+                    Register LABS
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
@@ -274,7 +274,7 @@ const Contracts = () => {
                     variant="outlined"
                     fullWidth
                     startIcon={<Code aria-hidden="true" />}
-                    href="https://github.com/yourusername/stellar-did-platform/blob/main/contracts/stellar/DIDContract.js"
+                    href="https://github.com/yourusername/stellar-LABS-platform/blob/main/contracts/stellar/LABSContract.js"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View contract source code on GitHub (opens in new tab)"
@@ -302,8 +302,8 @@ const Contracts = () => {
                     <CheckCircle color="success" aria-hidden="true" />
                   </ListItemIcon>
                   <ListItemText 
-                    primary="DID Registry" 
-                    secondary="Register and manage decentralized identities" 
+                    primary="LABS Registry" 
+                    secondary="Register and manage cognitive lab identities" 
                   />
                 </ListItem>
                 <Divider />
@@ -394,7 +394,7 @@ const Contracts = () => {
         <DialogTitle id="deploy-contract-dialog-title">Deploy New Contract</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }} id="deploy-contract-dialog-description">
-            Deploy a new DID Registry contract to the Stellar network. This will create a new contract account.
+            Deploy a new LABS Registry contract to the Stellar network. This will create a new contract account.
           </Typography>
           
           <TextField

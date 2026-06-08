@@ -123,7 +123,7 @@ class MetricsMiddleware {
         },
         metrics: {
           activeConnections: 'available via /metrics',
-          didRegistrySize: 'available via /metrics',
+          LABSRegistrySize: 'available via /metrics',
           cacheHitRate: 'available via /metrics',
           databaseConnections: 'available via /metrics',
           queueSize: 'available via /metrics',

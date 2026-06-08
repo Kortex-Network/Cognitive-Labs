@@ -5,7 +5,7 @@
 ### Plan Summary
 
 - Implement React.lazy + Suspense in frontend/src/App.js for route-based code splitting
-- Lazy load all pages: Dashboard, CreateDID, Credentials, Account, Contracts, ResolveDID, Scanner
+- Lazy load all pages: Dashboard, CreateLABS, Credentials, Account, Contracts, ResolveLABS, Scanner
 - Expected result: Initial bundle ~100-300KB, additional chunks loaded on navigation
 
 ## Steps (Approved by User)

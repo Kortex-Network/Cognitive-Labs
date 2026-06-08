@@ -2,18 +2,18 @@
   "navigation": {
     "dashboard": "Dashboard",
     "credentials": "Credentials",
-    "createDid": "Create DID",
-    "resolveDid": "Resolve DID",
+    "createLABS": "Create LABS",
+    "resolveLABS": "Resolve LABS",
     "connectWallet": "Connect Wallet",
     "account": "Account",
     "scanner": "Scanner",
     "contracts": "Contracts"
   },
   "dashboard": {
-    "title": "Stellar DID Platform Dashboard",
-    "subtitle": "Overview of your decentralized identity ecosystem",
+    "title": "Stellar LABS Platform Dashboard",
+    "subtitle": "Overview of your cognitive labs ecosystem",
     "stats": {
-      "totalDids": "Total DIDs",
+      "totalLABSs": "Total LABSs",
       "totalCredentials": "Total Credentials",
       "activeUsers": "Active Users",
       "network": "Network",
@@ -68,8 +68,8 @@
     "verifyCredential": "Verify Credential",
     "credentialTemplates": "Credential Templates",
     "templateClickToUse": "Click to use a template:",
-    "issuerDid": "Issuer DID",
-    "subjectDid": "Subject DID",
+    "issuerLABS": "Issuer LABS",
+    "subjectLABS": "Subject LABS",
     "credentialType": "Credential Type",
     "claims": "Claims",
     "claimsPlaceholder": "{\"degree\": \"Bachelor of Science\", \"university\": \"Example University\"}",
@@ -85,7 +85,7 @@
   },
   "forms": {
     "required": "This field is required",
-    "invalidDidFormat": "Invalid DID format",
+    "invalidLABSFormat": "Invalid LABS format",
     "invalidJson": "Invalid JSON format"
   },
   "types": {

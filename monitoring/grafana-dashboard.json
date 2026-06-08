@@ -1,8 +1,8 @@
 {
   "dashboard": {
     "id": null,
-    "title": "Stellar DID Backend Performance",
-    "tags": ["stellar", "did", "backend"],
+    "title": "Stellar LABS Backend Performance",
+    "tags": ["stellar", "LABS", "backend"],
     "timezone": "browser",
     "panels": [
       {
@@ -79,12 +79,12 @@
       },
       {
         "id": 5,
-        "title": "DID Registry Size",
+        "title": "LABS Registry Size",
         "type": "stat",
         "targets": [
           {
-            "expr": "did_registry_size",
-            "legendFormat": "DIDs in Registry"
+            "expr": "LABS_registry_size",
+            "legendFormat": "LABSs in Registry"
           }
         ],
         "gridPos": {

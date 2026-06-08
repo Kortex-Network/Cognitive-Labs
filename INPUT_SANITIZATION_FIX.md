@@ -1,7 +1,7 @@
 # Input Sanitization Security Fix - Issue #17
 
 ## Summary
-Implemented comprehensive input sanitization and validation to prevent XSS attacks across the Decentralized Identity DID platform.
+Implemented comprehensive input sanitization and validation to prevent XSS attacks across the Cognitive Lab platform.
 
 ## Vulnerability Details
 **Issue**: User inputs were not properly sanitized before rendering, creating potential XSS vulnerabilities.
@@ -19,7 +19,7 @@ Implemented comprehensive input sanitization and validation to prevent XSS attac
 - **HTML escaping**: `escapeHtml()` function to convert special characters
 - **HTML sanitization**: `sanitizeHtml()` removes dangerous tags and attributes
 - **Text sanitization**: `sanitizeText()` removes HTML brackets and dangerous protocols
-- **Format validation**: Specialized validators for DID, public keys, secret keys, and URLs
+- **Format validation**: Specialized validators for Cognitive Lab, public keys, secret keys, and URLs
 - **JSON sanitization**: `sanitizeJsonForDisplay()` for safe JSON rendering
 - **Suggestions sanitization**: `sanitizeSuggestions()` for autocomplete data
 
@@ -53,7 +53,7 @@ Implemented comprehensive input sanitization and validation to prevent XSS attac
 
 ### 5. API Endpoint Protection
 **Applied validation to critical endpoints**:
-- `/contracts/register-did` - Full DID registration validation
+- `/contracts/register-Cognitive Lab` - Full Cognitive Lab registration validation
 - `/contracts/issue-credential` - Credential issuance with claim sanitization
 - `/contracts/revoke-credential` - Credential revocation validation
 - `/contracts/verify-credential` - Credential verification validation
@@ -76,7 +76,7 @@ Implemented comprehensive input sanitization and validation to prevent XSS attac
 - **HTML injection**: Escapes HTML special characters in text content
 
 ### Input Validation
-- **DID validation**: Enforces `did:stellar:G[A-Z0-7]{55}` format
+- **Cognitive Lab validation**: Enforces `Cognitive Lab:stellar:G[A-Z0-7]{55}` format
 - **Public key validation**: Enforces `G[A-Z0-7]{55}` format
 - **Secret key validation**: Enforces `S[A-Z0-7]{55}` format
 - **URL validation**: Only allows HTTP/HTTPS protocols
@@ -121,29 +121,29 @@ Implemented comprehensive input sanitization and validation to prevent XSS attac
 
 ### Frontend Usage
 ```javascript
-import { sanitizeText, validateAndSanitizeDID } from '../utils/inputSanitization';
+import { sanitizeText, validateAndSanitizeLABS } from '../utils/inputSanitization';
 import { SafeDisplay } from '../components/SafeDisplay';
 import { useInputValidation } from '../hooks/useInputValidation';
 
 // Sanitize user input
 const cleanInput = sanitizeText(userInput);
 
-// Validate DID
-const { isValid, sanitizedDid } = validateAndSanitizeDID(didInput);
+// Validate Cognitive Lab
+const { isValid, sanitizedLABS } = validateAndSanitizeLABS(LABSInput);
 
 // Safe rendering
 <SafeDisplay content={userContent} type="html" />
 
 // Form validation
-const { errors, handleChange, validateAll } = useInputValidation(DID_VALIDATION_RULES);
+const { errors, handleChange, validateAll } = useInputValidation(LABS_VALIDATION_RULES);
 ```
 
 ### Backend Usage
 ```javascript
 // Apply validation middleware
-router.post('/register-did', validateEndpoint('registerDID'), async (req, res) => {
+router.post('/register-Cognitive Lab', validateEndpoint('registerLABS'), async (req, res) => {
   // req.body is already validated and sanitized
-  const { did, publicKey, serviceEndpoint, signerSecret } = req.body;
+  const { Cognitive Lab, publicKey, serviceEndpoint, signerSecret } = req.body;
 });
 
 // Global sanitization is applied automatically to all routes

@@ -1,10 +1,10 @@
-# Decentralized Identity DID Registry
+# Cognitive Lab Registry
 
 A comprehensive self-sovereign identity platform where users control their personal data without relying on centralized services.
 
 ## 🚀 Overview
 
-This project implements a **production-ready DID Registry** with advanced features addressing critical enterprise requirements:
+This project implements a **production-ready Cognitive Lab Registry** with advanced features addressing critical enterprise requirements:
 
 ### ✅ Issues Resolved
 - **#140**: Enhanced RBAC with fine-grained permissions
@@ -15,7 +15,7 @@ This project implements a **production-ready DID Registry** with advanced featur
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                IntegratedDIDRegistry                       │
+│                IntegratedLABSRegistry                       │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐ │
 │  │ Enhanced RBAC   │  │ Upgradeability  │  │ Gas Optimize │ │
@@ -54,10 +54,10 @@ This project implements a **production-ready DID Registry** with advanced featur
 
 | Operation | Baseline Gas | Optimized Gas | Reduction |
 |-----------|--------------|---------------|-----------|
-| DID Creation | ~120,000 | ~84,000 | **30%** |
-| DID Update | ~80,000 | ~56,000 | **30%** |
+| Cognitive Lab Creation | ~120,000 | ~84,000 | **30%** |
+| Cognitive Lab Update | ~80,000 | ~56,000 | **30%** |
 | Credential Issue | ~100,000 | ~65,000 | **35%** |
-| Batch DID (10) | ~1,200,000 | ~600,000 | **50%** |
+| Batch Cognitive Lab (10) | ~1,200,000 | ~600,000 | **50%** |
 | Batch Credentials (10) | ~1,000,000 | ~500,000 | **50%** |
 
 ## 🛠️ Installation
@@ -70,8 +70,8 @@ This project implements a **production-ready DID Registry** with advanced featur
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-DID-
-cd Decentralized-Identity-DID-
+git clone https://github.com/olaleyeolajide81-sketch/Decentralized-Identity-LABS-
+cd Decentralized-Identity-LABS-
 
 # Install dependencies
 npm install
@@ -108,26 +108,26 @@ npx hardhat run scripts/deploy.js --network mainnet
 
 ## 📖 Usage Examples
 
-### Creating a DID
+### Creating a Cognitive Lab
 ```javascript
-const integratedRegistry = await ethers.getContractAt("IntegratedDIDRegistry", registryAddress);
+const integratedRegistry = await ethers.getContractAt("IntegratedLABSRegistry", registryAddress);
 
-// Create DID with enhanced permissions and gas optimization
-await integratedRegistry.createDIDIntegrated(
-  "did:ethereum:0x1234567890123456789012345678901234567890",
+// Create Cognitive Lab with enhanced permissions and gas optimization
+await integratedRegistry.createLABSIntegrated(
+  "Cognitive Lab:ethereum:0x1234567890123456789012345678901234567890",
   "0x04abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567abc890def123",
-  "https://did.example.com/endpoint"
+  "https://Cognitive Lab.example.com/endpoint"
 );
 ```
 
 ### Batch Operations
 ```javascript
-// Batch create DIDs for maximum gas efficiency
-const dids = ["did1", "did2", "did3"];
+// Batch create Cognitive Labs for maximum gas efficiency
+const Cognitive Labs = ["LABS1", "LABS2", "LABS3"];
 const publicKeys = ["key1", "key2", "key3"];
 const serviceEndpoints = ["endpoint1", "endpoint2", "endpoint3"];
 
-await integratedRegistry.batchCreateDIDsIntegrated(dids, publicKeys, serviceEndpoints);
+await integratedRegistry.batchCreateLABSsIntegrated(Cognitive Labs, publicKeys, serviceEndpoints);
 ```
 
 ### Role Management
@@ -174,10 +174,10 @@ npx hardhat test test/EnhancedAccessControl.test.js
 npx hardhat test test/EnhancedProxy.test.js
 
 # Gas optimization tests
-npx hardhat test test/GasOptimizedDIDRegistry.test.js
+npx hardhat test test/GasOptimizedLABSRegistry.test.js
 
 # Integration tests
-npx hardhat test test/IntegratedDIDRegistry.test.js
+npx hardhat test test/IntegratedLABSRegistry.test.js
 ```
 
 ### Test Coverage
@@ -249,10 +249,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 📧 Email: support@did-registry.com
-- 💬 Discord: [Join our Discord](https://discord.gg/did-registry)
-- 🐦 Twitter: [@DIDRegistry](https://twitter.com/DIDRegistry)
+- 📧 Email: support@LABS-registry.com
+- 💬 Discord: [Join our Discord](https://discord.gg/LABS-registry)
+- 🐦 Twitter: [@LABSRegistry](https://twitter.com/LABSRegistry)
 
 ---
 
-**Built with ❤️ for the decentralized identity community**
+**Built with ❤️ for the cognitive labs community**

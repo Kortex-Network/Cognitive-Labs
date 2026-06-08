@@ -12,7 +12,7 @@ def create_pr():
     # GitHub API configuration
     GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Set this environment variable
     REPO_OWNER = "olaleyeolajide81-sketch"
-    REPO_NAME = "Decentralized-Identity-DID-"
+    REPO_NAME = "Decentralized-Identity-LABS-"
     
     # PR details
     title = "feat: Implement Comprehensive RBAC System with Fine-Grained Permissions #140"

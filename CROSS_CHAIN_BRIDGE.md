@@ -4,15 +4,15 @@ This document describes the cross-chain bridge feature added as part of **Issue 
 
 ## Overview
 
-The platform previously supported only the **Stellar network** for DID operations.  
-This update adds a bridge layer that allows DIDs and Verifiable Credentials anchored on Stellar to be mirrored on **Ethereum and any EVM-compatible chain** (Polygon, BSC, Sepolia testnet, etc.).
+The platform previously supported only the **Stellar network** for Cognitive Lab operations.  
+This update adds a bridge layer that allows Cognitive Labs and Verifiable Credentials anchored on Stellar to be mirrored on **Ethereum and any EVM-compatible chain** (Polygon, BSC, Sepolia testnet, etc.).
 
 ## Architecture
 
 ```
 Stellar Network                  EVM Network (Ethereum, Polygon, etc.)
 ──────────────────────           ────────────────────────────────────────
-DIDContract.js (Stellar)  ───►  EthereumDIDRegistry.sol (EVM contract)
+LABSContract.js (Stellar)  ───►  EthereumLABSRegistry.sol (EVM contract)
                                          ▲
                           CrossChainService.js (backend bridge service)
                                          │
@@ -23,7 +23,7 @@ DIDContract.js (Stellar)  ───►  EthereumDIDRegistry.sol (EVM contract)
 
 | File | Description |
 |------|-------------|
-| `contracts/ethereum/EthereumDIDRegistry.sol` | Solidity contract deployed on EVM chains |
+| `contracts/ethereum/EthereumLABSRegistry.sol` | Solidity contract deployed on EVM chains |
 | `backend/src/services/crossChainService.js` | Bridge service using `ethers.js` |
 | `backend/src/routes/bridge.js` | REST API endpoints for bridging |
 | `backend/src/__tests__/bridge.test.js` | Route-level tests |
@@ -36,20 +36,20 @@ Add the following to your `.env` (see `.env.example`):
 ```env
 EVM_RPC_URL=https://rpc2.sepolia.org
 EVM_PRIVATE_KEY=0xYOUR_PRIVATE_KEY_HERE
-EVM_DID_REGISTRY_ADDRESS=0xYOUR_CONTRACT_ADDRESS_HERE
+EVM_LABS_REGISTRY_ADDRESS=0xYOUR_CONTRACT_ADDRESS_HERE
 EVM_CHAIN_ID=11155111
 ```
 
 ## API Endpoints
 
-### Bridge a DID to Ethereum
+### Bridge a Cognitive Lab to Ethereum
 ```
-POST /api/v1/bridge/did
+POST /api/v1/bridge/Cognitive Lab
 Authorization: Bearer <JWT>
 Content-Type: application/json
 
 {
-  "did": "did:stellar:GABC123...",
+  "Cognitive Lab": "Cognitive Lab:stellar:GABC123...",
   "ownerAddress": "0xYourEthereumAddress"
 }
 ```
@@ -58,7 +58,7 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "message": "DID bridged successfully",
+  "message": "Cognitive Lab bridged successfully",
   "transactionHash": "0x..."
 }
 ```
@@ -88,9 +88,9 @@ Content-Type: application/json
 
 ---
 
-### Check Cross-Chain Status of a DID
+### Check Cross-Chain Status of a Cognitive Lab
 ```
-GET /api/v1/bridge/status/:did
+GET /api/v1/bridge/status/:Cognitive Lab
 Authorization: Bearer <JWT>
 ```
 
@@ -99,7 +99,7 @@ Authorization: Bearer <JWT>
 {
   "success": true,
   "status": {
-    "did": "did:stellar:GABC123...",
+    "Cognitive Lab": "Cognitive Lab:stellar:GABC123...",
     "stellar": true,
     "ethereum": true,
     "synced": true
@@ -110,9 +110,9 @@ Authorization: Bearer <JWT>
 ## Deploying the Ethereum Contract
 
 1. Install Hardhat or Foundry in a local toolchain.
-2. Deploy `contracts/ethereum/EthereumDIDRegistry.sol` to your target EVM network.
+2. Deploy `contracts/ethereum/EthereumLABSRegistry.sol` to your target EVM network.
 3. Grant `ADMIN_ROLE` to the bridge wallet (`EVM_PRIVATE_KEY`).
-4. Set `EVM_DID_REGISTRY_ADDRESS` in your `.env` to the deployed contract address.
+4. Set `EVM_LABS_REGISTRY_ADDRESS` in your `.env` to the deployed contract address.
 
 ## Supported Chains
 

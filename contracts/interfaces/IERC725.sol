@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
  * @title IERC725
  * @dev Interface for ERC725 standard (Identity) with comprehensive functionality
  * 
- * This interface defines the standard for decentralized identity management on
+ * This interface defines the standard for cognitive labs identity management on
  * blockchain networks. It provides mechanisms for identity owners to store
  * arbitrary data and execute operations on behalf of their identity.
  * 
@@ -16,7 +16,7 @@ pragma solidity ^0.8.0;
  * - Standardized interface for identity contracts
  * 
  * Use Cases:
- * - DID document management
+ * - LABS document management
  * - Identity data storage
  * - Contract execution on behalf of identity
  * - Cross-chain identity operations

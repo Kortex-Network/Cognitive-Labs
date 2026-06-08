@@ -1,7 +1,7 @@
 const request = require("supertest");
 const fc = require("fast-check");
 
-// Mock contractService before requiring app to avoid DIDContract constructor issues
+// Mock contractService before requiring app to avoid LABSContract constructor issues
 jest.mock("../services/contractService", () => {
   return jest.fn().mockImplementation(() => ({}));
 });
@@ -13,13 +13,13 @@ const { generateToken } = require("../services/qrService");
 
 const arbitraryInvalidPayload = () =>
   fc.oneof(
-    fc.record({ did: fc.string({ minLength: 1 }) }), // missing type
+    fc.record({ LABS: fc.string({ minLength: 1 }) }), // missing type
     fc.record({
       type: fc
         .string({ minLength: 1 })
-        .filter((s) => !["did", "credential", "connection"].includes(s)),
+        .filter((s) => !["LABS", "credential", "connection"].includes(s)),
     }), // wrong type
-    fc.record({ type: fc.constant("did") }), // missing did
+    fc.record({ type: fc.constant("LABS") }), // missing LABS
     fc.record({ type: fc.constant("credential") }), // missing credentialId
     fc.record({ type: fc.constant("connection") }), // missing publicKey
   );
@@ -27,16 +27,16 @@ const arbitraryInvalidPayload = () =>
 // ─── Unit Tests ──────────────────────────────────────────────────────────────
 
 describe("POST /api/v1/qr/generate", () => {
-  test("returns token and deepLink for valid DID payload", async () => {
+  test("returns token and deepLink for valid LABS payload", async () => {
     const res = await request(app)
       .post("/api/v1/qr/generate")
-      .send({ type: "did", did: "did:stellar:abc" });
+      .send({ type: "LABS", LABS: "LABS:stellar:abc" });
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toHaveProperty("token");
     expect(res.body.data).toHaveProperty("deepLink");
-    expect(res.body.data.deepLink).toMatch(/^did-marketplace:\/\/qr\?payload=/);
+    expect(res.body.data.deepLink).toMatch(/^LABS-marketplace:\/\/qr\?payload=/);
   });
 
   test("returns token and deepLink for valid credential payload", async () => {
@@ -51,7 +51,7 @@ describe("POST /api/v1/qr/generate", () => {
   test("returns 400 for missing type", async () => {
     const res = await request(app)
       .post("/api/v1/qr/generate")
-      .send({ did: "did:stellar:abc" });
+      .send({ LABS: "LABS:stellar:abc" });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -70,13 +70,13 @@ describe("POST /api/v1/qr/generate", () => {
 
 describe("POST /api/v1/qr/validate", () => {
   test("returns decoded payload for valid token", async () => {
-    const { token } = generateToken({ type: "did", did: "did:stellar:abc" });
+    const { token } = generateToken({ type: "LABS", LABS: "LABS:stellar:abc" });
     const res = await request(app).post("/api/v1/qr/validate").send({ token });
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.type).toBe("did");
-    expect(res.body.data.did).toBe("did:stellar:abc");
+    expect(res.body.data.type).toBe("LABS");
+    expect(res.body.data.LABS).toBe("LABS:stellar:abc");
   });
 
   test("returns 400 when token is missing", async () => {
@@ -86,7 +86,7 @@ describe("POST /api/v1/qr/validate", () => {
   });
 
   test("returns 401 for tampered token", async () => {
-    const { token } = generateToken({ type: "did", did: "x" });
+    const { token } = generateToken({ type: "LABS", LABS: "x" });
     const res = await request(app)
       .post("/api/v1/qr/validate")
       .send({ token: token + "tampered" });
@@ -121,8 +121,8 @@ describe("Property 7: Tampered or Expired Token Returns 401", () => {
         fc.string({ minLength: 1, maxLength: 10 }),
         async (suffix) => {
           const { token } = generateToken({
-            type: "did",
-            did: "did:stellar:test",
+            type: "LABS",
+            LABS: "LABS:stellar:test",
           });
           const tampered = token.slice(0, -1) + suffix;
           const res = await request(app)

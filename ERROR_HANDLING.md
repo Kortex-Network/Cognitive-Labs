@@ -38,8 +38,8 @@ The backend uses custom error classes for better error categorization:
 
 - `ContractAddressNotSetError` - Smart contract not deployed
 - `ContractDeploymentFailedError` - Contract deployment issues
-- `DIDRegistrationFailedError` - DID registration problems
-- `DIDUpdateFailedError` - DID update failures
+- `LABSRegistrationFailedError` - Cognitive Lab registration problems
+- `LABSUpdateFailedError` - Cognitive Lab update failures
 - `CredentialIssuanceFailedError` - Credential issuance issues
 - `TransactionFailedError` - Stellar transaction failures
 - `AccountNotFoundError` - Account doesn't exist
@@ -77,10 +77,10 @@ A reusable component that displays errors with:
 
 All frontend components have been updated to use the new error handling:
 
-1. **CreateDID.js** - DID creation errors
+1. **CreateLABS.js** - Cognitive Lab creation errors
 2. **Contracts.js** - Contract deployment errors  
 3. **Credentials.js** - Credential issuance/verification errors
-4. **ResolveDID.js** - DID resolution errors
+4. **ResolveLABS.js** - Cognitive Lab resolution errors
 5. **Account.js** - Account information errors
 6. **useWallet.js** - Wallet connection errors
 
@@ -96,9 +96,9 @@ All frontend components have been updated to use the new error handling:
 - **User Message**: "Smart contract is not deployed yet."
 - **Suggestions**: Deploy contract first, check account balance, verify secret key
 
-### DID Errors
-- **Technical**: `DIDRegistrationFailed`, `DIDUpdateFailed`
-- **User Message**: "Failed to register/update your DID."
+### Cognitive Lab Errors
+- **Technical**: `LABSRegistrationFailed`, `LABSUpdateFailed`
+- **User Message**: "Failed to register/update your Cognitive Lab."
 - **Suggestions**: Check ownership, verify format, ensure funds
 
 ### Transaction Errors
@@ -124,7 +124,7 @@ throw new ContractDeploymentFailedError(error.message);
 
 ```javascript
 try {
-  const response = await stellarAPI.post('/contracts/register-did', data);
+  const response = await stellarAPI.post('/contracts/register-Cognitive Lab', data);
   // Handle success
 } catch (err) {
   const errorInfo = handleApiError(err);
@@ -162,10 +162,10 @@ try {
   "error": {
     "code": "ValidationError",
     "userMessage": "Please check your input and try again.",
-    "action": "The did field is required. Please provide a valid value.",
-    "path": "/api/v1/contracts/register-did",
+    "action": "The Cognitive Lab field is required. Please provide a valid value.",
+    "path": "/api/v1/contracts/register-Cognitive Lab",
     "timestamp": "2024-01-01T12:00:00.000Z",
-    "technicalError": "ValidationError: \"did\" is required",
+    "technicalError": "ValidationError: \"Cognitive Lab\" is required",
     "stack": "Error: ValidationError..."
   }
 }
@@ -176,7 +176,7 @@ try {
 ```javascript
 {
   title: "Invalid Input",
-  message: "The did field is required. Please provide a valid value.",
+  message: "The Cognitive Lab field is required. Please provide a valid value.",
   suggestions: [
     "Review all required fields",
     "Check that all formats are correct",
@@ -184,7 +184,7 @@ try {
   ],
   technicalDetails: {
     code: "ValidationError",
-    originalMessage: "ValidationError: \"did\" is required"
+    originalMessage: "ValidationError: \"Cognitive Lab\" is required"
   }
 }
 ```

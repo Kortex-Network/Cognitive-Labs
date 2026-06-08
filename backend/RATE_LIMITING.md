@@ -1,6 +1,6 @@
 # Contract Rate Limiting Implementation
 
-This document describes the enhanced rate limiting system implemented for the Decentralized Identity DID platform to prevent spam and abuse of critical operations.
+This document describes the enhanced rate limiting system implemented for the Cognitive Lab platform to prevent spam and abuse of critical operations.
 
 ## Overview
 
@@ -43,24 +43,24 @@ The rate limiting system provides time-based rate limiting for different types o
 ### Contract Read Operations
 - **Window**: 5 minutes (configurable)
 - **Limit**: 50 requests per window
-- **Use Case**: Getting DID documents, retrieving credentials, account information
+- **Use Case**: Getting Cognitive Lab documents, retrieving credentials, account information
 
 ### Contract Write Operations
 - **Window**: 10 minutes (configurable)
 - **Limit**: 10 requests per window
-- **Use Case**: Updating DIDs, revoking credentials
+- **Use Case**: Updating Cognitive Labs, revoking credentials
 
 ### Critical Operations
 
 #### Contract Deployment
 - **Window**: 1 hour (configurable)
 - **Limit**: 3 deployments per hour
-- **Use Case**: Deploying new DID registry contracts
+- **Use Case**: Deploying new Cognitive Lab registry contracts
 
-#### DID Registration
+#### Cognitive Lab Registration
 - **Window**: 5 minutes (configurable)
 - **Limit**: 5 registrations per window
-- **Use Case**: Registering new DIDs on the blockchain
+- **Use Case**: Registering new Cognitive Labs on the blockchain
 
 #### Credential Issuance
 - **Window**: 5 minutes (configurable)
@@ -102,8 +102,8 @@ RATE_LIMIT_CONTRACT_WRITE_MAX=10
 RATE_LIMIT_DEPLOY_CONTRACT_WINDOW_MS=3600000
 RATE_LIMIT_DEPLOY_CONTRACT_MAX=3
 
-RATE_LIMIT_REGISTER_DID_WINDOW_MS=300000
-RATE_LIMIT_REGISTER_DID_MAX=5
+RATE_LIMIT_REGISTER_LABS_WINDOW_MS=300000
+RATE_LIMIT_REGISTER_LABS_MAX=5
 
 RATE_LIMIT_ISSUE_CREDENTIAL_WINDOW_MS=300000
 RATE_LIMIT_ISSUE_CREDENTIAL_MAX=15
@@ -139,8 +139,8 @@ The rate limiting system uses a layered middleware approach:
 // Example of smart detection logic
 if (path.includes('/deploy')) {
   return limiters.deployContract(req, res, next);
-} else if (path.includes('/register-did')) {
-  return limiters.registerDID(req, res, next);
+} else if (path.includes('/register-Cognitive Lab')) {
+  return limiters.registerLABS(req, res, next);
 }
 ```
 

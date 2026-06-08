@@ -14,7 +14,7 @@ import "../access/EnhancedAccessControl.sol";
  * 
  * This contract provides a sophisticated proxy implementation that goes beyond basic UUPS
  * functionality by incorporating governance controls, upgrade scheduling, emergency mechanisms,
- * and comprehensive audit trails. It's designed specifically for the DID Registry ecosystem
+ * and comprehensive audit trails. It's designed specifically for the LABS Registry ecosystem
  * where upgradeability must be balanced with security and user trust.
  * 
  * Key Features:
@@ -38,7 +38,7 @@ import "../access/EnhancedAccessControl.sol";
  * - Access control integration
  * 
  * @author Fatima Sanusi
- * @notice Use this contract as the secure proxy for DID registry implementations
+ * @notice Use this contract as the secure proxy for LABS registry implementations
  * @dev Implements advanced proxy patterns with governance integration
  */
 contract EnhancedProxy is 

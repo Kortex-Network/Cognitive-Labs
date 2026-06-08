@@ -35,7 +35,7 @@ import ErrorDisplay from '../components/ErrorDisplay';
 
 // Mock data for fallback when API is unavailable
 const MOCK_STATS = {
-  totalDIDs: 742,
+  totalLABSs: 742,
   totalCredentials: 3521,
   activeUsers: 187,
   network: 'TESTNET',
@@ -76,7 +76,7 @@ const Dashboard = () => {
 
       const timestamp = new Date().toLocaleTimeString();
       setStats({
-        totalDIDs: Math.floor(Math.random() * 1000) + 100,
+        totalLABSs: Math.floor(Math.random() * 1000) + 100,
         totalCredentials: Math.floor(Math.random() * 5000) + 500,
         activeUsers: Math.floor(Math.random() * 200) + 50,
         network: contractInfo.data.network || 'TESTNET',
@@ -123,7 +123,7 @@ const Dashboard = () => {
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        wsRef.current.send(JSON.stringify({ type: 'subscribe', topics: ['did:created', 'did:updated', 'credential:issued', 'credential:revoked', 'contract:deployed'] }));
+        wsRef.current.send(JSON.stringify({ type: 'subscribe', topics: ['LABS:created', 'LABS:updated', 'credential:issued', 'credential:revoked', 'contract:deployed'] }));
       };
 
       wsRef.current.onmessage = (event) => {
@@ -185,7 +185,7 @@ const Dashboard = () => {
   }
 
   return (
-    <Box component="main" aria-label="Stellar DID Platform Dashboard" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
+    <Box component="main" aria-label="Stellar LABS Platform Dashboard" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
       <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }}>
         {t("dashboard.title")}
       </Typography>
@@ -258,11 +258,11 @@ const Dashboard = () => {
                 <Grid container spacing={2} role="list" aria-label="Platform statistics list">
                   <Grid item xs={6} role="listitem">
                     <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'background.default' }}>
-                      <Typography variant="h4" color="primary.main" aria-label={`${stats.totalDIDs} total DIDs`}>
-                        {stats.totalDIDs}
+                      <Typography variant="h4" color="primary.main" aria-label={`${stats.totalLABSs} total LABSs`}>
+                        {stats.totalLABSs}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Total DIDs
+                        Total LABSs
                       </Typography>
                     </Paper>
                   </Grid>
@@ -309,7 +309,7 @@ const Dashboard = () => {
                   <VerifiedUser sx={{ mr: 1, color: 'primary.main' }} aria-hidden="true" />
                   <Typography variant="h6" component="h2">Use Cases</Typography>
                 </Box>
-                <List aria-label="DID use cases">
+                <List aria-label="LABS use cases">
                   <ListItem>
                     <ListItemIcon>
                       <School color="primary" aria-hidden="true" />
@@ -395,22 +395,22 @@ const Dashboard = () => {
                     <Button 
                       variant="contained" 
                       fullWidth 
-                      href="/create-did"
+                      href="/create-LABS"
                       startIcon={<AccountBalance aria-hidden="true" />}
-                      aria-label="Navigate to Create DID page"
+                      aria-label="Navigate to Create LABS page"
                     >
-                      Create DID
+                      Create LABS
                     </Button>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Button 
                       variant="outlined" 
                       fullWidth 
-                      href="/resolve-did"
+                      href="/resolve-LABS"
                       startIcon={<VerifiedUser aria-hidden="true" />}
-                      aria-label="Navigate to Resolve DID page"
+                      aria-label="Navigate to Resolve LABS page"
                     >
-                      Resolve DID
+                      Resolve LABS
                     </Button>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>

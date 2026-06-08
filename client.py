@@ -1,25 +1,25 @@
 import requests
 
-class StellarDIDError(Exception):
+class StellarLABSError(Exception):
     pass
 
-class StellarDIDClient:
+class StellarLABSClient:
     def __init__(self, api_url="http://localhost:3001/api/v1"):
         self.api_url = api_url
         self.session = requests.Session()
 
     def _handle_response(self, response):
         if response.status_code >= 400:
-            raise StellarDIDError(f"Error {response.status_code}: {response.text}")
+            raise StellarLABSError(f"Error {response.status_code}: {response.text}")
         return response.json()
 
-    def get_did(self, did: str):
-        res = self.session.get(f"{self.api_url}/did/{did}")
+    def get_LABS(self, LABS: str):
+        res = self.session.get(f"{self.api_url}/LABS/{LABS}")
         return self._handle_response(res)
 
-    def create_did(self, did_data: dict, token: str):
+    def create_LABS(self, LABS_data: dict, token: str):
         headers = {"Authorization": f"Bearer {token}"}
-        res = self.session.post(f"{self.api_url}/did", json=did_data, headers=headers)
+        res = self.session.post(f"{self.api_url}/LABS", json=LABS_data, headers=headers)
         return self._handle_response(res)
 
     def issue_credential(self, credential_data: dict, token: str):

@@ -1,6 +1,6 @@
 # Image Optimization Implementation
 
-This document describes the image optimization solution implemented for the Stellar DID Platform frontend to address Issue #12: Image Optimization Missing.
+This document describes the image optimization solution implemented for the Cognitive Lab Platform frontend to address Issue #12: Image Optimization Missing.
 
 ## Overview
 

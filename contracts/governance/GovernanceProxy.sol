@@ -3,18 +3,18 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./DIDGovernor.sol";
+import "./LABSGovernor.sol";
 import "./Timelock.sol";
 
 /**
  * @title GovernanceProxy
- * @dev Proxy contract that integrates governance with existing DID contracts
- * Acts as a bridge between the governance system and the DID registry
+ * @dev Proxy contract that integrates governance with existing LABS contracts
+ * Acts as a bridge between the governance system and the LABS registry
  */
 contract GovernanceProxy is Ownable {
     
-    DIDGovernor public governor;
-    DIDTimelock public timelock;
+    LABSGovernor public governor;
+    LABSTimelock public timelock;
     address public proxyAdmin;
     
     mapping(address => bool) public authorizedContracts;
@@ -58,8 +58,8 @@ contract GovernanceProxy is Ownable {
         address _timelock,
         address _proxyAdmin
     ) {
-        governor = DIDGovernor(_governor);
-        timelock = DIDTimelock(_timelock);
+        governor = LABSGovernor(_governor);
+        timelock = LABSTimelock(_timelock);
         proxyAdmin = _proxyAdmin;
         authorizedContracts[_governor] = true;
         authorizedContracts[_timelock] = true;

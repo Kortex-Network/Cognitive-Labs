@@ -2,7 +2,7 @@
  * @title EventSourcing
  * @dev Event sourcing system for comprehensive audit trail with immutable event log
  * 
- * This module provides event sourcing functionality to track all DID and credential
+ * This module provides event sourcing functionality to track all LABS and credential
  * operations with an immutable event log. It supports event replay, snapshots,
  * temporal queries, and comprehensive audit capabilities.
  * 
@@ -42,12 +42,12 @@ class EventSourcing extends EventEmitter {
         
         // Event types
         this.eventTypes = new Set([
-            'DID_CREATED',
-            'DID_UPDATED',
-            'DID_TRANSFERRED',
-            'DID_DELETED',
-            'DID_SUSPENDED',
-            'DID_REACTIVATED',
+            'LABS_CREATED',
+            'LABS_UPDATED',
+            'LABS_TRANSFERRED',
+            'LABS_DELETED',
+            'LABS_SUSPENDED',
+            'LABS_REACTIVATED',
             'CREDENTIAL_ISSUED',
             'CREDENTIAL_REVOKED',
             'CREDENTIAL_UPDATED',
@@ -152,21 +152,21 @@ class EventSourcing extends EventEmitter {
      */
     initializeEventSchemas() {
         return {
-            DID_CREATED: {
+            LABS_CREATED: {
                 required: ['aggregateId', 'aggregateType', 'eventType', 'version', 'timestamp', 'data'],
                 properties: {
                     data: {
                         type: 'object',
-                        required: ['did', 'owner', 'publicKey', 'serviceEndpoints']
+                        required: ['LABS', 'owner', 'publicKey', 'serviceEndpoints']
                     }
                 }
             },
-            DID_UPDATED: {
+            LABS_UPDATED: {
                 required: ['aggregateId', 'aggregateType', 'eventType', 'version', 'timestamp', 'data'],
                 properties: {
                     data: {
                         type: 'object',
-                        required: ['did', 'changes']
+                        required: ['LABS', 'changes']
                     }
                 }
             },
@@ -513,14 +513,14 @@ class EventSourcing extends EventEmitter {
         
         // Apply event based on type
         switch (event.eventType) {
-            case 'DID_CREATED':
-                return this.applyDIDCreated(currentState, eventData);
-            case 'DID_UPDATED':
-                return this.applyDIDUpdated(currentState, eventData);
-            case 'DID_TRANSFERRED':
-                return this.applyDIDTransferred(currentState, eventData);
-            case 'DID_DELETED':
-                return this.applyDIDDeleted(currentState, eventData);
+            case 'LABS_CREATED':
+                return this.applyLABSCreated(currentState, eventData);
+            case 'LABS_UPDATED':
+                return this.applyLABSUpdated(currentState, eventData);
+            case 'LABS_TRANSFERRED':
+                return this.applyLABSTransferred(currentState, eventData);
+            case 'LABS_DELETED':
+                return this.applyLABSDeleted(currentState, eventData);
             case 'CREDENTIAL_ISSUED':
                 return this.applyCredentialIssued(currentState, eventData);
             case 'CREDENTIAL_REVOKED':
@@ -545,10 +545,10 @@ class EventSourcing extends EventEmitter {
     }
 
     // Event application methods
-    applyDIDCreated(currentState, eventData) {
+    applyLABSCreated(currentState, eventData) {
         return {
             ...currentState,
-            did: eventData.did,
+            LABS: eventData.LABS,
             owner: eventData.owner,
             publicKey: eventData.publicKey,
             serviceEndpoints: eventData.serviceEndpoints,
@@ -558,7 +558,7 @@ class EventSourcing extends EventEmitter {
         };
     }
 
-    applyDIDUpdated(currentState, eventData) {
+    applyLABSUpdated(currentState, eventData) {
         return {
             ...currentState,
             ...eventData.changes,
@@ -566,7 +566,7 @@ class EventSourcing extends EventEmitter {
         };
     }
 
-    applyDIDTransferred(currentState, eventData) {
+    applyLABSTransferred(currentState, eventData) {
         return {
             ...currentState,
             owner: eventData.newOwner,
@@ -575,7 +575,7 @@ class EventSourcing extends EventEmitter {
         };
     }
 
-    applyDIDDeleted(currentState, eventData) {
+    applyLABSDeleted(currentState, eventData) {
         return {
             ...currentState,
             active: false,
@@ -788,7 +788,7 @@ class EventSourcing extends EventEmitter {
             $or: [
                 { aggregateId: entityId },
                 { 'metadata.actor': entityId },
-                { 'data.did': entityId },
+                { 'data.LABS': entityId },
                 { 'data.credentialId': entityId },
                 { 'data.subject': entityId },
                 { 'data.issuer': entityId }

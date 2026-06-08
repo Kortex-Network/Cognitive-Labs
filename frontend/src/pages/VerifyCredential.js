@@ -348,13 +348,13 @@ const VerifyCredential = () => {
                       copyable
                     />
                     <CredentialDetail
-                      label="Issuer DID"
+                      label="Issuer LABS"
                       value={result.issuer}
                       mono
                       copyable
                     />
                     <CredentialDetail
-                      label="Subject DID"
+                      label="Subject LABS"
                       value={result.subject}
                       mono
                       copyable

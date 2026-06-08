@@ -165,17 +165,17 @@ const RATE_LIMIT_CONFIGS = {
     },
   },
 
-  registerDID: {
+  registerLABS: {
     windowMs:
-      parseInt(process.env.RATE_LIMIT_REGISTER_DID_WINDOW_MS) || 5 * 60 * 1000, // 5 minutes
-    max: parseInt(process.env.RATE_LIMIT_REGISTER_DID_MAX) || 5, // 5 DID registrations per 5 minutes
+      parseInt(process.env.RATE_LIMIT_REGISTER_LABS_WINDOW_MS) || 5 * 60 * 1000, // 5 minutes
+    max: parseInt(process.env.RATE_LIMIT_REGISTER_LABS_MAX) || 5, // 5 LABS registrations per 5 minutes
     message: {
       success: false,
-      error: "Too many DID registrations",
-      message: "Rate limit exceeded for DID registrations",
+      error: "Too many LABS registrations",
+      message: "Rate limit exceeded for LABS registrations",
       retryAfter:
         Math.ceil(
-          (parseInt(process.env.RATE_LIMIT_REGISTER_DID_WINDOW_MS) ||
+          (parseInt(process.env.RATE_LIMIT_REGISTER_LABS_WINDOW_MS) ||
             5 * 60 * 1000) / 60000,
         ) + " minutes",
     },
@@ -275,7 +275,7 @@ const limiters = {
   contractRead: createRateLimiter(RATE_LIMIT_CONFIGS.contractRead),
   contractWrite: createRateLimiter(RATE_LIMIT_CONFIGS.contractWrite),
   deployContract: createRateLimiter(RATE_LIMIT_CONFIGS.deployContract),
-  registerDID: createRateLimiter(RATE_LIMIT_CONFIGS.registerDID),
+  registerLABS: createRateLimiter(RATE_LIMIT_CONFIGS.registerLABS),
   issueCredential: createRateLimiter(RATE_LIMIT_CONFIGS.issueCredential),
   createAccount: createRateLimiter(RATE_LIMIT_CONFIGS.createAccount),
   fundAccount: createRateLimiter(RATE_LIMIT_CONFIGS.fundAccount),
@@ -354,8 +354,8 @@ const smartRateLimiter = (req, res, next) => {
       // Specific contract write operations
       if (path.includes("/deploy")) {
         return limiters.deployContract(req, res, next);
-      } else if (path.includes("/register-did")) {
-        return limiters.registerDID(req, res, next);
+      } else if (path.includes("/register-LABS")) {
+        return limiters.registerLABS(req, res, next);
       } else if (path.includes("/issue-credential")) {
         return limiters.issueCredential(req, res, next);
       } else if (path.includes("/create-account")) {

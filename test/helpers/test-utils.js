@@ -1,17 +1,17 @@
 const { ethers } = require("hardhat");
 
 /**
- * Test utilities and helper functions for DID Registry testing
+ * Test utilities and helper functions for Cognitive Lab Registry testing
  */
 
 class TestHelper {
     /**
-     * Generate test DID string
+     * Generate test Cognitive Lab string
      * @param {string} address - Ethereum address
-     * @returns {string} DID string
+     * @returns {string} Cognitive Lab string
      */
-    static generateTestDID(address) {
-        return `did:ethereum:${address}`;
+    static generateTestCognitiveLab(address) {
+        return `LABS:ethereum:${address}`;
     }
 
     /**
@@ -29,13 +29,13 @@ class TestHelper {
      * @returns {string} Service endpoint URL
      */
     static generateTestServiceEndpoint(domain = "example.com") {
-        return `https://did.${domain}/endpoint`;
+        return `https://cognitive-lab.${domain}/endpoint`;
     }
 
     /**
      * Generate test credential data
      * @param {string} issuer - Issuer URL
-     * @param {string} subject - Subject DID
+     * @param {string} subject - Subject Cognitive Lab
      * @param {string} type - Credential type
      * @returns {object} Credential data object
      */
@@ -43,7 +43,7 @@ class TestHelper {
         return {
             id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes(`${issuer}-${subject}-${type}-${Date.now()}`)),
             issuer: issuer || `https://issuer-${Date.now()}.example.com`,
-            subject: subject || this.generateTestDID(ethers.Wallet.createRandom().address),
+            subject: subject || this.generateTestCognitiveLab(ethers.Wallet.createRandom().address),
             credentialType: type || "VerificationCredential",
             expires: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
             dataHash: ethers.utils.keccak256(ethers.utils.toUtf8Bytes(`credential-data-${Date.now()}`))
@@ -80,10 +80,10 @@ class TestHelper {
         const stateRecovery = await StateRecoveryFactory.deploy();
         await stateRecovery.deployed();
 
-        // Deploy EthereumDIDRegistry
-        const DIDRegistryFactory = await ethers.getContractFactory("EthereumDIDRegistry");
-        const didRegistry = await DIDRegistryFactory.deploy();
-        await didRegistry.deployed();
+        // Deploy EthereumCognitiveLabRegistry
+        const CognitiveLabRegistryFactory = await ethers.getContractFactory("EthereumCognitiveLabRegistry");
+        const cognitiveLabRegistry = await CognitiveLabRegistryFactory.deploy();
+        await cognitiveLabRegistry.deployed();
 
         // Deploy RecoveryGovernance
         const RecoveryGovernanceFactory = await ethers.getContractFactory("RecoveryGovernance");
@@ -91,7 +91,7 @@ class TestHelper {
         await recoveryGovernance.deployed();
 
         return {
-            didRegistry,
+            cognitiveLabRegistry,
             stateRecovery,
             recoveryGovernance,
             owner,
@@ -110,13 +110,13 @@ class TestHelper {
      * @param {object} signers - Contract signers
      */
     static async setupRolesAndPermissions(contracts, signers) {
-        const { didRegistry, stateRecovery, recoveryGovernance } = contracts;
+        const { cognitiveLabRegistry, stateRecovery, recoveryGovernance } = contracts;
         const { admin, governor, guardian, auditor, issuer, recovery } = signers;
 
-        // DID Registry roles
-        await didRegistry.grantRole(await didRegistry.ADMIN_ROLE(), admin.address);
-        await didRegistry.grantRole(await didRegistry.ISSUER_ROLE(), issuer.address);
-        await didRegistry.grantRole(await didRegistry.RECOVERY_ROLE(), recovery.address);
+        // Cognitive Lab Registry roles
+        await cognitiveLabRegistry.grantRole(await cognitiveLabRegistry.ADMIN_ROLE(), admin.address);
+        await cognitiveLabRegistry.grantRole(await cognitiveLabRegistry.ISSUER_ROLE(), issuer.address);
+        await cognitiveLabRegistry.grantRole(await cognitiveLabRegistry.RECOVERY_ROLE(), recovery.address);
 
         // State Recovery roles
         await stateRecovery.grantRole(await stateRecovery.RECOVERY_ROLE(), recovery.address);
@@ -129,39 +129,39 @@ class TestHelper {
         await recoveryGovernance.grantRole(await recoveryGovernance.AUDITOR_ROLE(), auditor.address);
 
         // Set up contract relationships
-        await didRegistry.setStateRecoveryContract(stateRecovery.address);
-        await stateRecovery.setTargetContracts(didRegistry.address, ethers.constants.AddressZero);
+        await cognitiveLabRegistry.setStateRecoveryContract(stateRecovery.address);
+        await stateRecovery.setTargetContracts(cognitiveLabRegistry.address, ethers.constants.AddressZero);
         await recoveryGovernance.connect(governor).authorizeContract(stateRecovery.address);
         
         // Grant recovery contract permissions
-        await didRegistry.grantRole(await didRegistry.RECOVERY_ROLE(), stateRecovery.address);
-        await stateRecovery.grantRole(await stateRecovery.RECOVERY_ROLE(), didRegistry.address);
+        await cognitiveLabRegistry.grantRole(await cognitiveLabRegistry.RECOVERY_ROLE(), stateRecovery.address);
+        await stateRecovery.grantRole(await stateRecovery.RECOVERY_ROLE(), cognitiveLabRegistry.address);
     }
 
     /**
-     * Create a complete DID setup with claims and credentials
+     * Create a complete Cognitive Lab setup with claims and credentials
      * @param {object} contracts - Deployed contracts
      * @param {object} signers - Contract signers
      * @param {object} options - Configuration options
-     * @returns {object} Created DID data
+     * @returns {object} Created Cognitive Lab data
      */
-    static async createCompleteDIDSetup(contracts, signers, options = {}) {
-        const { didRegistry, stateRecovery, recoveryGovernance } = contracts;
+    static async createCompleteCognitiveLabSetup(contracts, signers, options = {}) {
+        const { cognitiveLabRegistry, stateRecovery, recoveryGovernance } = contracts;
         const { admin, issuer, user } = signers;
 
-        const did = options.did || this.generateTestDID(user.address);
+        const cognitiveLab = options.cognitiveLab || this.generateTestCognitiveLab(user.address);
         const publicKey = options.publicKey || this.generateTestPublicKey();
         const serviceEndpoint = options.serviceEndpoint || this.generateTestServiceEndpoint();
 
-        // Bridge DID
-        await didRegistry.connect(admin).bridgeDID(did, user.address, publicKey, serviceEndpoint);
+        // Bridge Cognitive Lab
+        await cognitiveLabRegistry.connect(admin).bridgeCognitiveLab(cognitiveLab, user.address, publicKey, serviceEndpoint);
 
         // Add claims
         const claims = [];
         if (options.addClaims !== false) {
             for (let i = 0; i < (options.claimCount || 3); i++) {
                 const claim = this.generateTestClaim(i + 1, issuer.address);
-                await didRegistry.connect(user).addClaim(
+                await cognitiveLabRegistry.connect(user).addClaim(
                     claim.topic,
                     claim.scheme,
                     claim.issuer,
@@ -179,10 +179,10 @@ class TestHelper {
             for (let i = 0; i < (options.credentialCount || 2); i++) {
                 const credential = this.generateTestCredential(
                     `https://issuer-${i}.example.com`,
-                    did,
+                    cognitiveLab,
                     `CredentialType${i}`
                 );
-                await didRegistry.connect(admin).bridgeCredential(
+                await cognitiveLabRegistry.connect(admin).bridgeCredential(
                     credential.id,
                     credential.issuer,
                     credential.subject,
@@ -195,7 +195,7 @@ class TestHelper {
         }
 
         return {
-            did,
+            cognitiveLab,
             publicKey,
             serviceEndpoint,
             claims,
@@ -213,11 +213,11 @@ class TestHelper {
      * @returns {object} Recovery result
      */
     static async performGovernedRecovery(contracts, signers, recoveryData, reason, emergency = false) {
-        const { didRegistry, stateRecovery, recoveryGovernance } = contracts;
+        const { cognitiveLabRegistry, stateRecovery, recoveryGovernance } = contracts;
         const { governor, admin } = signers;
 
         // Enable recovery mode
-        await didRegistry.connect(admin).enableRecoveryMode();
+        await cognitiveLabRegistry.connect(admin).enableRecoveryMode();
 
         // Activate emergency mode if needed
         if (emergency) {
@@ -227,12 +227,12 @@ class TestHelper {
         // Encode recovery data
         const encodedData = ethers.utils.defaultAbiCoder.encode(
             ["string", "address", "string", "string"],
-            [recoveryData.did, recoveryData.newOwner, recoveryData.newPublicKey, recoveryData.newServiceEndpoint]
+            [recoveryData.cognitiveLab, recoveryData.newOwner, recoveryData.newPublicKey, recoveryData.newServiceEndpoint]
         );
 
         // Perform governed recovery
         const tx = await recoveryGovernance.connect(governor).governedRecovery(
-            0, // DID_DOCUMENT
+            0, // COGNITIVE_LAB_DOCUMENT
             encodedData,
             reason,
             emergency
@@ -331,9 +331,9 @@ class TestHelper {
             minUint256: 0,
             maxAddress: "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
             minAddress: ethers.constants.AddressZero,
-            longDID: "did:ethereum:" + "1".repeat(40),
-            shortDID: "did:ethereum:0x1",
-            invalidDID: "not-a-did",
+            longCognitiveLab: "LABS:ethereum:" + "1".repeat(40),
+            shortCognitiveLab: "LABS:ethereum:0x1",
+            invalidCognitiveLab: "not-a-cognitive-lab",
             longPublicKey: "0x" + "A".repeat(64),
             shortPublicKey: "0x1",
             invalidPublicKey: "0xZZZ",
@@ -353,27 +353,27 @@ class TestHelper {
     }
 
     /**
-     * Batch bridge multiple DIDs
-     * @param {object} didRegistry - DID Registry contract
+     * Batch bridge multiple Cognitive Labs
+     * @param {object} cognitiveLabRegistry - Cognitive Lab Registry contract
      * @param {object} admin - Admin signer
-     * @param {array} dids - Array of DID data
+     * @param {array} cognitiveLabs - Array of Cognitive Lab data
      */
-    static async batchBridgeDIDs(didRegistry, admin, dids) {
-        const promises = dids.map(did => 
-            didRegistry.connect(admin).bridgeDID(did.did, did.owner, did.publicKey, did.serviceEndpoint)
+    static async batchBridgeCognitiveLabs(cognitiveLabRegistry, admin, cognitiveLabs) {
+        const promises = cognitiveLabs.map(cognitiveLab => 
+            cognitiveLabRegistry.connect(admin).bridgeCognitiveLab(cognitiveLab.cognitiveLab, cognitiveLab.owner, cognitiveLab.publicKey, cognitiveLab.serviceEndpoint)
         );
         return Promise.all(promises);
     }
 
     /**
      * Batch add multiple claims
-     * @param {object} didRegistry - DID Registry contract
+     * @param {object} cognitiveLabRegistry - Cognitive Lab Registry contract
      * @param {object} user - User signer
      * @param {array} claims - Array of claim data
      */
-    static async batchAddClaims(didRegistry, user, claims) {
+    static async batchAddClaims(cognitiveLabRegistry, user, claims) {
         const promises = claims.map(claim => 
-            didRegistry.connect(user).addClaim(
+            cognitiveLabRegistry.connect(user).addClaim(
                 claim.topic,
                 claim.scheme,
                 claim.issuer,
@@ -386,22 +386,22 @@ class TestHelper {
     }
 
     /**
-     * Validate DID document structure
-     * @param {object} didDoc - DID document
+     * Validate Cognitive Lab document structure
+     * @param {object} cognitiveLabDoc - Cognitive Lab document
      * @param {object} expected - Expected values
-     * @returns {boolean} Whether DID document is valid
+     * @returns {boolean} Whether Cognitive Lab document is valid
      */
-    static validateDIDDocument(didDoc, expected = {}) {
+    static validateCognitiveLabDocument(cognitiveLabDoc, expected = {}) {
         const requiredFields = ['owner', 'created', 'updated', 'active', 'publicKey', 'serviceEndpoint'];
         
         for (const field of requiredFields) {
-            if (didDoc[field] === undefined) {
+            if (cognitiveLabDoc[field] === undefined) {
                 return false;
             }
         }
 
         for (const [key, value] of Object.entries(expected)) {
-            if (didDoc[key] !== value) {
+            if (cognitiveLabDoc[key] !== value) {
                 return false;
             }
         }

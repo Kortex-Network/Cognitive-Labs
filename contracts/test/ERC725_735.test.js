@@ -1,20 +1,20 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("StellarDIDRegistry ERC-725/735 Interface Tests", function () {
+describe("StellarLABSRegistry ERC-725/735 Interface Tests", function () {
     let contract;
     let owner, user1, issuer;
-    const did = "did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890";
+    const LABS = "LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890";
     const publicKey = "GABC1234567890ABCDEF1234567890ABCDEF1234567890";
 
     beforeEach(async function () {
         [owner, user1, issuer] = await ethers.getSigners();
-        const ContractFactory = await ethers.getContractFactory("StellarDIDRegistry");
+        const ContractFactory = await ethers.getContractFactory("StellarLABSRegistry");
         contract = await ContractFactory.deploy();
         await contract.deployed();
         
-        // Create a DID for user1 to test interfaces
-        await contract.connect(user1).createDID(did, publicKey, "https://example.com");
+        // Create a LABS for user1 to test interfaces
+        await contract.connect(user1).createLABS(LABS, publicKey, "https://example.com");
     });
 
     describe("ERC-725 (Identity Data Storage)", function () {
@@ -34,9 +34,9 @@ describe("StellarDIDRegistry ERC-725/735 Interface Tests", function () {
             const key = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("testKey"));
             const value = ethers.utils.toUtf8Bytes("testValue");
             
-            // Should revert because owner (deployer) has no DID
+            // Should revert because owner (deployer) has no LABS
             await expect(contract.setData(key, value))
-                .to.be.revertedWith("No DID found for caller address");
+                .to.be.revertedWith("No LABS found for caller address");
         });
     });
 

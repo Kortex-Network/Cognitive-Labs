@@ -452,7 +452,7 @@ const Analytics = () => {
                         <TableHead>
                           <TableRow>
                             <TableCell>Rank</TableCell>
-                            <TableCell>Issuer DID</TableCell>
+                            <TableCell>Issuer LABS</TableCell>
                             <TableCell align="right">Credentials Issued</TableCell>
                             <TableCell align="right">Verification Rate</TableCell>
                           </TableRow>

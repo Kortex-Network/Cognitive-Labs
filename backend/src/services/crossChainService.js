@@ -11,36 +11,36 @@ class CrossChainService {
     const privateKey = process.env.EVM_PRIVATE_KEY || '0x0123456789012345678901234567890123456789012345678901234567890123';
     this.wallet = new ethers.Wallet(privateKey, this.provider);
 
-    this.ethereumContractAddress = process.env.EVM_DID_REGISTRY_ADDRESS;
+    this.ethereumContractAddress = process.env.EVM_LABS_REGISTRY_ADDRESS;
 
     // Minimal ABI for bridging operations
     const abi = [
-      "function bridgeDID(string did, address ownerAddress, string publicKey, string serviceEndpoint) external returns (bool)",
+      "function bridgeLABS(string LABS, address ownerAddress, string publicKey, string serviceEndpoint) external returns (bool)",
       "function bridgeCredential(bytes32 credentialId, string issuer, string subject, string credentialType, uint256 expires, bytes32 dataHash) external returns (bytes32)",
-      "function getDIDDocument(string did) external view returns (tuple(string did, address owner, string publicKey, uint256 created, uint256 updated, bool active, string serviceEndpoint))",
+      "function getLABSDocument(string LABS) external view returns (tuple(string LABS, address owner, string publicKey, uint256 created, uint256 updated, bool active, string serviceEndpoint))",
       "function getCredential(bytes32 credentialId) external view returns (tuple(bytes32 id, string issuer, string subject, string credentialType, uint256 issued, uint256 expires, bytes32 dataHash, bool revoked))"
     ];
 
     if (this.ethereumContractAddress) {
       this.ethereumContract = new ethers.Contract(this.ethereumContractAddress, abi, this.wallet);
     } else {
-      logger.warn('EVM_DID_REGISTRY_ADDRESS is not set. Cross-chain operations will fail.');
+      logger.warn('EVM_LABS_REGISTRY_ADDRESS is not set. Cross-chain operations will fail.');
     }
 
     this.stellarContractService = new ContractService();
   }
 
   /**
-   * Bridge a DID from Stellar to Ethereum
+   * Bridge a LABS from Stellar to Ethereum
    */
-  async bridgeDIDToEthereum(did, ownerAddress) {
+  async bridgeLABSToEthereum(LABS, ownerAddress) {
     try {
-      logger.info('Bridging DID to Ethereum', { did, ownerAddress });
+      logger.info('Bridging LABS to Ethereum', { LABS, ownerAddress });
 
-      // 1. Fetch DID from Stellar
-      const didDocument = await this.stellarContractService.getDID(did);
-      if (!didDocument) {
-        throw new Error(`DID ${did} not found on Stellar`);
+      // 1. Fetch LABS from Stellar
+      const LABSDocument = await this.stellarContractService.getLABS(LABS);
+      if (!LABSDocument) {
+        throw new Error(`LABS ${LABS} not found on Stellar`);
       }
 
       if (!this.ethereumContract) {
@@ -48,21 +48,21 @@ class CrossChainService {
       }
 
       // 2. Call bridge function on Ethereum
-      const tx = await this.ethereumContract.bridgeDID(
-        didDocument.did,
+      const tx = await this.ethereumContract.bridgeLABS(
+        LABSDocument.LABS,
         ownerAddress,
-        didDocument.publicKey,
-        didDocument.serviceEndpoint || ""
+        LABSDocument.publicKey,
+        LABSDocument.serviceEndpoint || ""
       );
 
       logger.info('Waiting for bridge transaction to be mined...', { txHash: tx.hash });
       const receipt = await tx.wait();
 
-      logger.info('DID bridged successfully', { transactionHash: receipt.hash });
+      logger.info('LABS bridged successfully', { transactionHash: receipt.hash });
       return receipt;
     } catch (error) {
-      logger.error('Failed to bridge DID to Ethereum:', error);
-      throw new Error(`Bridge DID failed: ${error.message}`);
+      logger.error('Failed to bridge LABS to Ethereum:', error);
+      throw new Error(`Bridge LABS failed: ${error.message}`);
     }
   }
 
@@ -118,27 +118,27 @@ class CrossChainService {
   /**
    * Check cross-chain state
    */
-  async verifyCrossChainState(did) {
+  async verifyCrossChainState(LABS) {
     try {
-      const stellarDID = await this.stellarContractService.getDID(did);
+      const stellarLABS = await this.stellarContractService.getLABS(LABS);
 
-      let ethereumDID = null;
+      let ethereumLABS = null;
       if (this.ethereumContract) {
         try {
-          const result = await this.ethereumContract.getDIDDocument(did);
-          if (result.did === did) {
-            ethereumDID = result;
+          const result = await this.ethereumContract.getLABSDocument(LABS);
+          if (result.LABS === LABS) {
+            ethereumLABS = result;
           }
         } catch (err) {
-          logger.debug('DID not found on Ethereum side', { error: err.message });
+          logger.debug('LABS not found on Ethereum side', { error: err.message });
         }
       }
 
       return {
-        did,
-        stellar: !!stellarDID,
-        ethereum: !!ethereumDID,
-        synced: !!stellarDID && !!ethereumDID
+        LABS,
+        stellar: !!stellarLABS,
+        ethereum: !!ethereumLABS,
+        synced: !!stellarLABS && !!ethereumLABS
       };
     } catch (error) {
       logger.error('Failed to verify cross-chain state:', error);
@@ -146,22 +146,22 @@ class CrossChainService {
     }
   }
 
-  async bridgeDIDToEthereumAsync(did, ownerAddress) {
+  async bridgeLABSToEthereumAsync(LABS, ownerAddress) {
     try {
-      const job = await crossChainBridgeQueue.add('bridge-did', { did, ownerAddress }, {
+      const job = await crossChainBridgeQueue.add('bridge-LABS', { LABS, ownerAddress }, {
         priority: 1,
         removeOnComplete: false
       });
 
-      logger.info('DID bridge job queued:', { jobId: job.id, did });
+      logger.info('LABS bridge job queued:', { jobId: job.id, LABS });
 
       return {
         jobId: job.id,
         status: 'queued',
-        message: 'DID bridge queued for processing'
+        message: 'LABS bridge queued for processing'
       };
     } catch (error) {
-      logger.error('Error queuing DID bridge:', error);
+      logger.error('Error queuing LABS bridge:', error);
       throw error;
     }
   }
@@ -186,14 +186,14 @@ class CrossChainService {
     }
   }
 
-  async verifyCrossChainStateAsync(did) {
+  async verifyCrossChainStateAsync(LABS) {
     try {
-      const job = await crossChainBridgeQueue.add('verify-cross-chain-state', { did }, {
+      const job = await crossChainBridgeQueue.add('verify-cross-chain-state', { LABS }, {
         priority: 2,
         removeOnComplete: false
       });
 
-      logger.info('Cross-chain state verification job queued:', { jobId: job.id, did });
+      logger.info('Cross-chain state verification job queued:', { jobId: job.id, LABS });
 
       return {
         jobId: job.id,

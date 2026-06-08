@@ -62,23 +62,23 @@ describe('Input Validation Middleware', () => {
   });
 
   describe('validateInput', () => {
-    test('should validate DID input', async () => {
-      app.post('/test-did', validateInput('did', 'body'), (req, res) => {
-        res.json({ did: req.body.did });
+    test('should validate LABS input', async () => {
+      app.post('/test-LABS', validateInput('LABS', 'body'), (req, res) => {
+        res.json({ LABS: req.body.LABS });
       });
 
-      // Valid DID
+      // Valid LABS
       const validResponse = await request(app)
-        .post('/test-did')
-        .send({ did: 'did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' });
+        .post('/test-LABS')
+        .send({ LABS: 'LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' });
 
       expect(validResponse.status).toBe(200);
-      expect(validResponse.body.did).toBe('did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789');
+      expect(validResponse.body.LABS).toBe('LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789');
 
-      // Invalid DID
+      // Invalid LABS
       const invalidResponse = await request(app)
-        .post('/test-did')
-        .send({ did: 'invalid-did' });
+        .post('/test-LABS')
+        .send({ LABS: 'invalid-LABS' });
 
       expect(invalidResponse.status).toBe(400);
       expect(invalidResponse.body.success).toBe(false);
@@ -127,40 +127,40 @@ describe('Input Validation Middleware', () => {
   });
 
   describe('validateEndpoint', () => {
-    test('should validate register DID endpoint', async () => {
-      app.post('/register-did', validateEndpoint('registerDID'), (req, res) => {
+    test('should validate register LABS endpoint', async () => {
+      app.post('/register-LABS', validateEndpoint('registerLABS'), (req, res) => {
         res.json({ success: true, data: req.body });
       });
 
       const validPayload = {
-        did: 'did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
+        LABS: 'LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
         publicKey: 'GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
         serviceEndpoint: 'https://example.com',
         signerSecret: 'SABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
       };
 
       const response = await request(app)
-        .post('/register-did')
+        .post('/register-LABS')
         .send(validPayload);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
     });
 
-    test('should reject invalid register DID payload', async () => {
-      app.post('/register-did', validateEndpoint('registerDID'), (req, res) => {
+    test('should reject invalid register LABS payload', async () => {
+      app.post('/register-LABS', validateEndpoint('registerLABS'), (req, res) => {
         res.json({ success: true, data: req.body });
       });
 
       const invalidPayload = {
-        did: 'invalid-did',
+        LABS: 'invalid-LABS',
         publicKey: 'invalid-key',
         serviceEndpoint: 'javascript:alert("xss")',
         signerSecret: 'invalid-secret'
       };
 
       const response = await request(app)
-        .post('/register-did')
+        .post('/register-LABS')
         .send(invalidPayload);
 
       expect(response.status).toBe(400);
@@ -173,8 +173,8 @@ describe('Input Validation Middleware', () => {
       });
 
       const validPayload = {
-        issuerDID: 'did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
-        subjectDID: 'did:stellar:GBCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
+        issuerLABS: 'LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
+        subjectLABS: 'LABS:stellar:GBCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
         credentialType: 'test-credential',
         claims: {
           name: 'John Doe',
@@ -196,8 +196,8 @@ describe('Input Validation Middleware', () => {
       });
 
       const payloadWithXSS = {
-        issuerDID: 'did:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
-        subjectDID: 'did:stellar:GBCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
+        issuerLABS: 'LABS:stellar:GABCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
+        subjectLABS: 'LABS:stellar:GBCDEFGHIJKLMNOPQRSTUVWXYZ123456789',
         credentialType: 'test-credential',
         claims: {
           name: '<script>alert("xss")</script>John Doe',

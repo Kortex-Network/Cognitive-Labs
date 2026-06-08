@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Decentralized Identity (DID) platform now supports batch operations with atomic execution and rollback capabilities. This feature allows you to perform multiple DID and credential operations in a single transaction, ensuring data consistency and providing automatic rollback on failures.
+The Cognitive Labs platform now supports batch operations with atomic execution and rollback capabilities. This feature allows you to perform multiple Cognitive Lab and credential operations in a single transaction, ensuring data consistency and providing automatic rollback on failures.
 
 ## Features
 
@@ -15,10 +15,10 @@ The Decentralized Identity (DID) platform now supports batch operations with ato
 
 ## Supported Operations
 
-### DID Operations
-- `CREATE_DID`: Create new decentralized identities
-- `UPDATE_DID`: Update existing DID documents
-- `BRIDGE_DID`: Bridge DIDs to Ethereum blockchain
+### Cognitive Lab Operations
+- `CREATE_LABS`: Create new cognitive lab identities
+- `UPDATE_LABS`: Update existing Cognitive Lab documents
+- `BRIDGE_LABS`: Bridge Cognitive Labs to Ethereum blockchain
 
 ### Credential Operations
 - `ISSUE_CREDENTIAL`: Issue verifiable credentials
@@ -37,7 +37,7 @@ Content-Type: application/json
 {
   "operations": [
     {
-      "type": "CREATE_DID",
+      "type": "CREATE_LABS",
       "data": {
         "serviceEndpoint": "https://example.com"
       }
@@ -45,8 +45,8 @@ Content-Type: application/json
     {
       "type": "ISSUE_CREDENTIAL",
       "data": {
-        "issuerDid": "did:stellar:issuer123",
-        "subjectDid": "did:stellar:subject456",
+        "issuerLABS": "Cognitive Lab:stellar:issuer123",
+        "subjectLABS": "Cognitive Lab:stellar:subject456",
         "claims": {
           "name": "John Doe",
           "degree": "Bachelor of Science"
@@ -70,13 +70,13 @@ POST /api/batch/{batchId}/rollback
 
 ### Specialized Batch Endpoints
 
-#### Batch DID Creation
+#### Batch Cognitive Lab Creation
 ```http
-POST /api/batch/did/create-batch
+POST /api/batch/Cognitive Lab/create-batch
 Content-Type: application/json
 
 {
-  "didConfigs": [
+  "LABSConfigs": [
     {
       "serviceEndpoint": "https://service1.example.com",
       "additionalServices": [
@@ -94,28 +94,28 @@ Content-Type: application/json
 }
 ```
 
-#### Batch DID Updates
+#### Batch Cognitive Lab Updates
 ```http
-POST /api/batch/did/update-batch
+POST /api/batch/Cognitive Lab/update-batch
 Content-Type: application/json
 
 {
   "updates": [
     {
-      "did": "did:stellar:test123",
+      "Cognitive Lab": "Cognitive Lab:stellar:test123",
       "updates": {
         "serviceEndpoint": "https://updated.example.com"
       },
       "secretKey": "secret-key-1"
     },
     {
-      "did": "did:stellar:test456",
+      "Cognitive Lab": "Cognitive Lab:stellar:test456",
       "updates": {
         "verificationMethod": [
           {
             "id": "#key-2",
             "type": "Ed25519VerificationKey2018",
-            "controller": "did:stellar:test456",
+            "controller": "Cognitive Lab:stellar:test456",
             "publicKeyBase58": "new-public-key"
           }
         ]
@@ -134,8 +134,8 @@ Content-Type: application/json
 {
   "credentials": [
     {
-      "issuerDid": "did:stellar:university",
-      "subjectDid": "did:stellar:student1",
+      "issuerLABS": "Cognitive Lab:stellar:university",
+      "subjectLABS": "Cognitive Lab:stellar:student1",
       "claims": {
         "degree": "Bachelor of Science",
         "major": "Computer Science",
@@ -146,8 +146,8 @@ Content-Type: application/json
       "expirationDate": "2033-06-15"
     },
     {
-      "issuerDid": "did:stellar:university",
-      "subjectDid": "did:stellar:student2",
+      "issuerLABS": "Cognitive Lab:stellar:university",
+      "subjectLABS": "Cognitive Lab:stellar:student2",
       "claims": {
         "degree": "Master of Science",
         "major": "Data Science",
@@ -170,33 +170,33 @@ Content-Type: application/json
   "revocations": [
     {
       "credentialId": "urn:uuid:cred-123",
-      "issuerDid": "did:stellar:university",
+      "issuerLABS": "Cognitive Lab:stellar:university",
       "reason": "Degree revoked due to academic misconduct"
     },
     {
       "credentialId": "urn:uuid:cred-456",
-      "issuerDid": "did:stellar:licensing-board",
+      "issuerLABS": "Cognitive Lab:stellar:licensing-board",
       "reason": "License expired"
     }
   ]
 }
 ```
 
-#### Batch DID Bridging
+#### Batch Cognitive Lab Bridging
 ```http
-POST /api/batch/bridge/did-batch
+POST /api/batch/bridge/LABS-batch
 Content-Type: application/json
 
 {
-  "dids": [
+  "Cognitive Labs": [
     {
-      "did": "did:stellar:test123",
+      "Cognitive Lab": "Cognitive Lab:stellar:test123",
       "ownerAddress": "0x1234567890123456789012345678901234567890",
       "publicKey": "stellar-public-key-1",
       "serviceEndpoint": "https://bridged.example.com"
     },
     {
-      "did": "did:stellar:test456",
+      "Cognitive Lab": "Cognitive Lab:stellar:test456",
       "ownerAddress": "0x0987654321098765432109876543210987654321",
       "publicKey": "stellar-public-key-2",
       "serviceEndpoint": "https://bridged2.example.com"
@@ -213,25 +213,25 @@ Content-Type: application/json
 {
   "operations": [
     {
-      "type": "CREATE_DID",
+      "type": "CREATE_LABS",
       "data": {
-        "serviceEndpoint": "https://new-did.example.com"
+        "serviceEndpoint": "https://new-Cognitive Lab.example.com"
       }
     },
     {
       "type": "ISSUE_CREDENTIAL",
       "data": {
-        "issuerDid": "did:stellar:existing-issuer",
-        "subjectDid": "did:stellar:new-subject",
+        "issuerLABS": "Cognitive Lab:stellar:existing-issuer",
+        "subjectLABS": "Cognitive Lab:stellar:new-subject",
         "claims": {
           "verificationStatus": "verified"
         }
       }
     },
     {
-      "type": "UPDATE_DID",
+      "type": "UPDATE_LABS",
       "data": {
-        "did": "did:stellar:existing-did",
+        "Cognitive Lab": "Cognitive Lab:stellar:existing-Cognitive Lab",
         "updates": {
           "serviceEndpoint": "https://updated.example.com"
         },
@@ -253,10 +253,10 @@ Content-Type: application/json
     "results": [
       {
         "operationId": "op-uuid-1",
-        "type": "CREATE_DID",
+        "type": "CREATE_LABS",
         "status": "SUCCESS",
         "result": {
-          "did": "did:stellar:test123",
+          "Cognitive Lab": "Cognitive Lab:stellar:test123",
           "account": {
             "publicKey": "test-public-key"
           }
@@ -270,8 +270,8 @@ Content-Type: application/json
         "status": "SUCCESS",
         "result": {
           "id": "urn:uuid:cred-123",
-          "issuer": "did:stellar:issuer",
-          "subject": "did:stellar:subject"
+          "issuer": "Cognitive Lab:stellar:issuer",
+          "subject": "Cognitive Lab:stellar:subject"
         },
         "startTime": "2023-01-01T00:00:01.000Z",
         "endTime": "2023-01-01T00:00:02.000Z"
@@ -330,7 +330,7 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "error": "DID creation failed: Account already exists"
+  "error": "Cognitive Lab creation failed: Account already exists"
 }
 ```
 
@@ -338,7 +338,7 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "error": "Rollback failed: Could not delete created DID"
+  "error": "Rollback failed: Could not delete created Cognitive Lab"
 }
 ```
 
@@ -374,8 +374,8 @@ const response = await fetch('/api/batch/credentials/issue-batch', {
   body: JSON.stringify({
     credentials: [
       {
-        issuerDid: 'did:stellar:tech-university',
-        subjectDid: 'did:stellar:student001',
+        issuerLABS: 'Cognitive Lab:stellar:tech-university',
+        subjectLABS: 'Cognitive Lab:stellar:student001',
         claims: {
           degree: 'Bachelor of Science',
           major: 'Computer Science',
@@ -384,8 +384,8 @@ const response = await fetch('/api/batch/credentials/issue-batch', {
         type: ['VerifiableCredential', 'UniversityDegreeCredential']
       },
       {
-        issuerDid: 'did:stellar:tech-university',
-        subjectDid: 'did:stellar:student002',
+        issuerLABS: 'Cognitive Lab:stellar:tech-university',
+        subjectLABS: 'Cognitive Lab:stellar:student002',
         claims: {
           degree: 'Bachelor of Science',
           major: 'Data Science',
@@ -403,22 +403,22 @@ console.log(`Issued ${result.data.summary.successfulOperations} degrees`);
 
 ### Example 2: Cross-Chain Bridge Setup
 ```javascript
-// Bridge multiple DIDs and credentials to Ethereum
+// Bridge multiple Cognitive Labs and credentials to Ethereum
 const operations = [
-  // Bridge DIDs
+  // Bridge Cognitive Labs
   {
-    type: 'BRIDGE_DID',
+    type: 'BRIDGE_LABS',
     data: {
-      did: 'did:stellar:user1',
+      Cognitive Lab: 'Cognitive Lab:stellar:user1',
       ownerAddress: '0x123...',
       publicKey: 'stellar-pub-1',
       serviceEndpoint: 'https://dapp.example.com'
     }
   },
   {
-    type: 'BRIDGE_DID',
+    type: 'BRIDGE_LABS',
     data: {
-      did: 'did:stellar:user2',
+      Cognitive Lab: 'Cognitive Lab:stellar:user2',
       ownerAddress: '0x456...',
       publicKey: 'stellar-pub-2',
       serviceEndpoint: 'https://dapp.example.com'
@@ -429,8 +429,8 @@ const operations = [
     type: 'BRIDGE_CREDENTIAL',
     data: {
       credentialId: 'urn:uuid:cred-123',
-      issuer: 'did:stellar:university',
-      subject: 'did:stellar:user1',
+      issuer: 'Cognitive Lab:stellar:university',
+      subject: 'Cognitive Lab:stellar:user1',
       credentialType: 'UniversityDegreeCredential',
       expires: 1735689600000,
       dataHash: '0xabc123...'
@@ -486,7 +486,7 @@ monitorBatch(batchResult.data.batchId);
 ## Performance Considerations
 
 ### Throughput
-- DID operations: ~10 operations/second
+- Cognitive Lab operations: ~10 operations/second
 - Credential operations: ~50 operations/second
 - Mixed operations: ~20 operations/second
 
@@ -529,15 +529,15 @@ DEBUG=batch:* npm start
 
 ### Node.js SDK
 ```javascript
-const { BatchService } = require('@decentralized-identity/batch-sdk');
+const { BatchService } = require('@Cognitive Labs/batch-sdk');
 
 const batchService = new BatchService();
 
 const operations = [
-  BatchService.createDIDOperation({ serviceEndpoint: 'https://example.com' }),
+  BatchService.createLABSOperation({ serviceEndpoint: 'https://example.com' }),
   BatchService.issueCredentialOperation({
-    issuerDid: 'did:stellar:issuer',
-    subjectDid: 'did:stellar:subject',
+    issuerLABS: 'Cognitive Lab:stellar:issuer',
+    subjectLABS: 'Cognitive Lab:stellar:subject',
     claims: { name: 'John Doe' }
   })
 ];
@@ -547,12 +547,12 @@ const result = await batchService.executeBatch('my-batch', operations);
 
 ### Python Client
 ```python
-from did_client import BatchClient
+from LABS_client import BatchClient
 
 client = BatchClient()
 operations = [
     {
-        'type': 'CREATE_DID',
+        'type': 'CREATE_LABS',
         'data': {'service_endpoint': 'https://example.com'}
     }
 ]

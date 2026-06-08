@@ -194,7 +194,7 @@ class AnalyticsService {
   groupByIssuer(credentials) {
     const groups = {};
     credentials.forEach(c => {
-      const issuer = this.shortenDID(c.issuer);
+      const issuer = this.shortenLABS(c.issuer);
       groups[issuer] = (groups[issuer] || 0) + 1;
     });
     return groups;
@@ -393,7 +393,7 @@ class AnalyticsService {
   getTopSubjects(credentials, limit) {
     const subjectCounts = {};
     credentials.forEach(c => {
-      const subject = this.shortenDID(c.subject);
+      const subject = this.shortenLABS(c.subject);
       subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
     });
     
@@ -410,17 +410,17 @@ class AnalyticsService {
       .map(c => ({
         id: c.id,
         type: c.credentialType,
-        issuer: this.shortenDID(c.issuer),
-        subject: this.shortenDID(c.subject),
+        issuer: this.shortenLABS(c.issuer),
+        subject: this.shortenLABS(c.subject),
         issued: c.issued,
         status: c.revoked ? 'revoked' : (c.expires && new Date(c.expires) < new Date() ? 'expired' : 'active')
       }));
   }
 
-  shortenDID(did) {
-    if (!did) return 'unknown';
-    if (did.length <= 20) return did;
-    return `${did.substring(0, 10)}...${did.substring(did.length - 8)}`;
+  shortenLABS(LABS) {
+    if (!LABS) return 'unknown';
+    if (LABS.length <= 20) return LABS;
+    return `${LABS.substring(0, 10)}...${LABS.substring(LABS.length - 8)}`;
   }
 }
 

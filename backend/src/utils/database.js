@@ -11,7 +11,7 @@ const RETRY_DELAY = parseInt(process.env.DB_RETRY_DELAY || '5000');
  * @param {number} retryCount - Current retry attempt number
  */
 const connectDatabase = async (retryCount = 0) => {
-  const mongoURI = process.env.MONGODB_URI || process.env.MONGODB_URL || 'mongodb://localhost:27017/stellar-did';
+  const mongoURI = process.env.MONGODB_URI || process.env.MONGODB_URL || 'mongodb://localhost:27017/stellar-LABS';
   
   const options = {
     // Connection Pool Options for High Traffic

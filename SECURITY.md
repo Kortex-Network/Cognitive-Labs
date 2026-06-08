@@ -12,7 +12,7 @@
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Please report security vulnerabilities by emailing **security@stellar-did-platform.com**.  
+Please report security vulnerabilities by emailing **security@stellar-LABS-platform.com**.  
 Include the following in your report:
 
 - Description of the vulnerability
@@ -27,14 +27,14 @@ We will acknowledge receipt within **48 hours** and aim to provide a full respon
 
 | Date         | Auditor              | Scope                                      | Status     |
 |--------------|----------------------|--------------------------------------------|------------|
-| Mar 25, 2026 | Internal Audit Team  | StellarDIDRegistry.sol (RBAC & pause)      | ✅ Fixed   |
+| Mar 25, 2026 | Internal Audit Team  | StellarLABSRegistry.sol (RBAC & pause)      | ✅ Fixed   |
 | Apr 23, 2026 | Internal Audit Team  | All contracts (Issue #154 full audit)      | ✅ Fixed   |
 
 Full audit reports are located in [`contracts/SECURITY_AUDIT_REPORT.md`](./contracts/SECURITY_AUDIT_REPORT.md).
 
 ## Bug Bounty
 
-We run a responsible disclosure program. Valid critical/high severity findings may be eligible for a reward. Contact **security@stellar-did-platform.com** for details.
+We run a responsible disclosure program. Valid critical/high severity findings may be eligible for a reward. Contact **security@stellar-LABS-platform.com** for details.
 
 ## Security Best Practices for Deployers
 

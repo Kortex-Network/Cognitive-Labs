@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const DIDService = require('./didService');
+const LABSService = require('./LABSService');
 
 /**
  * Credential Sharing Service
@@ -8,7 +8,7 @@ const DIDService = require('./didService');
  */
 class CredentialSharingService {
   constructor() {
-    this.didService = new DIDService();
+    this.LABSService = new LABSService();
     // In-memory storage for shared credentials (in production, use a database)
     this.sharedCredentials = new Map();
     this.encryptionKey = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
@@ -17,24 +17,24 @@ class CredentialSharingService {
   /**
    * Share a credential with a third party
    * @param {string} credentialId - The credential ID to share
-   * @param {string} sharedByDID - The DID of the user sharing the credential
-   * @param {string} sharedWithDID - The DID of the third party receiving access
+   * @param {string} sharedByLABS - The LABS of the user sharing the credential
+   * @param {string} sharedWithLABS - The LABS of the third party receiving access
    * @param {object} options - Sharing options
    * @param {number} options.expiresIn - Expiration time in seconds (default: 86400 = 24 hours)
    * @param {number} options.maxAccessCount - Maximum number of times the credential can be accessed (optional)
    * @param {string} options.purpose - Purpose of sharing (optional)
    * @returns {object} Shared credential details with access token
    */
-  async shareCredential(credentialId, sharedByDID, sharedWithDID, options = {}) {
+  async shareCredential(credentialId, sharedByLABS, sharedWithLABS, options = {}) {
     try {
       // Validate inputs
-      if (!credentialId || !sharedByDID || !sharedWithDID) {
-        throw new Error('credentialId, sharedByDID, and sharedWithDID are required');
+      if (!credentialId || !sharedByLABS || !sharedWithLABS) {
+        throw new Error('credentialId, sharedByLABS, and sharedWithLABS are required');
       }
 
-      // Verify both DIDs exist
-      await this.didService.resolveDID(sharedByDID);
-      await this.didService.resolveDID(sharedWithDID);
+      // Verify both LABSs exist
+      await this.LABSService.resolveLABS(sharedByLABS);
+      await this.LABSService.resolveLABS(sharedWithLABS);
 
       // Generate unique sharing ID
       const sharingId = crypto.randomUUID();
@@ -48,8 +48,8 @@ class CredentialSharingService {
         {
           sharingId,
           credentialId,
-          sharedByDID,
-          sharedWithDID,
+          sharedByLABS,
+          sharedWithLABS,
           purpose: options.purpose || 'general'
         },
         this.encryptionKey,
@@ -60,8 +60,8 @@ class CredentialSharingService {
       const sharingRecord = {
         sharingId,
         credentialId,
-        sharedByDID,
-        sharedWithDID,
+        sharedByLABS,
+        sharedWithLABS,
         createdAt: new Date().toISOString(),
         expiresAt,
         maxAccessCount: options.maxAccessCount || null,
@@ -93,14 +93,14 @@ class CredentialSharingService {
    * Access a shared credential
    * @param {string} sharingId - The sharing ID
    * @param {string} accessToken - The access token
-   * @param {string} requestorDID - The DID of the party requesting access
+   * @param {string} requestorLABS - The LABS of the party requesting access
    * @returns {object} The shared credential if access is granted
    */
-  async accessSharedCredential(sharingId, accessToken, requestorDID) {
+  async accessSharedCredential(sharingId, accessToken, requestorLABS) {
     try {
       // Validate inputs
-      if (!sharingId || !accessToken || !requestorDID) {
-        throw new Error('sharingId, accessToken, and requestorDID are required');
+      if (!sharingId || !accessToken || !requestorLABS) {
+        throw new Error('sharingId, accessToken, and requestorLABS are required');
       }
 
       // Retrieve sharing record
@@ -125,7 +125,7 @@ class CredentialSharingService {
       }
 
       // Verify requestor is authorized
-      if (decoded.sharedWithDID !== requestorDID) {
+      if (decoded.sharedWithLABS !== requestorLABS) {
         throw new Error('Requestor is not authorized to access this credential');
       }
 
@@ -157,8 +157,8 @@ class CredentialSharingService {
         success: true,
         data: {
           credentialId: sharingRecord.credentialId,
-          sharedBy: sharingRecord.sharedByDID,
-          sharedWith: sharingRecord.sharedWithDID,
+          sharedBy: sharingRecord.sharedByLABS,
+          sharedWith: sharingRecord.sharedWithLABS,
           purpose: sharingRecord.purpose,
           accessCount: sharingRecord.accessCount,
           remainingAccess: sharingRecord.maxAccessCount 
@@ -176,13 +176,13 @@ class CredentialSharingService {
   /**
    * Revoke a shared credential
    * @param {string} sharingId - The sharing ID
-   * @param {string} sharedByDID - The DID of the user who shared the credential
+   * @param {string} sharedByLABS - The LABS of the user who shared the credential
    * @returns {object} Revocation confirmation
    */
-  async revokeSharedCredential(sharingId, sharedByDID) {
+  async revokeSharedCredential(sharingId, sharedByLABS) {
     try {
-      if (!sharingId || !sharedByDID) {
-        throw new Error('sharingId and sharedByDID are required');
+      if (!sharingId || !sharedByLABS) {
+        throw new Error('sharingId and sharedByLABS are required');
       }
 
       const sharingRecord = this.sharedCredentials.get(sharingId);
@@ -192,7 +192,7 @@ class CredentialSharingService {
       }
 
       // Verify the revoker is the original sharer
-      if (sharingRecord.sharedByDID !== sharedByDID) {
+      if (sharingRecord.sharedByLABS !== sharedByLABS) {
         throw new Error('Only the original sharer can revoke access');
       }
 
@@ -216,15 +216,15 @@ class CredentialSharingService {
   }
 
   /**
-   * Get all shared credentials for a DID
-   * @param {string} did - The DID to query
+   * Get all shared credentials for a LABS
+   * @param {string} LABS - The LABS to query
    * @param {string} role - 'sharedBy' or 'sharedWith'
    * @returns {array} List of shared credentials
    */
-  async getSharedCredentials(did, role = 'sharedBy') {
+  async getSharedCredentials(LABS, role = 'sharedBy') {
     try {
-      if (!did) {
-        throw new Error('DID is required');
+      if (!LABS) {
+        throw new Error('LABS is required');
       }
 
       if (role !== 'sharedBy' && role !== 'sharedWith') {
@@ -234,12 +234,12 @@ class CredentialSharingService {
       const sharedList = [];
       
       for (const [sharingId, record] of this.sharedCredentials.entries()) {
-        if (record[role] === did) {
+        if (record[role] === LABS) {
           sharedList.push({
             sharingId,
             credentialId: record.credentialId,
             [role]: record[role],
-            otherParty: role === 'sharedBy' ? record.sharedWithDID : record.sharedByDID,
+            otherParty: role === 'sharedBy' ? record.sharedWithLABS : record.sharedByLABS,
             createdAt: record.createdAt,
             expiresAt: record.expiresAt,
             accessCount: record.accessCount,
@@ -263,14 +263,14 @@ class CredentialSharingService {
   /**
    * Extend expiration of a shared credential
    * @param {string} sharingId - The sharing ID
-   * @param {string} sharedByDID - The DID of the user who shared the credential
+   * @param {string} sharedByLABS - The LABS of the user who shared the credential
    * @param {number} additionalSeconds - Additional time in seconds to extend
    * @returns {object} Updated sharing details
    */
-  async extendSharingExpiration(sharingId, sharedByDID, additionalSeconds) {
+  async extendSharingExpiration(sharingId, sharedByLABS, additionalSeconds) {
     try {
-      if (!sharingId || !sharedByDID || !additionalSeconds) {
-        throw new Error('sharingId, sharedByDID, and additionalSeconds are required');
+      if (!sharingId || !sharedByLABS || !additionalSeconds) {
+        throw new Error('sharingId, sharedByLABS, and additionalSeconds are required');
       }
 
       const sharingRecord = this.sharedCredentials.get(sharingId);
@@ -280,7 +280,7 @@ class CredentialSharingService {
       }
 
       // Verify the requester is the original sharer
-      if (sharingRecord.sharedByDID !== sharedByDID) {
+      if (sharingRecord.sharedByLABS !== sharedByLABS) {
         throw new Error('Only the original sharer can extend expiration');
       }
 

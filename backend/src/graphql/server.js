@@ -27,15 +27,15 @@ class GraphQLServer {
         plugins: [
           ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
           {
-            requestDidStart() {
+            requestLABSStart() {
               return {
-                didResolveOperation(requestContext) {
+                LABSResolveOperation(requestContext) {
                   logger.info('GraphQL operation resolved:', {
                     operation: requestContext.request.operationName,
                     variables: requestContext.request.variables
                   });
                 },
-                didEncounterErrors(requestContext) {
+                LABSEncounterErrors(requestContext) {
                   logger.error('GraphQL errors encountered:', {
                     operation: requestContext.request.operationName,
                     errors: requestContext.errors

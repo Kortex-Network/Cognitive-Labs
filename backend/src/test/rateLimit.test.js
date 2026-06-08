@@ -15,20 +15,20 @@ describe('Rate Limiting Tests', () => {
       res.json({ success: true, message: 'Contract deployed' });
     });
     
-    app.post('/api/v1/contracts/register-did', (req, res) => {
-      res.json({ success: true, message: 'DID registered' });
+    app.post('/api/v1/contracts/register-LABS', (req, res) => {
+      res.json({ success: true, message: 'LABS registered' });
     });
     
     app.post('/api/v1/contracts/issue-credential', (req, res) => {
       res.json({ success: true, message: 'Credential issued' });
     });
     
-    app.get('/api/v1/contracts/did/:did', (req, res) => {
-      res.json({ success: true, message: 'DID retrieved' });
+    app.get('/api/v1/contracts/LABS/:LABS', (req, res) => {
+      res.json({ success: true, message: 'LABS retrieved' });
     });
     
-    app.get('/api/v1/did/test', (req, res) => {
-      res.json({ success: true, message: 'General DID endpoint' });
+    app.get('/api/v1/LABS/test', (req, res) => {
+      res.json({ success: true, message: 'General LABS endpoint' });
     });
   });
 
@@ -36,7 +36,7 @@ describe('Rate Limiting Tests', () => {
     it('should allow requests within general rate limit', async () => {
       for (let i = 0; i < 5; i++) {
         const response = await request(app)
-          .get('/api/v1/did/test');
+          .get('/api/v1/LABS/test');
         
         expect(response.status).toBe(200);
         expect(response.headers['x-ratelimit-limit']).toBeDefined();
@@ -50,7 +50,7 @@ describe('Rate Limiting Tests', () => {
     it('should allow contract read requests within limit', async () => {
       for (let i = 0; i < 5; i++) {
         const response = await request(app)
-          .get('/api/v1/contracts/did/did:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456');
+          .get('/api/v1/contracts/LABS/LABS:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456');
         
         expect(response.status).toBe(200);
       }
@@ -60,9 +60,9 @@ describe('Rate Limiting Tests', () => {
   describe('Contract Write Rate Limiting', () => {
     it('should allow contract write requests within limit', async () => {
       const response = await request(app)
-        .post('/api/v1/contracts/register-did')
+        .post('/api/v1/contracts/register-LABS')
         .send({
-          did: 'did:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
+          LABS: 'LABS:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
           publicKey: 'GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
           signerSecret: 'SABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
         });
@@ -84,11 +84,11 @@ describe('Rate Limiting Tests', () => {
       expect(response.status).toBe(200);
     });
 
-    it('should rate limit DID registrations', async () => {
+    it('should rate limit LABS registrations', async () => {
       const response = await request(app)
-        .post('/api/v1/contracts/register-did')
+        .post('/api/v1/contracts/register-LABS')
         .send({
-          did: 'did:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
+          LABS: 'LABS:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
           publicKey: 'GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
           signerSecret: 'SABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
         });
@@ -100,8 +100,8 @@ describe('Rate Limiting Tests', () => {
       const response = await request(app)
         .post('/api/v1/contracts/issue-credential')
         .send({
-          issuerDID: 'did:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
-          subjectDID: 'did:stellar:GDEF1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
+          issuerLABS: 'LABS:stellar:GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
+          subjectLABS: 'LABS:stellar:GDEF1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456',
           credentialType: 'test',
           claims: { test: true },
           signerSecret: 'SABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
@@ -114,7 +114,7 @@ describe('Rate Limiting Tests', () => {
   describe('Rate Limit Headers', () => {
     it('should include rate limit headers in responses', async () => {
       const response = await request(app)
-        .get('/api/v1/did/test');
+        .get('/api/v1/LABS/test');
       
       expect(response.headers).toHaveProperty('x-ratelimit-limit');
       expect(response.headers).toHaveProperty('x-ratelimit-remaining');

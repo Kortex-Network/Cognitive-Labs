@@ -69,10 +69,10 @@ class AnalyticsService {
   }
 
   setupEventCollectors() {
-    // Track DID operations
-    this.events.set('did_created', new Set());
-    this.events.set('did_updated', new Set());
-    this.events.set('did_deactivated', new Set());
+    // Track LABS operations
+    this.events.set('LABS_created', new Set());
+    this.events.set('LABS_updated', new Set());
+    this.events.set('LABS_deactivated', new Set());
     
     // Track credential operations
     this.events.set('credential_issued', new Set());
@@ -326,9 +326,9 @@ class NotificationService {
   }
 
   loadTemplates() {
-    this.templates.set('did_created', {
-      subject: 'New DID Created',
-      body: 'Your DID {{did}} has been successfully created.',
+    this.templates.set('LABS_created', {
+      subject: 'New LABS Created',
+      body: 'Your LABS {{LABS}} has been successfully created.',
       channels: ['email', 'push', 'websocket']
     });
 
@@ -514,7 +514,7 @@ class AIAssistantService {
   }
 
   setupCapabilities() {
-    this.capabilities.set('did_generation', new DIDGenerationCapability());
+    this.capabilities.set('LABS_generation', new LABSGenerationCapability());
     this.capabilities.set('credential_analysis', new CredentialAnalysisCapability());
     this.capabilities.set('security_advice', new SecurityAdviceCapability());
     this.capabilities.set('data_insights', new DataInsightsCapability());
@@ -986,11 +986,11 @@ class WebSocketChannel {
 }
 
 // Capability implementations (simplified)
-class DIDGenerationCapability {
+class LABSGenerationCapability {
   async process(input, conversation, options) {
     return {
-      response: 'I can help you generate a DID. Please provide your public key and preferred service endpoint.',
-      metadata: { capability: 'did_generation' }
+      response: 'I can help you generate a LABS. Please provide your public key and preferred service endpoint.',
+      metadata: { capability: 'LABS_generation' }
     };
   }
 }
@@ -1007,7 +1007,7 @@ class CredentialAnalysisCapability {
 class SecurityAdviceCapability {
   async process(input, conversation, options) {
     return {
-      response: 'I can provide security advice for your DID and credentials. What specific concerns do you have?',
+      response: 'I can provide security advice for your LABS and credentials. What specific concerns do you have?',
       metadata: { capability: 'security_advice' }
     };
   }

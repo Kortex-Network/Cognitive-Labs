@@ -14,15 +14,15 @@ const deployContractSchema = Joi.object({
   deployerSecret: Joi.string().required().min(56).max(56)
 });
 
-const registerDIDSchema = Joi.object({
-  did: Joi.string().required().pattern(/^did:stellar:G[A-Z0-9]{55}$/),
+const registerLABSSchema = Joi.object({
+  LABS: Joi.string().required().pattern(/^LABS:stellar:G[A-Z0-9]{55}$/),
   publicKey: Joi.string().required().min(56).max(56),
   serviceEndpoint: Joi.string().uri().optional(),
   signerSecret: Joi.string().required().min(56).max(56)
 });
 
-const updateDIDSchema = Joi.object({
-  did: Joi.string().required().pattern(/^did:stellar:G[A-Z0-9]{55}$/),
+const updateLABSSchema = Joi.object({
+  LABS: Joi.string().required().pattern(/^LABS:stellar:G[A-Z0-9]{55}$/),
   updates: Joi.object({
     publicKey: Joi.string().min(56).max(56).optional(),
     serviceEndpoint: Joi.string().uri().optional()
@@ -31,8 +31,8 @@ const updateDIDSchema = Joi.object({
 });
 
 const issueCredentialSchema = Joi.object({
-  issuerDID: Joi.string().required().pattern(/^did:stellar:G[A-Z0-9]{55}$/),
-  subjectDID: Joi.string().required().pattern(/^did:stellar:G[A-Z0-9]{55}$/),
+  issuerLABS: Joi.string().required().pattern(/^LABS:stellar:G[A-Z0-9]{55}$/),
+  subjectLABS: Joi.string().required().pattern(/^LABS:stellar:G[A-Z0-9]{55}$/),
   credentialType: Joi.string().required(),
   claims: Joi.object().required(),
   signerSecret: Joi.string().required().min(56).max(56)
@@ -42,14 +42,14 @@ const issueCredentialSchema = Joi.object({
  * @openapi
  * tags:
  *   name: Contracts
- *   description: Smart contract operations for DID and Credentials on Stellar
+ *   description: Smart contract operations for LABS and Credentials on Stellar
  */
 
 /**
  * @openapi
  * /contracts/deploy:
  *   post:
- *     summary: Deploy DID registry contract
+ *     summary: Deploy LABS registry contract
  *     tags: [Contracts]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -89,7 +89,7 @@ router.post('/deploy',
 
       const { deployerSecret } = value;
       
-      logger.info('Deploying DID registry contract', { userId: req.userId });
+      logger.info('Deploying LABS registry contract', { userId: req.userId });
       
       const result = await contractService.deployContract(deployerSecret);
       
@@ -106,9 +106,9 @@ router.post('/deploy',
 
 /**
  * @openapi
- * /contracts/register-did:
+ * /contracts/register-LABS:
  *   post:
- *     summary: Register a new DID on the blockchain
+ *     summary: Register a new LABS on the blockchain
  *     tags: [Contracts]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -117,9 +117,9 @@ router.post('/deploy',
  *         application/json:
  *           schema:
  *             type: object
- *             required: [did, publicKey, signerSecret]
+ *             required: [LABS, publicKey, signerSecret]
  *             properties:
- *               did:
+ *               LABS:
  *                 type: string
  *               publicKey:
  *                 type: string
@@ -129,21 +129,21 @@ router.post('/deploy',
  *                 type: string
  *     responses:
  *       201:
- *         description: DID registered successfully
+ *         description: LABS registered successfully
  */
-router.post('/register-did', 
+router.post('/register-LABS', 
   rbacMiddleware.authenticate(),
-  rbacMiddleware.requirePermission('did.create'),
-  rbacMiddleware.auditLog('did_register'),
-  validateEndpoint('registerDID'),
+  rbacMiddleware.requirePermission('LABS.create'),
+  rbacMiddleware.auditLog('LABS_register'),
+  validateEndpoint('registerLABS'),
   async (req, res, next) => {
     try {
-      const { did, publicKey, serviceEndpoint, signerSecret } = req.body;
+      const { LABS, publicKey, serviceEndpoint, signerSecret } = req.body;
       
-      logger.info('Registering DID on blockchain', { did, userId: req.userId });
+      logger.info('Registering LABS on blockchain', { LABS, userId: req.userId });
       
-      const result = await contractService.registerDID(
-        did,
+      const result = await contractService.registerLABS(
+        LABS,
         publicKey,
         serviceEndpoint,
         signerSecret
@@ -152,7 +152,7 @@ router.post('/register-did',
       res.status(201).json({
         success: true,
         data: result,
-        message: 'DID registered successfully'
+        message: 'LABS registered successfully'
       });
     } catch (error) {
       next(error);
@@ -162,22 +162,22 @@ router.post('/register-did',
 
 /**
  * @openapi
- * /contracts/update-did:
+ * /contracts/update-LABS:
  *   put:
- *     summary: Update DID document on blockchain
+ *     summary: Update LABS document on blockchain
  *     tags: [Contracts]
  *     security: [{ bearerAuth: [] }]
  *     responses:
  *       200:
- *         description: DID updated successfully
+ *         description: LABS updated successfully
  */
-router.put('/update-did', 
+router.put('/update-LABS', 
   rbacMiddleware.authenticate(),
-  rbacMiddleware.requirePermission('did.update'),
-  rbacMiddleware.auditLog('did_update'),
+  rbacMiddleware.requirePermission('LABS.update'),
+  rbacMiddleware.auditLog('LABS_update'),
   async (req, res, next) => {
     try {
-      const { error, value } = updateDIDSchema.validate(req.body);
+      const { error, value } = updateLABSSchema.validate(req.body);
       
       if (error) {
         return res.status(400).json({
@@ -187,16 +187,16 @@ router.put('/update-did',
         });
       }
 
-      const { did, updates, signerSecret } = value;
+      const { LABS, updates, signerSecret } = value;
       
-      logger.info('Updating DID on blockchain', { did, userId: req.userId });
+      logger.info('Updating LABS on blockchain', { LABS, userId: req.userId });
       
-      const result = await contractService.updateDID(did, updates, signerSecret);
+      const result = await contractService.updateLABS(LABS, updates, signerSecret);
       
       res.json({
         success: true,
         data: result,
-        message: 'DID updated successfully'
+        message: 'LABS updated successfully'
       });
     } catch (error) {
       next(error);
@@ -222,18 +222,18 @@ router.post('/issue-credential',
   validateEndpoint('issueCredential'),
   async (req, res, next) => {
     try {
-      const { issuerDID, subjectDID, credentialType, claims, signerSecret } = req.body;
+      const { issuerLABS, subjectLABS, credentialType, claims, signerSecret } = req.body;
       
       logger.info('Issuing credential on blockchain', {
-        issuerDID,
-        subjectDID,
+        issuerLABS,
+        subjectLABS,
         credentialType,
         userId: req.userId
       });
       
       const result = await contractService.issueCredential(
-        issuerDID,
-        subjectDID,
+        issuerLABS,
+        subjectLABS,
         credentialType,
         claims,
         signerSecret
@@ -286,50 +286,50 @@ router.post('/revoke-credential',
 
 /**
  * @openapi
- * /contracts/did/{did}:
+ * /contracts/LABS/{LABS}:
  *   get:
- *     summary: Get DID document from blockchain
+ *     summary: Get LABS document from blockchain
  *     tags: [Contracts]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
- *         name: did
+ *         name: LABS
  *         required: true
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: DID retrieved successfully
+ *         description: LABS retrieved successfully
  *       404:
- *         description: DID not found
+ *         description: LABS not found
  */
-router.get('/did/:did', sanitizeParams, async (req, res, next) => {
+router.get('/LABS/:LABS', sanitizeParams, async (req, res, next) => {
   try {
-    const { did } = req.params;
+    const { LABS } = req.params;
     
-    // Validate DID format
-    if (!did.match(/^did:stellar:G[A-Z0-9]{55}$/)) {
+    // Validate LABS format
+    if (!LABS.match(/^LABS:stellar:G[A-Z0-9]{55}$/)) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid DID format'
+        error: 'Invalid LABS format'
       });
     }
     
-    logger.debug('Getting DID from blockchain', { did });
+    logger.debug('Getting LABS from blockchain', { LABS });
     
-    const didDocument = await contractService.getDID(did);
+    const LABSDocument = await contractService.getLABS(LABS);
     
-    if (!didDocument) {
+    if (!LABSDocument) {
       return res.status(404).json({
         success: false,
-        error: 'DID not found'
+        error: 'LABS not found'
       });
     }
     
     res.json({
       success: true,
-      data: didDocument,
-      message: 'DID retrieved successfully'
+      data: LABSDocument,
+      message: 'LABS retrieved successfully'
     });
   } catch (error) {
     next(error);
@@ -380,9 +380,9 @@ router.get('/credential/:credentialId', sanitizeParams, async (req, res, next) =
 
 /**
  * @openapi
- * /contracts/owner-dids/{publicKey}:
+ * /contracts/owner-LABSs/{publicKey}:
  *   get:
- *     summary: Get all DIDs for an owner
+ *     summary: Get all LABSs for an owner
  *     tags: [Contracts]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -393,9 +393,9 @@ router.get('/credential/:credentialId', sanitizeParams, async (req, res, next) =
  *           type: string
  *     responses:
  *       200:
- *         description: Owner DIDs retrieved successfully
+ *         description: Owner LABSs retrieved successfully
  */
-router.get('/owner-dids/:publicKey', async (req, res, next) => {
+router.get('/owner-LABSs/:publicKey', async (req, res, next) => {
   try {
     const { publicKey } = req.params;
     
@@ -407,15 +407,15 @@ router.get('/owner-dids/:publicKey', async (req, res, next) => {
       });
     }
     
-    logger.debug('Getting owner DIDs', { publicKey });
+    logger.debug('Getting owner LABSs', { publicKey });
     
-    const dids = await contractService.getOwnerDIDs(publicKey);
+    const LABSs = await contractService.getOwnerLABSs(publicKey);
     
     res.json({
       success: true,
-      data: dids,
-      count: dids.length,
-      message: 'Owner DIDs retrieved successfully'
+      data: LABSs,
+      count: LABSs.length,
+      message: 'Owner LABSs retrieved successfully'
     });
   } catch (error) {
     next(error);

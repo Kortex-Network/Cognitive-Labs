@@ -4,7 +4,7 @@ const { logger } = require('../middleware');
 class CacheManager {
   constructor() {
     this.defaultTTL = 300; // 5 minutes
-    this.keyPrefix = 'stellar-did:';
+    this.keyPrefix = 'stellar-LABS:';
     this.stats = {
       hits: 0,
       misses: 0,

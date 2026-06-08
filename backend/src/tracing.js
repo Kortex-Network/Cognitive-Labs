@@ -11,7 +11,7 @@ const exporter = process.env.OTLP_ENDPOINT
 
 const sdk = new NodeSDK({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'did-backend-service',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'LABS-backend-service',
   }),
   traceExporter: exporter,
   instrumentations: [getNodeAutoInstrumentations()],

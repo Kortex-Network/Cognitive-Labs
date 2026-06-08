@@ -1,38 +1,38 @@
 const { logger } = require('../middleware');
-const DIDService = require('../services/didService');
+const LABSService = require('../services/LABSService');
 const CredentialService = require('../services/credentialService');
 const StellarService = require('../services/stellarService');
 const ContractService = require('../services/contractService');
 
 const resolvers = {
   Query: {
-    // DID Queries
-    did: async (_, { did }) => {
+    // LABS Queries
+    LABS: async (_, { LABS }) => {
       try {
-        return await DIDService.getDID(did);
+        return await LABSService.getLABS(LABS);
       } catch (error) {
-        logger.error('Error fetching DID:', error);
-        throw new Error('Failed to fetch DID');
+        logger.error('Error fetching LABS:', error);
+        throw new Error('Failed to fetch LABS');
       }
     },
 
-    dids: async (_, { owner, active, limit, offset, sortBy, sortOrder }) => {
+    LABSs: async (_, { owner, active, limit, offset, sortBy, sortOrder }) => {
       try {
         const filters = { owner, active };
         const options = { limit, offset, sortBy, sortOrder };
-        return await DIDService.getDIDs(filters, options);
+        return await LABSService.getLABSs(filters, options);
       } catch (error) {
-        logger.error('Error fetching DIDs:', error);
-        throw new Error('Failed to fetch DIDs');
+        logger.error('Error fetching LABSs:', error);
+        throw new Error('Failed to fetch LABSs');
       }
     },
 
-    didCount: async (_, { active }) => {
+    LABSCount: async (_, { active }) => {
       try {
-        return await DIDService.getDIDCount({ active });
+        return await LABSService.getLABSCount({ active });
       } catch (error) {
-        logger.error('Error fetching DID count:', error);
-        throw new Error('Failed to fetch DID count');
+        logger.error('Error fetching LABS count:', error);
+        throw new Error('Failed to fetch LABS count');
       }
     },
 
@@ -159,16 +159,16 @@ const resolvers = {
     networkStats: async () => {
       try {
         const stats = await Promise.all([
-          DIDService.getDIDCount(),
-          DIDService.getDIDCount({ active: true }),
+          LABSService.getLABSCount(),
+          LABSService.getLABSCount({ active: true }),
           CredentialService.getCredentialCount(),
           CredentialService.getCredentialCount({ revoked: false }),
           StellarService.getTransactionCount()
         ]);
 
         return {
-          totalDIDs: stats[0],
-          activeDIDs: stats[1],
+          totalLABSs: stats[0],
+          activeLABSs: stats[1],
           totalCredentials: stats[2],
           activeCredentials: stats[3],
           totalTransactions: stats[4],
@@ -182,12 +182,12 @@ const resolvers = {
     },
 
     // Search Queries
-    searchDIDs: async (_, { query, limit }) => {
+    searchLABSs: async (_, { query, limit }) => {
       try {
-        return await DIDService.searchDIDs(query, limit);
+        return await LABSService.searchLABSs(query, limit);
       } catch (error) {
-        logger.error('Error searching DIDs:', error);
-        throw new Error('Failed to search DIDs');
+        logger.error('Error searching LABSs:', error);
+        throw new Error('Failed to search LABSs');
       }
     },
 
@@ -202,31 +202,31 @@ const resolvers = {
   },
 
   Mutation: {
-    // DID Mutations
-    createDID: async (_, { 
-      did, 
+    // LABS Mutations
+    createLABS: async (_, { 
+      LABS, 
       publicKey, 
       serviceEndpoint, 
       verificationMethods, 
       services 
     }) => {
       try {
-        const didData = {
-          did,
+        const LABSData = {
+          LABS,
           publicKey,
           serviceEndpoint,
           verificationMethods,
           services
         };
-        return await DIDService.createDID(didData);
+        return await LABSService.createLABS(LABSData);
       } catch (error) {
-        logger.error('Error creating DID:', error);
-        throw new Error('Failed to create DID');
+        logger.error('Error creating LABS:', error);
+        throw new Error('Failed to create LABS');
       }
     },
 
-    updateDID: async (_, { 
-      did, 
+    updateLABS: async (_, { 
+      LABS, 
       publicKey, 
       serviceEndpoint, 
       verificationMethods, 
@@ -239,19 +239,19 @@ const resolvers = {
           verificationMethods,
           services
         };
-        return await DIDService.updateDID(did, updateData);
+        return await LABSService.updateLABS(LABS, updateData);
       } catch (error) {
-        logger.error('Error updating DID:', error);
-        throw new Error('Failed to update DID');
+        logger.error('Error updating LABS:', error);
+        throw new Error('Failed to update LABS');
       }
     },
 
-    deactivateDID: async (_, { did }) => {
+    deactivateLABS: async (_, { LABS }) => {
       try {
-        return await DIDService.deactivateDID(did);
+        return await LABSService.deactivateLABS(LABS);
       } catch (error) {
-        logger.error('Error deactivating DID:', error);
-        throw new Error('Failed to deactivate DID');
+        logger.error('Error deactivating LABS:', error);
+        throw new Error('Failed to deactivate LABS');
       }
     },
 
@@ -384,22 +384,22 @@ const resolvers = {
   },
 
   Subscription: {
-    // DID Subscriptions
-    didCreated: {
+    // LABS Subscriptions
+    LABSCreated: {
       subscribe: (_, { owner }) => {
-        return DIDService.subscribeToDIDCreated(owner);
+        return LABSService.subscribeToLABSCreated(owner);
       }
     },
 
-    didUpdated: {
-      subscribe: (_, { did }) => {
-        return DIDService.subscribeToDIDUpdated(did);
+    LABSUpdated: {
+      subscribe: (_, { LABS }) => {
+        return LABSService.subscribeToLABSUpdated(LABS);
       }
     },
 
-    didDeactivated: {
-      subscribe: (_, { did }) => {
-        return DIDService.subscribeToDIDDeactivated(did);
+    LABSDeactivated: {
+      subscribe: (_, { LABS }) => {
+        return LABSService.subscribeToLABSDeactivated(LABS);
       }
     },
 

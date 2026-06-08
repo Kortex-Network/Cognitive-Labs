@@ -1,4 +1,4 @@
-# Stellar DID Contract Makefile
+# Stellar LABS Contract Makefile
 
 # Default target
 .PHONY: all
@@ -15,7 +15,7 @@ install:
 # Build the contract
 .PHONY: build
 build:
-	@echo "Building Stellar DID contract..."
+	@echo "Building Stellar LABS contract..."
 	cargo build --target wasm32-unknown-unknown --release
 	@echo "Contract built successfully!"
 
@@ -23,7 +23,7 @@ build:
 .PHONY: optimize
 optimize: build
 	@echo "Optimizing WASM..."
-	wasm-opt target/wasm32-unknown-unknown/release/stellar_did_contract.wasm -Oz -o target/wasm32-unknown-unknown/release/stellar_did_contract_opt.wasm
+	wasm-opt target/wasm32-unknown-unknown/release/stellar_LABS_contract.wasm -Oz -o target/wasm32-unknown-unknown/release/stellar_LABS_contract_opt.wasm
 	@echo "WASM optimized!"
 
 # Run tests
@@ -37,7 +37,7 @@ test:
 deploy-testnet: optimize
 	@echo "Deploying to testnet..."
 	soroban contract deploy \
-		--wasm target/wasm32-unknown-unknown/release/stellar_did_contract_opt.wasm \
+		--wasm target/wasm32-unknown-unknown/release/stellar_LABS_contract_opt.wasm \
 		--source $(DEPLOYER_SECRET) \
 		--network testnet
 
@@ -46,7 +46,7 @@ deploy-testnet: optimize
 deploy-futurenet: optimize
 	@echo "Deploying to futurenet..."
 	soroban contract deploy \
-		--wasm target/wasm32-unknown-unknown/release/stellar_did_contract_opt.wasm \
+		--wasm target/wasm32-unknown-unknown/release/stellar_LABS_contract_opt.wasm \
 		--source $(DEPLOYER_SECRET) \
 		--network futurenet
 
@@ -64,32 +64,32 @@ init-contract:
 		--network "$(NETWORK)" \
 		--owner $(OWNER_ADDRESS)
 
-# Register a DID
-.PHONY: register-did
-register-did:
-	@echo "Registering DID..."
+# Register a LABS
+.PHONY: register-LABS
+register-LABS:
+	@echo "Registering LABS..."
 	soroban contract invoke \
 		--id $(CONTRACT_ID) \
 		--source $(OWNER_SECRET) \
 		--network $(NETWORK) \
 		-- \
-		register_did \
-		--did "$(DID)" \
+		register_LABS \
+		--LABS "$(LABS)" \
 		--public_key "$(PUBLIC_KEY)" \
 		--service_endpoint "$(SERVICE_ENDPOINT)" \
 		--owner $(OWNER_ADDRESS)
 
-# Resolve a DID
-.PHONY: resolve-did
-resolve-did:
-	@echo "Resolving DID..."
+# Resolve a LABS
+.PHONY: resolve-LABS
+resolve-LABS:
+	@echo "Resolving LABS..."
 	soroban contract invoke \
 		--id $(CONTRACT_ID) \
 		--source $(USER_SECRET) \
 		--network $(NETWORK) \
 		-- \
-		resolve_did \
-		--did "$(DID)"
+		resolve_LABS \
+		--LABS "$(LABS)"
 
 # Issue a credential
 .PHONY: issue-credential
@@ -101,8 +101,8 @@ issue-credential:
 		--network $(NETWORK) \
 		-- \
 		issue_credential \
-		--issuer "$(ISSUER_DID)" \
-		--subject "$(SUBJECT_DID)" \
+		--issuer "$(ISSUER_LABS)" \
+		--subject "$(SUBJECT_LABS)" \
 		--credential_type "$(CREDENTIAL_TYPE)" \
 		--claims_hash "$(CLAIMS_HASH)" \
 		--expires $(EXPIRES) \
@@ -161,14 +161,14 @@ docs:
 .PHONY: size
 size: build
 	@echo "Contract size analysis:"
-	@ls -lh target/wasm32-unknown-unknown/release/stellar_did_contract.wasm
+	@ls -lh target/wasm32-unknown-unknown/release/stellar_LABS_contract.wasm
 	@echo "WASM sections:"
-	wasm-objdump -h target/wasm32-unknown-unknown/release/stellar_did_contract.wasm
+	wasm-objdump -h target/wasm32-unknown-unknown/release/stellar_LABS_contract.wasm
 
 # Help
 .PHONY: help
 help:
-	@echo "Stellar DID Contract - Available Commands:"
+	@echo "Stellar LABS Contract - Available Commands:"
 	@echo ""
 	@echo "Build & Test:"
 	@echo "  make build          - Build the contract"
@@ -182,8 +182,8 @@ help:
 	@echo "  make init-contract  - Initialize deployed contract"
 	@echo ""
 	@echo "Operations (requires environment variables):"
-	@echo "  make register-did   - Register a new DID"
-	@echo "  make resolve-did    - Resolve an existing DID"
+	@echo "  make register-LABS   - Register a new LABS"
+	@echo "  make resolve-LABS    - Resolve an existing LABS"
 	@echo "  make issue-credential - Issue a verifiable credential"
 	@echo "  make verify-credential - Verify a credential"
 	@echo "  make contract-info  - Get contract information"

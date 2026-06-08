@@ -24,11 +24,11 @@ function truncate(str, maxLen = 20) {
 /**
  * Return the primary identifier for a payload (for the label).
  */
-function getPayloadId(payload) {
+function getPayloaLABS(payload) {
   if (!payload) return "";
   switch (payload.type) {
-    case "did":
-      return payload.did;
+    case "LABS":
+      return payload.LABS;
     case "credential":
       return payload.credentialId;
     case "connection":
@@ -56,7 +56,7 @@ const QRGenerator = React.memo(({ payload, size = MIN_SIZE }) => {
   // Memoize the label to prevent recalculations
   const label = useMemo(
     () => (payload
-      ? `${payload.type}: ${truncate(getPayloadId(payload))}`
+      ? `${payload.type}: ${truncate(getPayloaLABS(payload))}`
       : ""),
     [payload]
   );

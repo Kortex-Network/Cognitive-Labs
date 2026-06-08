@@ -7,7 +7,7 @@ import "../access/EnhancedAccessControl.sol";
 
 /**
  * @title UpgradeableProxyFactory
- * @dev Factory contract for creating and managing upgradeable DID registry proxies
+ * @dev Factory contract for creating and managing upgradeable LABS registry proxies
  * 
  * This contract provides a centralized way to create upgradeable proxies with
  * standardized initialization and governance controls. It ensures all proxies
@@ -22,7 +22,7 @@ import "../access/EnhancedAccessControl.sol";
  * - Upgrade coordination
  * 
  * @author Fatima Sanusi
- * @notice Use this contract to create upgradeable DID registry proxies
+ * @notice Use this contract to create upgradeable LABS registry proxies
  */
 contract UpgradeableProxyFactory is Ownable {
     

@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 const TestHelper = require("./helpers/test-utils");
 
 describe("Security Tests", function () {
-    let didRegistry;
+    let LABSRegistry;
     let stateRecovery;
     let recoveryGovernance;
     let owner, admin, governor, guardian, auditor, issuer, recovery, user1, user2, attacker;
@@ -13,7 +13,7 @@ describe("Security Tests", function () {
         [owner, admin, governor, guardian, auditor, issuer, recovery, user1, user2, attacker] = signers;
         
         const contracts = await TestHelper.deployContracts(signers);
-        didRegistry = contracts.didRegistry;
+        LABSRegistry = contracts.LABSRegistry;
         stateRecovery = contracts.stateRecovery;
         recoveryGovernance = contracts.recoveryGovernance;
         
@@ -21,26 +21,26 @@ describe("Security Tests", function () {
     });
 
     describe("Access Control Security", function () {
-        it("Should prevent unauthorized DID bridging", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+        it("Should prevent unauthorized LABS bridging", async function () {
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
             await expect(
-                didRegistry.connect(attacker).bridgeDID(testDID, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
+                LABSRegistry.connect(attacker).bridgeLABS(testLABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
             ).to.be.revertedWith("AccessControl: caller missing role");
         });
 
         it("Should prevent unauthorized role granting", async function () {
             await expect(
-                didRegistry.connect(attacker).grantRole(await didRegistry.ADMIN_ROLE(), user1.address)
+                LABSRegistry.connect(attacker).grantRole(await LABSRegistry.ADMIN_ROLE(), user1.address)
             ).to.be.revertedWith("AccessControl: caller missing role");
         });
 
         it("Should prevent unauthorized recovery operations", async function () {
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [TestHelper.generateTestDID(user1.address), user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
+                [TestHelper.generateTestLABS(user1.address), user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
             );
             
             await expect(
@@ -64,32 +64,32 @@ describe("Security Tests", function () {
     });
 
     describe("Input Validation Security", function () {
-        it("Should prevent malicious input in DID strings", async function () {
-            const maliciousDIDs = [
-                "did:ethereum:<script>alert('xss')</script>",
-                "did:ethereum:javascript:alert('xss')",
-                "did:ethereum:data:text/html,<script>alert('xss')</script>",
-                "did:ethereum:../../../etc/passwd",
-                "did:ethereum:..\\..\\..\\windows\\system32\\config\\sam"
+        it("Should prevent malicious input in LABS strings", async function () {
+            const maliciousLABSs = [
+                "LABS:ethereum:<script>alert('xss')</script>",
+                "LABS:ethereum:javascript:alert('xss')",
+                "LABS:ethereum:data:text/html,<script>alert('xss')</script>",
+                "LABS:ethereum:../../../etc/passwd",
+                "LABS:ethereum:..\\..\\..\\windows\\system32\\config\\sam"
             ];
             
-            for (const maliciousDID of maliciousDIDs) {
+            for (const maliciousLABS of maliciousLABSs) {
                 // These should be stored as strings but not cause issues
                 await expect(
-                    didRegistry.connect(admin).bridgeDID(maliciousDID, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
+                    LABSRegistry.connect(admin).bridgeLABS(maliciousLABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
                 ).to.not.be.reverted;
             }
         });
 
         it("Should prevent overflow in numeric inputs", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
             // Test with maximum uint256 values
             await expect(
-                didRegistry.connect(admin).bridgeCredential(
+                LABSRegistry.connect(admin).bridgeCredential(
                     ethers.constants.MaxUint256,
                     "https://max-issuer.com",
-                    testDID,
+                    testLABS,
                     "MaxCredential",
                     ethers.constants.MaxUint256,
                     ethers.constants.MaxUint256
@@ -101,8 +101,8 @@ describe("Security Tests", function () {
             const veryLongString = "A".repeat(100000); // 100KB string
             
             await expect(
-                didRegistry.connect(admin).bridgeDID(
-                    TestHelper.generateTestDID(user1.address),
+                LABSRegistry.connect(admin).bridgeLABS(
+                    TestHelper.generateTestLABS(user1.address),
                     user1.address,
                     TestHelper.generateTestPublicKey(),
                     veryLongString
@@ -113,9 +113,9 @@ describe("Security Tests", function () {
 
     describe("Reentrancy Protection", function () {
         it("Should prevent reentrancy attacks on critical functions", async function () {
-            // Create a DID first
-            await TestHelper.createCompleteDIDSetup(
-                { didRegistry, stateRecovery, recoveryGovernance },
+            // Create a LABS first
+            await TestHelper.createCompleteLABSSetup(
+                { LABSRegistry, stateRecovery, recoveryGovernance },
                 { admin, issuer, user: user1 }
             );
             
@@ -126,75 +126,75 @@ describe("Security Tests", function () {
             
             // Normal operation should work
             await expect(
-                didRegistry.connect(user1).setData(key, value)
+                LABSRegistry.connect(user1).setData(key, value)
             ).to.not.be.reverted;
         });
     });
 
     describe("State Corruption Prevention", function () {
         it("Should prevent inconsistent state updates", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
-            // Bridge DID
-            await didRegistry.connect(admin).bridgeDID(testDID, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
+            // Bridge LABS
+            await LABSRegistry.connect(admin).bridgeLABS(testLABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
             
             // Verify initial state
-            const initialDoc = await didRegistry.getDIDDocument(testDID);
+            const initialDoc = await LABSRegistry.getLABSDocument(testLABS);
             expect(initialDoc.owner).to.equal(user1.address);
             
             // Attempt recovery without proper authorization
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             
             await expect(
-                didRegistry.connect(attacker).recoverDIDDocument(testDID, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
+                LABSRegistry.connect(attacker).recoverLABSDocument(testLABS, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
             ).to.be.revertedWith("Only recovery contract can call this function");
             
             // Verify state is unchanged
-            const finalDoc = await didRegistry.getDIDDocument(testDID);
+            const finalDoc = await LABSRegistry.getLABSDocument(testLABS);
             expect(finalDoc.owner).to.equal(user1.address);
             expect(finalDoc.updated).to.equal(initialDoc.updated);
         });
 
         it("Should maintain data integrity during concurrent operations", async function () {
-            const testDIDs = [];
+            const testLABSs = [];
             
-            // Create multiple DIDs
+            // Create multiple LABSs
             for (let i = 0; i < 5; i++) {
-                const did = TestHelper.generateTestDID(ethers.Wallet.createRandom().address);
-                testDIDs.push(did);
+                const LABS = TestHelper.generateTestLABS(ethers.Wallet.createRandom().address);
+                testLABSs.push(LABS);
             }
             
-            // Bridge all DIDs concurrently
-            const bridgePromises = testDIDs.map(did => 
-                didRegistry.connect(admin).bridgeDID(did, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
+            // Bridge all LABSs concurrently
+            const bridgePromises = testLABSs.map(LABS => 
+                LABSRegistry.connect(admin).bridgeLABS(LABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
             );
             
             await Promise.all(bridgePromises);
             
-            // Verify all DIDs were created correctly
-            for (const did of testDIDs) {
-                const didDoc = await didRegistry.getDIDDocument(did);
-                expect(didDoc.owner).to.equal(user1.address);
-                expect(didDoc.active).to.be.true;
+            // Verify all LABSs were created correctly
+            for (const LABS of testLABSs) {
+                const LABSDoc = await LABSRegistry.getLABSDocument(LABS);
+                expect(LABSDoc.owner).to.equal(user1.address);
+                expect(LABSDoc.active).to.be.true;
             }
         });
     });
 
     describe("Front-running Protection", function () {
         it("Should prevent front-running of recovery operations", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
-            // Create DID setup
-            await TestHelper.createCompleteDIDSetup(
-                { didRegistry, stateRecovery, recoveryGovernance },
+            // Create LABS setup
+            await TestHelper.createCompleteLABSSetup(
+                { LABSRegistry, stateRecovery, recoveryGovernance },
                 { admin, issuer, user: user1 },
-                { did: testDID }
+                { LABS: testLABS }
             );
             
             // Create recovery proposal
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [testDID, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
+                [testLABS, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
             );
             
             const proposalId = await stateRecovery.connect(recovery).proposeRecovery(
@@ -212,25 +212,25 @@ describe("Security Tests", function () {
             await TestHelper.increaseTime(2 * 60 * 60); // 2 hours
             
             // Execute recovery
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             await stateRecovery.connect(recovery).executeRecovery(proposalId);
             
             // Verify recovery was successful
-            const didDoc = await didRegistry.getDIDDocument(testDID);
-            expect(didDoc.owner).to.equal(user2.address);
+            const LABSDoc = await LABSRegistry.getLABSDocument(testLABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
         });
     });
 
     describe("Gas Griefing Prevention", function () {
         it("Should handle gas limit attacks gracefully", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
-            // Create DID with many operations
-            await didRegistry.connect(admin).bridgeDID(testDID, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
+            // Create LABS with many operations
+            await LABSRegistry.connect(admin).bridgeLABS(testLABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
             
             // Add many claims
             for (let i = 0; i < 50; i++) {
-                await didRegistry.connect(user1).addClaim(
+                await LABSRegistry.connect(user1).addClaim(
                     i,
                     1,
                     issuer.address,
@@ -241,7 +241,7 @@ describe("Security Tests", function () {
             }
             
             // Operations should still work even with high gas usage
-            const claimIds = await didRegistry.connect(user1).getClaimIdsByTopic(1);
+            const claimIds = await LABSRegistry.connect(user1).getClaimIdsByTopic(1);
             expect(claimIds.length).to.be.greaterThan(0);
         });
     });
@@ -252,9 +252,9 @@ describe("Security Tests", function () {
             const operations = [];
             
             for (let i = 0; i < 100; i++) {
-                const did = TestHelper.generateTestDID(ethers.Wallet.createRandom().address);
+                const LABS = TestHelper.generateTestLABS(ethers.Wallet.createRandom().address);
                 operations.push(
-                    didRegistry.connect(admin).bridgeDID(did, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
+                    LABSRegistry.connect(admin).bridgeLABS(LABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint())
                 );
             }
             
@@ -262,48 +262,48 @@ describe("Security Tests", function () {
             await Promise.all(operations);
             
             // Verify contract is still functional
-            const testDID = TestHelper.generateTestDID(user2.address);
-            await didRegistry.connect(admin).bridgeDID(testDID, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
+            const testLABS = TestHelper.generateTestLABS(user2.address);
+            await LABSRegistry.connect(admin).bridgeLABS(testLABS, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
             
-            const didDoc = await didRegistry.getDIDDocument(testDID);
-            expect(didDoc.owner).to.equal(user2.address);
+            const LABSDoc = await LABSRegistry.getLABSDocument(testLABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
         });
     });
 
     describe("Privacy and Data Protection", function () {
         it("Should not expose sensitive data in events", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             const sensitiveData = "sensitive-private-key-data";
             
-            const tx = await didRegistry.connect(admin).bridgeDID(testDID, user1.address, sensitiveData, TestHelper.generateTestServiceEndpoint());
+            const tx = await LABSRegistry.connect(admin).bridgeLABS(testLABS, user1.address, sensitiveData, TestHelper.generateTestServiceEndpoint());
             const receipt = await tx.wait();
             
             // Check that sensitive data is not exposed in event topics
-            const event = receipt.events.find(e => e.event === "DIDBridged");
-            expect(event.args.publicKey).to.equal(sensitiveData); // Data is in event, but this is expected for DID registry
+            const event = receipt.events.find(e => e.event === "LABSBridged");
+            expect(event.args.publicKey).to.equal(sensitiveData); // Data is in event, but this is expected for LABS registry
             
             // In a production environment, sensitive data should be encrypted or hashed
         });
 
         it("Should handle zero-knowledge proof scenarios", async function () {
             // Test that the system can work with hashed/encrypted data
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             const hashedKey = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("private-key"));
             const encryptedEndpoint = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("endpoint"));
             
             await expect(
-                didRegistry.connect(admin).bridgeDID(testDID, user1.address, hashedKey, encryptedEndpoint)
+                LABSRegistry.connect(admin).bridgeLABS(testLABS, user1.address, hashedKey, encryptedEndpoint)
             ).to.not.be.reverted;
             
-            const didDoc = await didRegistry.getDIDDocument(testDID);
-            expect(didDoc.publicKey).to.equal(hashedKey);
-            expect(didDoc.serviceEndpoint).to.equal(encryptedEndpoint);
+            const LABSDoc = await LABSRegistry.getLABSDocument(testLABS);
+            expect(LABSDoc.publicKey).to.equal(hashedKey);
+            expect(LABSDoc.serviceEndpoint).to.equal(encryptedEndpoint);
         });
     });
 
     describe("Cryptographic Security", function () {
         it("Should handle cryptographic operations securely", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
             // Test with proper cryptographic signatures
             const wallet = ethers.Wallet.createRandom();
@@ -311,10 +311,10 @@ describe("Security Tests", function () {
             const signature = await wallet.signMessage(message);
             
             // Add claim with cryptographic signature
-            await didRegistry.connect(admin).bridgeDID(testDID, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
+            await LABSRegistry.connect(admin).bridgeLABS(testLABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
             
             await expect(
-                didRegistry.connect(user1).addClaim(
+                LABSRegistry.connect(user1).addClaim(
                     1,
                     1,
                     wallet.address,
@@ -326,16 +326,16 @@ describe("Security Tests", function () {
         });
 
         it("Should validate hash inputs properly", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             const validHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("valid data"));
             const invalidHash = "0xinvalid";
             
             // Valid hash should work
             await expect(
-                didRegistry.connect(admin).bridgeCredential(
+                LABSRegistry.connect(admin).bridgeCredential(
                     validHash,
                     "https://issuer.com",
-                    testDID,
+                    testLABS,
                     "HashCredential",
                     1234567890,
                     validHash
@@ -344,10 +344,10 @@ describe("Security Tests", function () {
             
             // Invalid hash format should be handled gracefully
             await expect(
-                didRegistry.connect(admin).bridgeCredential(
+                LABSRegistry.connect(admin).bridgeCredential(
                     invalidHash,
                     "https://issuer.com",
-                    testDID,
+                    testLABS,
                     "InvalidHashCredential",
                     1234567890,
                     invalidHash
@@ -358,13 +358,13 @@ describe("Security Tests", function () {
 
     describe("Emergency Response Security", function () {
         it("Should handle emergency scenarios securely", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
-            // Create DID setup
-            await TestHelper.createCompleteDIDSetup(
-                { didRegistry, stateRecovery, recoveryGovernance },
+            // Create LABS setup
+            await TestHelper.createCompleteLABSSetup(
+                { LABSRegistry, stateRecovery, recoveryGovernance },
                 { admin, issuer, user: user1 },
-                { did: testDID }
+                { LABS: testLABS }
             );
             
             // Activate emergency mode
@@ -377,15 +377,15 @@ describe("Security Tests", function () {
             // Perform emergency recovery
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [testDID, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
+                [testLABS, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
             );
             
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             await recoveryGovernance.connect(governor).governedRecovery(0, recoveryData, "Emergency security recovery", true);
             
             // Verify emergency recovery worked
-            const didDoc = await didRegistry.getDIDDocument(testDID);
-            expect(didDoc.owner).to.equal(user2.address);
+            const LABSDoc = await LABSRegistry.getLABSDocument(testLABS);
+            expect(LABSDoc.owner).to.equal(user2.address);
             
             // Deactivate emergency mode
             await recoveryGovernance.connect(governor).deactivateEmergencyMode();
@@ -407,20 +407,20 @@ describe("Security Tests", function () {
 
     describe("Audit Trail Security", function () {
         it("Should maintain immutable audit trail", async function () {
-            const testDID = TestHelper.generateTestDID(user1.address);
+            const testLABS = TestHelper.generateTestLABS(user1.address);
             
             // Perform operations that should be audited
-            await didRegistry.connect(admin).bridgeDID(testDID, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
+            await LABSRegistry.connect(admin).bridgeLABS(testLABS, user1.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint());
             
             // Perform recovery through governance
             const recoveryData = ethers.utils.defaultAbiCoder.encode(
                 ["string", "address", "string", "string"],
-                [testDID, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
+                [testLABS, user2.address, TestHelper.generateTestPublicKey(), TestHelper.generateTestServiceEndpoint()]
             );
             
-            await didRegistry.connect(admin).enableRecoveryMode();
+            await LABSRegistry.connect(admin).enableRecoveryMode();
             const result = await TestHelper.performGovernedRecovery(
-                { didRegistry, stateRecovery, recoveryGovernance },
+                { LABSRegistry, stateRecovery, recoveryGovernance },
                 { governor, admin },
                 recoveryData,
                 "Audit trail test"

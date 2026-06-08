@@ -12,27 +12,27 @@ router.post("/share", async (req, res) => {
   try {
     const {
       credentialId,
-      sharedByDID,
-      sharedWithDID,
+      sharedByLABS,
+      sharedWithLABS,
       expiresIn,
       maxAccessCount,
       purpose,
     } = req.body;
 
     // Validate required fields
-    if (!credentialId || !sharedByDID || !sharedWithDID) {
+    if (!credentialId || !sharedByLABS || !sharedWithLABS) {
       return sendError(
         res,
         400,
-        "Missing required fields: credentialId, sharedByDID, sharedWithDID",
+        "Missing required fields: credentialId, sharedByLABS, sharedWithLABS",
         "VALIDATION_ERROR",
       );
     }
 
     const result = await sharingService.shareCredential(
       credentialId,
-      sharedByDID,
-      sharedWithDID,
+      sharedByLABS,
+      sharedWithLABS,
       {
         expiresIn,
         maxAccessCount,
@@ -53,14 +53,14 @@ router.post("/share", async (req, res) => {
  */
 router.post("/access", async (req, res) => {
   try {
-    const { sharingId, accessToken, requestorDID } = req.body;
+    const { sharingId, accessToken, requestorLABS } = req.body;
 
     // Validate required fields
-    if (!sharingId || !accessToken || !requestorDID) {
+    if (!sharingId || !accessToken || !requestorLABS) {
       return sendError(
         res,
         400,
-        "Missing required fields: sharingId, accessToken, requestorDID",
+        "Missing required fields: sharingId, accessToken, requestorLABS",
         "VALIDATION_ERROR",
       );
     }
@@ -68,7 +68,7 @@ router.post("/access", async (req, res) => {
     const result = await sharingService.accessSharedCredential(
       sharingId,
       accessToken,
-      requestorDID,
+      requestorLABS,
     );
 
     res.json(result);
@@ -84,21 +84,21 @@ router.post("/access", async (req, res) => {
  */
 router.post("/revoke", async (req, res) => {
   try {
-    const { sharingId, sharedByDID } = req.body;
+    const { sharingId, sharedByLABS } = req.body;
 
     // Validate required fields
-    if (!sharingId || !sharedByDID) {
+    if (!sharingId || !sharedByLABS) {
       return sendError(
         res,
         400,
-        "Missing required fields: sharingId, sharedByDID",
+        "Missing required fields: sharingId, sharedByLABS",
         "VALIDATION_ERROR",
       );
     }
 
     const result = await sharingService.revokeSharedCredential(
       sharingId,
-      sharedByDID,
+      sharedByLABS,
     );
 
     res.json(result);
@@ -110,22 +110,22 @@ router.post("/revoke", async (req, res) => {
 
 /**
  * GET /api/sharing/my-shares
- * Get all credentials shared by a DID
+ * Get all credentials shared by a LABS
  */
 router.get("/my-shares", async (req, res) => {
   try {
-    const { did } = req.query;
+    const { LABS } = req.query;
 
-    if (!did) {
+    if (!LABS) {
       return sendError(
         res,
         400,
-        "DID query parameter is required",
+        "LABS query parameter is required",
         "VALIDATION_ERROR",
       );
     }
 
-    const result = await sharingService.getSharedCredentials(did, "sharedBy");
+    const result = await sharingService.getSharedCredentials(LABS, "sharedBy");
 
     res.json(result);
   } catch (error) {
@@ -136,22 +136,22 @@ router.get("/my-shares", async (req, res) => {
 
 /**
  * GET /api/sharing/shared-with-me
- * Get all credentials shared with a DID
+ * Get all credentials shared with a LABS
  */
 router.get("/shared-with-me", async (req, res) => {
   try {
-    const { did } = req.query;
+    const { LABS } = req.query;
 
-    if (!did) {
+    if (!LABS) {
       return sendError(
         res,
         400,
-        "DID query parameter is required",
+        "LABS query parameter is required",
         "VALIDATION_ERROR",
       );
     }
 
-    const result = await sharingService.getSharedCredentials(did, "sharedWith");
+    const result = await sharingService.getSharedCredentials(LABS, "sharedWith");
 
     res.json(result);
   } catch (error) {
@@ -166,14 +166,14 @@ router.get("/shared-with-me", async (req, res) => {
  */
 router.post("/extend", async (req, res) => {
   try {
-    const { sharingId, sharedByDID, additionalSeconds } = req.body;
+    const { sharingId, sharedByLABS, additionalSeconds } = req.body;
 
     // Validate required fields
-    if (!sharingId || !sharedByDID || !additionalSeconds) {
+    if (!sharingId || !sharedByLABS || !additionalSeconds) {
       return sendError(
         res,
         400,
-        "Missing required fields: sharingId, sharedByDID, additionalSeconds",
+        "Missing required fields: sharingId, sharedByLABS, additionalSeconds",
         "VALIDATION_ERROR",
       );
     }
@@ -189,7 +189,7 @@ router.post("/extend", async (req, res) => {
 
     const result = await sharingService.extendSharingExpiration(
       sharingId,
-      sharedByDID,
+      sharedByLABS,
       additionalSeconds,
     );
 

@@ -128,7 +128,7 @@ router.get('/contracts/account/:publicKey', validateInput('publicKey', 'params')
 // Fallback for missing versions or root
 router.get('/', (req, res) => {
   res.json({
-    message: 'Decentralized Identity DID API',
+    message: 'Cognitive Lab LABS API',
     versions: ['v1'],
     current_version: 'v1'
   });

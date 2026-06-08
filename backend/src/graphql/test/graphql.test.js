@@ -4,12 +4,12 @@ const typeDefs = require('../schema');
 const resolvers = require('../resolvers');
 
 // Mock services
-jest.mock('../../services/didService');
+jest.mock('../../services/LABSService');
 jest.mock('../../services/credentialService');
 jest.mock('../../services/stellarService');
 jest.mock('../../services/contractService');
 
-const DIDService = require('../../services/didService');
+const LABSService = require('../../services/LABSService');
 const CredentialService = require('../../services/credentialService');
 const StellarService = require('../../services/stellarService');
 const ContractService = require('../../services/contractService');
@@ -35,11 +35,11 @@ describe('GraphQL API', () => {
     jest.clearAllMocks();
   });
 
-  describe('DID Queries', () => {
-    it('should fetch a single DID', async () => {
-      const mockDID = {
-        id: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-        did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+  describe('LABS Queries', () => {
+    it('should fetch a single LABS', async () => {
+      const mockLABS = {
+        id: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+        LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
         owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
         publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
         created: new Date('2023-01-01'),
@@ -50,13 +50,13 @@ describe('GraphQL API', () => {
         services: []
       };
 
-      DIDService.getDID.mockResolvedValue(mockDID);
+      LABSService.getLABS.mockResolvedValue(mockLABS);
 
-      const GET_DID = gql`
-        query GetDID($did: String!) {
-          did(did: $did) {
+      const GET_LABS = gql`
+        query GetLABS($LABS: String!) {
+          LABS(LABS: $LABS) {
             id
-            did
+            LABS
             owner
             publicKey
             created
@@ -67,49 +67,49 @@ describe('GraphQL API', () => {
       `;
 
       const response = await testServer.query({
-        query: GET_DID,
-        variables: { did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890' }
+        query: GET_LABS,
+        variables: { LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890' }
       });
 
       expect(response.errors).toBeUndefined();
-      expect(response.data.did).toEqual({
-        id: mockDID.id,
-        did: mockDID.did,
-        owner: mockDID.owner,
-        publicKey: mockDID.publicKey,
-        created: mockDID.created.toISOString(),
-        active: mockDID.active,
-        serviceEndpoint: mockDID.serviceEndpoint
+      expect(response.data.LABS).toEqual({
+        id: mockLABS.id,
+        LABS: mockLABS.LABS,
+        owner: mockLABS.owner,
+        publicKey: mockLABS.publicKey,
+        created: mockLABS.created.toISOString(),
+        active: mockLABS.active,
+        serviceEndpoint: mockLABS.serviceEndpoint
       });
-      expect(DIDService.getDID).toHaveBeenCalledWith('did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890');
+      expect(LABSService.getLABS).toHaveBeenCalledWith('LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890');
     });
 
-    it('should handle DID not found error', async () => {
-      DIDService.getDID.mockRejectedValue(new Error('DID not found'));
+    it('should handle LABS not found error', async () => {
+      LABSService.getLABS.mockRejectedValue(new Error('LABS not found'));
 
-      const GET_DID = gql`
-        query GetDID($did: String!) {
-          did(did: $did) {
+      const GET_LABS = gql`
+        query GetLABS($LABS: String!) {
+          LABS(LABS: $LABS) {
             id
-            did
+            LABS
           }
         }
       `;
 
       const response = await testServer.query({
-        query: GET_DID,
-        variables: { did: 'did:stellar:INVALID' }
+        query: GET_LABS,
+        variables: { LABS: 'LABS:stellar:INVALID' }
       });
 
       expect(response.errors).toBeDefined();
-      expect(response.errors[0].message).toBe('Failed to fetch DID');
+      expect(response.errors[0].message).toBe('Failed to fetch LABS');
     });
 
-    it('should fetch multiple DIDs with filters', async () => {
-      const mockDIDs = [
+    it('should fetch multiple LABSs with filters', async () => {
+      const mockLABSs = [
         {
-          id: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-          did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          id: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
           owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
           active: true,
           created: new Date('2023-01-01'),
@@ -118,41 +118,41 @@ describe('GraphQL API', () => {
         }
       ];
 
-      DIDService.getDIDs.mockResolvedValue(mockDIDs);
-      DIDService.getDIDCount.mockResolvedValue(1);
+      LABSService.getLABSs.mockResolvedValue(mockLABSs);
+      LABSService.getLABSCount.mockResolvedValue(1);
 
-      const LIST_DIDS = gql`
-        query ListDIDs($owner: String, $active: Boolean, $limit: Int) {
-          dids(owner: $owner, active: $active, limit: $limit) {
+      const LIST_LABSS = gql`
+        query ListLABSs($owner: String, $active: Boolean, $limit: Int) {
+          LABSs(owner: $owner, active: $active, limit: $limit) {
             id
-            did
+            LABS
             owner
             active
             created
           }
-          didCount(active: $active)
+          LABSCount(active: $active)
         }
       `;
 
       const response = await testServer.query({
-        query: LIST_DIDS,
+        query: LIST_LABSS,
         variables: { owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890', active: true, limit: 10 }
       });
 
       expect(response.errors).toBeUndefined();
-      expect(response.data.dids).toHaveLength(1);
-      expect(response.data.didCount).toBe(1);
-      expect(DIDService.getDIDs).toHaveBeenCalledWith(
+      expect(response.data.LABSs).toHaveLength(1);
+      expect(response.data.LABSCount).toBe(1);
+      expect(LABSService.getLABSs).toHaveBeenCalledWith(
         { owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890', active: true },
         { limit: 10, offset: 0, sortBy: 'created', sortOrder: 'desc' }
       );
     });
 
-    it('should search DIDs', async () => {
+    it('should search LABSs', async () => {
       const mockResults = [
         {
-          id: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-          did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          id: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
           owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
           serviceEndpoint: 'https://example.com',
           verificationMethods: [],
@@ -160,13 +160,13 @@ describe('GraphQL API', () => {
         }
       ];
 
-      DIDService.searchDIDs.mockResolvedValue(mockResults);
+      LABSService.searchLABSs.mockResolvedValue(mockResults);
 
-      const SEARCH_DIDS = gql`
-        query SearchDIDs($query: String!, $limit: Int) {
-          searchDIDs(query: $query, limit: $limit) {
+      const SEARCH_LABSS = gql`
+        query SearchLABSs($query: String!, $limit: Int) {
+          searchLABSs(query: $query, limit: $limit) {
             id
-            did
+            LABS
             owner
             serviceEndpoint
           }
@@ -174,13 +174,13 @@ describe('GraphQL API', () => {
       `;
 
       const response = await testServer.query({
-        query: SEARCH_DIDS,
+        query: SEARCH_LABSS,
         variables: { query: 'example', limit: 10 }
       });
 
       expect(response.errors).toBeUndefined();
-      expect(response.data.searchDIDs).toHaveLength(1);
-      expect(DIDService.searchDIDs).toHaveBeenCalledWith('example', 10);
+      expect(response.data.searchLABSs).toHaveLength(1);
+      expect(LABSService.searchLABSs).toHaveBeenCalledWith('example', 10);
     });
   });
 
@@ -188,8 +188,8 @@ describe('GraphQL API', () => {
     it('should fetch a single credential', async () => {
       const mockCredential = {
         id: 'urn:uuid:12345678-1234-1234-1234-123456789012',
-        issuer: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-        subject: 'did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+        issuer: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+        subject: 'LABS:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
         credentialType: 'Degree',
         issued: new Date('2023-01-01'),
         expires: new Date('2024-01-01'),
@@ -236,8 +236,8 @@ describe('GraphQL API', () => {
       const mockCredentials = [
         {
           id: 'urn:uuid:12345678-1234-1234-1234-123456789012',
-          issuer: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-          subject: 'did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+          issuer: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          subject: 'LABS:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
           credentialType: 'Degree',
           issued: new Date('2023-01-01'),
           revoked: false
@@ -264,7 +264,7 @@ describe('GraphQL API', () => {
       const response = await testServer.query({
         query: LIST_CREDENTIALS,
         variables: { 
-          issuer: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890', 
+          issuer: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890', 
           revoked: false, 
           limit: 10 
         }
@@ -341,23 +341,23 @@ describe('GraphQL API', () => {
   });
 
   describe('Mutations', () => {
-    it('should create a DID', async () => {
-      const mockDID = {
-        id: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-        did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+    it('should create a LABS', async () => {
+      const mockLABS = {
+        id: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+        LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
         owner: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
         publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
         created: new Date('2023-01-01'),
         active: true
       };
 
-      DIDService.createDID.mockResolvedValue(mockDID);
+      LABSService.createLABS.mockResolvedValue(mockLABS);
 
-      const CREATE_DID = gql`
-        mutation CreateDID($did: String!, $publicKey: String!, $serviceEndpoint: String) {
-          createDID(did: $did, publicKey: $publicKey, serviceEndpoint: $serviceEndpoint) {
+      const CREATE_LABS = gql`
+        mutation CreateLABS($LABS: String!, $publicKey: String!, $serviceEndpoint: String) {
+          createLABS(LABS: $LABS, publicKey: $publicKey, serviceEndpoint: $serviceEndpoint) {
             id
-            did
+            LABS
             owner
             publicKey
             created
@@ -367,30 +367,30 @@ describe('GraphQL API', () => {
       `;
 
       const response = await testServer.mutate({
-        mutation: CREATE_DID,
+        mutation: CREATE_LABS,
         variables: {
-          did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
           publicKey: 'GABC1234567890ABCDEF1234567890ABCDEF1234567890',
           serviceEndpoint: 'https://example.com'
         }
       });
 
       expect(response.errors).toBeUndefined();
-      expect(response.data.createDID).toEqual({
-        id: mockDID.id,
-        did: mockDID.did,
-        owner: mockDID.owner,
-        publicKey: mockDID.publicKey,
-        created: mockDID.created.toISOString(),
-        active: mockDID.active
+      expect(response.data.createLABS).toEqual({
+        id: mockLABS.id,
+        LABS: mockLABS.LABS,
+        owner: mockLABS.owner,
+        publicKey: mockLABS.publicKey,
+        created: mockLABS.created.toISOString(),
+        active: mockLABS.active
       });
     });
 
     it('should issue a credential', async () => {
       const mockCredential = {
         id: 'urn:uuid:12345678-1234-1234-1234-123456789012',
-        issuer: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-        subject: 'did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+        issuer: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+        subject: 'LABS:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
         credentialType: 'Degree',
         issued: new Date('2023-01-01'),
         dataHash: 'abc123',
@@ -416,8 +416,8 @@ describe('GraphQL API', () => {
       const response = await testServer.mutate({
         mutation: ISSUE_CREDENTIAL,
         variables: {
-          issuer: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
-          subject: 'did:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
+          issuer: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890',
+          subject: 'LABS:stellar:GDEF1234567890ABCDEF1234567890ABCDEF1234567890',
           credentialType: 'Degree',
           claims: { degree: 'Bachelor of Science', university: 'Example University' }
         }
@@ -472,8 +472,8 @@ describe('GraphQL API', () => {
   describe('Network Statistics', () => {
     it('should fetch network statistics', async () => {
       const mockStats = {
-        totalDIDs: 100,
-        activeDIDs: 80,
+        totalLABSs: 100,
+        activeLABSs: 80,
         totalCredentials: 250,
         activeCredentials: 200,
         totalTransactions: 500,
@@ -482,8 +482,8 @@ describe('GraphQL API', () => {
       };
 
       // Mock all the service calls
-      DIDService.getDIDCount.mockResolvedValue(100);
-      DIDService.getDIDCount.mockResolvedValue(80);
+      LABSService.getLABSCount.mockResolvedValue(100);
+      LABSService.getLABSCount.mockResolvedValue(80);
       CredentialService.getCredentialCount.mockResolvedValue(250);
       CredentialService.getCredentialCount.mockResolvedValue(200);
       StellarService.getTransactionCount.mockResolvedValue(500);
@@ -491,8 +491,8 @@ describe('GraphQL API', () => {
       const GET_STATS = gql`
         query GetNetworkStats {
           networkStats {
-            totalDIDs
-            activeDIDs
+            totalLABSs
+            activeLABSs
             totalCredentials
             activeCredentials
             totalTransactions
@@ -506,8 +506,8 @@ describe('GraphQL API', () => {
 
       expect(response.errors).toBeUndefined();
       expect(response.data.networkStats).toEqual({
-        totalDIDs: 100,
-        activeDIDs: 80,
+        totalLABSs: 100,
+        activeLABSs: 80,
         totalCredentials: 250,
         activeCredentials: 200,
         totalTransactions: 500,
@@ -519,25 +519,25 @@ describe('GraphQL API', () => {
 
   describe('Error Handling', () => {
     it('should handle service errors gracefully', async () => {
-      DIDService.getDID.mockRejectedValue(new Error('Service unavailable'));
+      LABSService.getLABS.mockRejectedValue(new Error('Service unavailable'));
 
-      const GET_DID = gql`
-        query GetDID($did: String!) {
-          did(did: $did) {
+      const GET_LABS = gql`
+        query GetLABS($LABS: String!) {
+          LABS(LABS: $LABS) {
             id
-            did
+            LABS
           }
         }
       `;
 
       const response = await testServer.query({
-        query: GET_DID,
-        variables: { did: 'did:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890' }
+        query: GET_LABS,
+        variables: { LABS: 'LABS:stellar:GABC1234567890ABCDEF1234567890ABCDEF1234567890' }
       });
 
       expect(response.errors).toBeDefined();
-      expect(response.errors[0].message).toBe('Failed to fetch DID');
-      expect(response.data).toEqual({ did: null });
+      expect(response.errors[0].message).toBe('Failed to fetch LABS');
+      expect(response.data).toEqual({ LABS: null });
     });
   });
 });
